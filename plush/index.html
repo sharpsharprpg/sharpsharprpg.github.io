@@ -300,7 +300,7 @@ function card(it){
 const CREDITS = {
   ba:   {t: 'Blue Archive Plushies', by: 'hitoriyama', what: '블루 아카이브 인형·버거 세트·오미오미 박스', links: [['CurseForge', 'https://www.curseforge.com/minecraft/texture-packs/blue-archive-plushies-resource-pack'], ['X', 'https://x.com/hitoriyama_san']]},
   hiro: {t: 'Idolmaster Shinosawa Hiro Plush', by: 'hitoriyama', what: '시노사와 히로', links: [['CurseForge', 'https://www.curseforge.com/minecraft/texture-packs/shinosawa-hiro-plush'], ['X', 'https://x.com/hitoriyama_san']]},
-  plana: {t: 'Plana', by: 'fubukaze', what: '프라나', links: [['X', 'https://x.com/fubukazevrc']]},   // 11-24 사용자 지정 출처
+  plana: {t: 'Plana', by: 'fubukaze', what: '프라나', links: [['X', 'https://x.com/fubukazevrc'], ['Planet Minecraft', 'https://www.planetminecraft.com/member/fubukaze/', 'Planet Minecraft — fubukaze 작가 페이지'], ['Planet Minecraft', 'https://www.planetminecraft.com/skin/a-r-o-n-a-blue-archive/', 'Planet Minecraft — 원본 스킨']]},   // 11-24 사용자 지정 출처
   fubu: {t: 'Arona - Blue Archive', by: 'dygdgf', what: '아로나', links: [['Planet Minecraft', 'https://www.planetminecraft.com/skin/arona-blue-archive-6971479/']]},
   holo: {t: 'Hololive Product', by: 'PunIsIntendeds', what: '홀로라이브 인형', links: [['CurseForge', 'https://www.curseforge.com/minecraft/mc-mods/hololive-product']]},
 };
@@ -313,7 +313,7 @@ const LOGO = {
   'X': '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>',
   'Planet Minecraft': '<img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAAXNSR0IArs4c6QAAADxQTFRFAAAAASZHAU6WDXTTJ47tAVepLpX0WK4BEy4vMZj3DnXML5b0////V6r/S6j/PaL/bsMQV7EPRIABKlQBEuab+QAAAAF0Uk5TAEDm2GYAAAEbSURBVHja7dHbjoQgEEXRUnDuKsr//+sUJ4oI1RkUGZNOrwfezg4BknUCEj1XwAYmT3t2858BfTKA6ZEARmBWfY9zhIFxY16gUjvQL+4JQBqAmgEDP54UgNyAuT3QG1McMGkAwkAHE3vwiJFPRynF14BXwAfMXjId2AjaeQWqB8adAaLAzGoEsC0JjFAagPLAAPvxGyy/UCMAZQE4GdDsZKCBjr2DhmAKmIJy2ra19gOCgGZIZATYGiAxYDw54DTYszCAxoEAXRAAH0CBxYFvKUCwBRRomGKYwo2Br6o3cNrALGg3DVwVgDMBuiwAUUCxPwIUOxQgQRPwMbtyqwBJ4gD4/S5AstwAPRYFIAlQhjiQvFz9gIgOyN//AscijdDU75OIAAAAAElFTkSuQmCC">',
 };
-const creditLinks = c => `<span class="logos">${c.links.map(([n, u]) => `<a class="logo-btn" href="${u}" target="_blank" rel="noopener" aria-label="${esc(n)}" title="${esc(n)}">${LOGO[n]}</a>`).join('')}</span>`;
+const creditLinks = c => `<span class="logos">${c.links.map(([n, u, tt]) => `<a class="logo-btn" href="${u}" target="_blank" rel="noopener" aria-label="${esc(tt || n)}" title="${esc(tt || n)}">${LOGO[n]}</a>`).join('')}</span>`;
 
 const safeDecode = s => { try { return decodeURIComponent(s); } catch (e) { return s; } };   // 잘못된 % 인코딩 주소에도 화면이 그려지게(11-16 리뷰)
 /* ---------- 화면 ---------- */
