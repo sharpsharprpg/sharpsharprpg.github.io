@@ -454,7 +454,7 @@ html body *{font-variant-numeric:tabular-nums; letter-spacing:normal !important;
   <nav class="side" id="side"></nav>
   <main class="main" id="main"></main>
 </div>
-<div class="nav-fabs"><button class="fab-btn" id="backFab" type="button" aria-label="뒤로가기" title="뒤로가기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 L8 12 L15 19"/></svg></button><button class="fab-btn" id="homeFab" type="button" aria-label="홈" title="홈"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 L12 4.5 L20 11.5"/><path d="M6.5 10 V19.5 H17.5 V10"/></svg></button><a class="fab-btn hub-fab" id="hubFab" href="https://claude.ai/artifact/Ms7AaGc4EpWaVbBbcyqHPK" target="_blank" rel="noopener" aria-label="위키 모음으로 가기" title="위키 모음으로 가기"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5"/><rect x="13.5" y="4" width="6.5" height="6.5"/><rect x="4" y="13.5" width="6.5" height="6.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5"/></svg></a></div>
+<div class="nav-fabs"><button class="fab-btn" id="backFab" type="button" aria-label="뒤로가기" title="뒤로가기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 L8 12 L15 19"/></svg></button><button class="fab-btn" id="homeFab" type="button" aria-label="홈" title="홈"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 L12 4.5 L20 11.5"/><path d="M6.5 10 V19.5 H17.5 V10"/></svg></button><a class="fab-btn hub-fab" id="hubFab" href="https://sharpsharprpg.github.io/hub/" target="_blank" rel="noopener" aria-label="위키 모음으로 가기" title="위키 모음으로 가기"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5"/><rect x="13.5" y="4" width="6.5" height="6.5"/><rect x="4" y="13.5" width="6.5" height="6.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5"/></svg></a></div>
 
 <style id="hub-style">.hub-link{display:inline-block;margin-top:10px;font-size:12px;color:var(--brass);border:1px solid var(--brass-dim);padding:4px 10px;text-decoration:none;white-space:nowrap}.hub-link:hover,.hub-link:focus-visible{border-color:var(--brass);color:var(--paper);outline:none}</style>
 <style id="touch-style">@media (max-width:1100px){
@@ -744,7 +744,7 @@ function buildNav(){
     <div class="kicker">${esc(EDITIONS[EDITION])} // TACZ</div>
     <div class="wiki-kind">총기 · 부착물 위키</div><h1 class="disp">Ordnance<br>Manifest</h1>
     <div class="sub mono">FIELD REFERENCE — REV.PROTO-1</div>
-    <a class="hub-link" href="https://claude.ai/artifact/Ms7AaGc4EpWaVbBbcyqHPK" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a>
+    <a class="hub-link" href="https://sharpsharprpg.github.io/hub/" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a>
     <div class="ed-switch" role="group" aria-label="팩 선택">${Object.entries(EDITIONS).map(([k,v])=>`<button type="button" class="ed-sw${k===EDITION?' on':''}" data-ed="${k}" aria-pressed="${k===EDITION}">${esc(v)}</button>`).join('')}</div>
   </div>`;
 

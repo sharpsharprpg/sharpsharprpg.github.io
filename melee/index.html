@@ -574,7 +574,7 @@ const FIND = W.filter(w=>!w.levelOf);   // 검색·비교에는 형태별 무기
 const CAT_LABEL = {}; CATS.forEach(c=>{ CAT_LABEL[c.key] = c.label; });
 const STYLE_LABEL = {COMMON:'공통', ONE_HAND:'한손', TWO_HAND:'양손', MOUNT:'기승', SHEATH:'납도', OCHS:'옥스(자세)', RANGED:'원거리'};
 const RARITY_LABEL = {COMMON:'일반', UNCOMMON:'고급', RARE:'희귀', EPIC:'영웅'};
-const GUN_WIKI = 'https://claude.ai/artifact/3MH5hFPuqzZjFpSgYA6aLQ';
+const GUN_WIKI = 'https://sharpsharprpg.github.io/gun/';
 
 function stripColor(s){ return (s||'').replace(/§./g,''); }
 function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -685,7 +685,7 @@ function buildNav(){
     <div class="kicker">SharpSharp RPG // MELEE</div>
     <h1 class="disp">Blade<br>Ledger</h1>
     <div class="sub mono">FIELD REFERENCE — ${esc(META.rev||'REV.1')}</div>
-    <a class="hub-link" href="https://claude.ai/artifact/Ms7AaGc4EpWaVbBbcyqHPK" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a>
+    <a class="hub-link" href="https://sharpsharprpg.github.io/hub/" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a>
   </div>`;   // 2026-11-13 사용자: 모든 위키에 위키 모음 바로가기(제목 칸 작은 줄 아래). 누르면 첫 화면으로 가지 않게 아래에서 전파를 막음
   html += `<div class="search-wrap">
     <input type="text" class="search-input" id="searchInput" placeholder="검색 — 무기 이름 / id / 모드" autocomplete="off">
@@ -1140,7 +1140,7 @@ sideEl.addEventListener('click', (e)=>{
   });
   document.getElementById('homeFab').addEventListener('click', ()=>{ window.showLanding(); window.scrollTo(0,0); });
   // 2026-11-15 사용자: 모바일(사이드바가 숨는 폭) 상단 버튼 줄의 홈 옆에 위키 모음(허브) 버튼. 데스크톱은 사이드바 링크가 있어 CSS로 숨김
-  document.getElementById('homeFab').insertAdjacentHTML('afterend', '<a class="fab-btn hub-fab" id="hubFab" href="https://claude.ai/artifact/Ms7AaGc4EpWaVbBbcyqHPK" target="_blank" rel="noopener" aria-label="위키 모음으로 가기" title="위키 모음으로 가기"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="4.5" width="6" height="6"/><rect x="13.5" y="4.5" width="6" height="6"/><rect x="4.5" y="13.5" width="6" height="6"/><rect x="13.5" y="13.5" width="6" height="6"/></svg></a>');
+  document.getElementById('homeFab').insertAdjacentHTML('afterend', '<a class="fab-btn hub-fab" id="hubFab" href="https://sharpsharprpg.github.io/hub/" target="_blank" rel="noopener" aria-label="위키 모음으로 가기" title="위키 모음으로 가기"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="4.5" width="6" height="6"/><rect x="13.5" y="4.5" width="6" height="6"/><rect x="4.5" y="13.5" width="6" height="6"/><rect x="13.5" y="13.5" width="6" height="6"/></svg></a>');
   fab.addEventListener('click', ()=>{
     const e = stack.pop(); if(!e) return;
     going = true;
