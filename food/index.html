@@ -1,11 +1,11 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <meta charset="utf-8">
-<title>Provisions Manifest</title>
+<title>음식 위키</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Ordnance Manifest(총기 위키)와 같은 토큰·레이아웃: 왼쪽 고정 목록 + 오른쪽 상세. 단일 어두운 테마. */
+/* 총기 위키(총기 위키)와 같은 토큰·레이아웃: 왼쪽 고정 목록 + 오른쪽 상세. 단일 어두운 테마. */
 :root{
   color-scheme:dark;
   --ink:#15170f; --panel:#1d2016; --panel-2:#262a1c; --panel-3:#2e321f;
@@ -417,10 +417,10 @@ function foodNavItem(f){
 }
 function buildNav(){
   const side = document.getElementById('side');
-  let h = `<div class="brand" data-go="landing|"><div class="kicker">SharpSharp RPG // FOOD &amp; DRINK</div><h1 class="disp">Provisions<br>Manifest</h1><div class="sub mono">음식·음료 야전 보급 자료 — 덤프 ${esc(DATA.meta.dumpDate)}</div></div><div class="hub-wrap"><a class="hub-link" href="https://sharpsharprpg.github.io/hub/" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a></div>`;
+  let h = `<div class="brand" data-go="landing|"><div class="kicker">SharpSharp RPG // FOOD &amp; DRINK</div><h1 class="disp">음식 위키</h1><div class="sub mono">음식·음료 ${FOODS.length}종</div></div><div class="hub-wrap"><a class="hub-link" href="https://sharpsharprpg.github.io/hub/" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a></div>`;
   h += `<div class="search-wrap"><input type="text" class="search-input" id="searchInput" placeholder="검색 — 음식 / 음료 / 효과 이름" autocomplete="off"><div class="search-results" id="searchResults"></div></div>`;
   const foodsOnly = FOODS.filter(f=>!isDrink(f)), drinks = FOODS.filter(isDrink);
-  h += `<div class="nav-section"><div class="nav-head" data-go="landing|"><span class="disp">음식 FOOD</span><span class="count">${foodsOnly.length}</span></div>`;
+  h += `<div class="nav-section"><div class="nav-head" data-go="landing|"><span class="disp">음식</span><span class="count">${foodsOnly.length}</span></div>`;
   TIER_ORDER.forEach(t=>{
     const g = foodsOnly.filter(f=>f.tier===t).sort((x,y)=> iname(x.id).localeCompare(iname(y.id),'ko'));
     if(!g.length) return;
@@ -430,13 +430,13 @@ function buildNav(){
     h += `</div></div></div></div>`;
   });
   h += `</div>`;
-  h += `<div class="nav-section"><div class="nav-head" data-go="tier|drink"><span class="disp">음료 DRINKS</span><span class="count">${drinks.length}</span></div>`;
+  h += `<div class="nav-section"><div class="nav-head" data-go="tier|drink"><span class="disp">음료</span><span class="count">${drinks.length}</span></div>`;
   h += `<div class="tier-block"><div class="tier-summary">음료 전체<span class="count">${drinks.length}</span></div><div class="tier-slide"><div><div class="tier-group">`;
   h += `<div class="nav-item table-link" data-go="tier|drink"><div class="thumb">▤</div><span class="nm">음료 전체 표</span></div>`;
   h += drinks.sort((x,y)=> iname(x.id).localeCompare(iname(y.id),'ko')).map(foodNavItem).join('');
   h += `</div></div></div></div></div>`;
   const effIds = Object.keys(EFF).filter(id=>EFF[id].food);
-  h += `<div class="nav-section"><div class="nav-head" data-go="effects|"><span class="disp">효과 EFFECTS</span><span class="count">${effIds.length}</span></div>`;
+  h += `<div class="nav-section"><div class="nav-head" data-go="effects|"><span class="disp">효과</span><span class="count">${effIds.length}</span></div>`;
   ['BENEFICIAL','HARMFUL','NEUTRAL'].forEach(c=>{
     const g = effIds.filter(id=>(EFF[id].cat||'NEUTRAL')===c).sort((a,b)=> strip(EFF[a].n).localeCompare(strip(EFF[b].n),'ko'));
     if(!g.length) return;
@@ -837,7 +837,7 @@ function showType(key){
 function showLanding(){
   currentView = {kind:'landing'};
   const meta = DATA.meta;
-  let h = `<div class="landing"><div class="disp big">Provisions<br>Manifest</div><p>SharpSharp RPG의 모든 음식·음료 보급 자료. 음식은 티어별로, 음료는 따로 모았습니다. 허기·포만도·수분·효과와 만드는 법은 게임 실행 중 덤프한 값입니다. 왼쪽 목록을 펼치거나 전체 표로 비교하세요.</p>`;
+  let h = `<div class="landing"><div class="disp big">음식 위키</div><p>음식과 음료를 모았습니다. 왼쪽 목록에서 고르거나 전체 표로 비교하세요.</p>`;
   const nDr = FOODS.filter(isDrink).length;
   h += `<div class="tier-cards">${TIER_ORDER.map(t=>{ const g=FOODS.filter(f=>f.tier===t && !isDrink(f)); if(!g.length) return ''; return `<div class="tier-card" data-go="tier|${t}"><span class="t">${esc(TIER_LABEL[t])}</span><span class="n">${g.length}</span><span class="s">음식</span></div>`; }).join('')}<div class="tier-card" data-go="tier|drink"><span class="t" style="color:var(--water)">음료</span><span class="n">${nDr}</span><span class="s">티어와 따로</span></div></div>`;
   const top = FOODS.filter(f=>f.tier>=5 && !isDrink(f));

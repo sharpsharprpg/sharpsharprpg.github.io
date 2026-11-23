@@ -1,11 +1,11 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <meta charset="utf-8">
-<title>SharpSharp RPG Mob Wiki</title>
+<title>몬스터 위키</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* 총기 위키(Ordnance Manifest)와 같은 야전 교범 톤: 왼쪽 목록 + 오른쪽 기록 카드. 한 가지 어두운 화면으로 고정 */
+/* 총기 위키(총기 위키)와 같은 야전 교범 톤: 왼쪽 목록 + 오른쪽 기록 카드. 한 가지 어두운 화면으로 고정 */
 :root{
   color-scheme:dark;
   --ink:#15170f; --panel:#1d2016; --panel-2:#262a1c; --panel-3:#2e321f;
@@ -384,15 +384,15 @@ function timePowderNav(){
 function companionNav(){
   const list = MOBS.filter(m=>m.companion); if(!list.length) return '';
   const g = {}; list.forEach(m=>{ (g[compGroupOf(m)]=g[compGroupOf(m)]||[]).push(m); });
-  return `<div class="nav-section comp"><div class="nav-head" data-view="group" data-id="__companion"><span class="disp">동료 COMPANIONS</span><span class="count mono">${list.length}</span></div>`
+  return `<div class="nav-section comp"><div class="nav-head" data-view="group" data-id="__companion"><span class="disp">동료</span><span class="count mono">${list.length}</span></div>`
     + compKeys(g).map(k=>`<div class="tier-block"><div class="tier-summary">${esc(k)}<span class="count">${g[k].length}</span></div><div class="tier-slide"><div>${g[k].sort(byName).map(navItem).join('')}</div></div></div>`).join('') + `</div>`;
 }
 function buildNav(){
   const side = document.getElementById('side');
   let html = `<div class="brand" id="brand">
     <div class="kicker">SharpSharp RPG // MOBS</div>
-    <h1 class="disp">Field<br>Bestiary</h1>
-    <div class="sub mono">몬스터 야전 교범 — ${MOBS.length}종 · ${esc(DATA.built)}</div>
+    <h1 class="disp">몬스터 위키</h1>
+    <div class="sub mono">몬스터 ${MOBS.length}종</div>
     <a class="hub-link" href="https://sharpsharprpg.github.io/hub/" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a>
   </div>
   <div class="search-wrap">
@@ -401,7 +401,7 @@ function buildNav(){
   </div>
   ${companionNav()}
   ${timePowderNav()}
-  <div class="nav-section"><div class="nav-head" data-view="ranking"><span class="disp">전투력 순위 RANK</span><span class="count mono">${MOBS.filter(m=>m.power).length}</span></div></div>`;
+  <div class="nav-section"><div class="nav-head" data-view="ranking"><span class="disp">전투력 순위</span><span class="count mono">${MOBS.filter(m=>m.power).length}</span></div></div>`;
   ['boss','mini'].forEach(t=>{
     const list = MOBS.filter(m=>m.tier===t);
     html += `<div class="nav-section"><div class="nav-head" data-view="group" data-id="${t}"><span class="disp">${groupTitle(t)}</span><span class="count mono">${list.length}</span></div>`;
@@ -571,9 +571,9 @@ function showLanding(){
   const keys = ['boss','mini',...CATS];
   const bosses = MOBS.filter(m=>m.tier==='boss').sort((a,b)=>(b.power||0)-(a.power||0));
   setMain(`<div class="landing">
-    <div class="disp big">Field<br>Bestiary</div>
+    <div class="disp big">몬스터 위키</div>
     <a class="hub-link" href="https://sharpsharprpg.github.io/hub/" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a>
-    <p>SharpSharp RPG 모드팩에 나오는 몹 ${MOBS.length}종의 야전 기록입니다. 몹마다 이 팩에서 실제로 쓰는 체력·방어력, 전투력과 위협도, 나오는 곳, 떨어뜨리는 아이템을 적었습니다. 바이옴·구조물·드롭 아이템 이름을 누르면 거기에 해당하는 몹을 모아 볼 수 있습니다.</p>
+    <p>몬스터 ${MOBS.length}종입니다. 이름을 누르면 체력·공격력·나오는 곳·떨어뜨리는 아이템이 나옵니다.</p>
     <div class="count-row">${keys.map(k=>`<div class="cell" data-g="${esc(k)}"><div class="lbl">${esc(k==='boss'?'보스':(k==='mini'?'엘리트 몹':k))}</div><div class="val">${MOBS.filter(m=>inGroup(m,k)).length}</div></div>`).join('')}<div class="cell" data-g="__timepowder"><div class="lbl">시간의 가루 재도전</div><div class="val">${MOBS.filter(m=>m.retry).length}</div></div></div>
     ${blockH('보스 BOSSES · 전투력 순', bosses.length)}
     <div class="grid-cards">${bosses.map(m=>miniCard(m, (m.power?('전투력 '+fmt(m.power)+' · '):'')+esc(m.dim||''))).join('')}</div>

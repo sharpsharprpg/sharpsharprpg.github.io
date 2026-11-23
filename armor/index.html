@@ -1,10 +1,10 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Armory Manifest</title>
+<title>방어구 위키</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* 레이아웃: 총기 위키(Ordnance Manifest)와 같은 왼쪽 목록 + 오른쪽 상세. 단일 다크 룩(야전 교범 톤) */
+/* 레이아웃: 총기 위키(총기 위키)와 같은 왼쪽 목록 + 오른쪽 상세. 단일 다크 룩(야전 교범 톤) */
 :root{
   color-scheme:dark;
   --ink:#15170f; --panel:#1d2016; --panel-2:#262a1c; --panel-3:#2e321f;
@@ -147,7 +147,7 @@ table.tbl{width:100%; border-collapse:collapse; font-size:13px;}
 .grid{display:grid; gap:3px; background:var(--ink); padding:6px; border:1px solid var(--brass-dim);}
 .grid .node{width:42px; height:42px; background:var(--panel-2); border-color:var(--line-soft);}
 .grid .empty{width:42px; height:42px;}
-/* 순서 조립: 총기 위키(Ordnance Manifest) JEI 패널과 같은 모양 */
+/* 순서 조립: 총기 위키(총기 위키) JEI 패널과 같은 모양 */
 .jei-recipe-row{display:flex; align-items:center; gap:12px; overflow-x:auto; padding:4px 0 10px;}
 .jei-recipe-row .fnode{display:flex; flex-direction:column; align-items:center; gap:6px; width:92px; flex:0 0 auto;}
 .jei-recipe-row .fnode .box{width:58px; height:58px; background:var(--panel); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; position:relative;}
@@ -402,7 +402,7 @@ function nameHtml(it){ return `<span${it.nc?` style="color:${esc(it.nc)}"`:''}>$
 /* ---------- 내비 ---------- */
 function buildNav(){
   const side = document.getElementById('side');
-  let h = `<div class="brand" id="brand"><div class="kicker">SharpSharp RPG // DEFENSE</div><h1>Armory<br>Manifest</h1><div class="sub">방어구 ${ITEM_IDS.length-SHIELDS.length} · 세트 ${SETS.length} · 방패 ${SHIELDS.length}</div><a class="hub-link" href="https://sharpsharprpg.github.io/hub/" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a></div>`;
+  let h = `<div class="brand" id="brand"><div class="kicker">SharpSharp RPG // DEFENSE</div><h1>방어구 위키</h1><div class="sub">방어구 ${ITEM_IDS.length-SHIELDS.length} · 세트 ${SETS.length} · 방패 ${SHIELDS.length}</div><a class="hub-link" href="https://sharpsharprpg.github.io/hub/" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a></div>`;
   h += `<div class="search-wrap"><input type="search" class="search-input" id="q" placeholder="검색 — 방어구 / 세트 / 방패 이름" autocomplete="off"><div class="search-results" id="qr" hidden></div></div>`;
   h += `<div class="nav-section"><div class="nav-head" data-go="home"><span class="disp">세트 비교</span><span class="count">${SETS.length}</span></div></div>`;
   const navItem = s => `<div class="nav-item" data-set="${s.idx}"><div class="thumb">${img(s.icon)}</div><span class="nm">${esc(s.name)}</span><span class="badge">${s.pieces.length}</span></div>`;
@@ -428,7 +428,7 @@ function buildNav(){
     h += `<div class="nav-section fold fold-dim"><div class="nav-head fold-sum" data-dim="${dm.key}"><span class="disp">${esc(dm.label)}</span><span class="count">${inDim.length}</span></div><div class="fold-body">${body}</div></div>`;
   });
   const grp = [['shield','방패'],['acc_shield','장신구 방패 (에테르)']];
-  h += `<div class="nav-section fold fold-dim"><div class="nav-head fold-sum" data-dim="shields"><span class="disp">방패 SHIELDS</span><span class="count">${SHIELDS.length}</span></div><div class="fold-body">`;
+  h += `<div class="nav-section fold fold-dim"><div class="nav-head fold-sum" data-dim="shields"><span class="disp">방패</span><span class="count">${SHIELDS.length}</span></div><div class="fold-body">`;
   grp.forEach(([k,l])=>{
     const list = SHIELDS.filter(x=>x.kind===k);
     h += `<div class="fold"><div class="fold-sum">${esc(l)}<span class="count">${list.length}</span></div><div class="fold-body">`;
@@ -508,7 +508,7 @@ function recipeHtml(r){
   if(r.k==='grid'){
     body = `<div class="flow"><div class="grid" style="grid-template-columns:repeat(${r.cols},42px)">${r.cells.map(row=>row.map(c=>node(c)).join('')).join('')}</div><span class="arrow">→</span>${outNode(r)}</div>`;
   } else if(r.k==='seq'){
-    // 총기 위키(Ordnance Manifest) 순서 조립 패널과 같은 모양: INPUT → 나무판(로마 숫자·기계·재료 칸) → OUTPUT
+    // 총기 위키(총기 위키) 순서 조립 패널과 같은 모양: INPUT → 나무판(로마 숫자·기계·재료 칸) → OUTPUT
     const inp = (r.in||[])[0], oit = IT[r.out];
     const navA = n => n && n.nav && IT[n.nav] ? ` data-nav="${ITEM_IDX[n.nav]}"` : '';
     body = `<div class="jei-recipe-row">
@@ -546,9 +546,8 @@ function showHome(){
     + `<optgroup label="세트 세부">${SUBS.map(([k,l])=>`<option value="s:${k}"${fMod==='s:'+k?' selected':''}>${esc(l)}</option>`).join('')}</optgroup>`
     + `<optgroup label="재료별">${MATS.filter(m=>usedM.has(m.key)).map(m=>`<option value="m:${esc(m.key)}"${fMod==='m:'+m.key?' selected':''}>재료 · ${esc(m.label)}</option>`).join('')}</optgroup>`;
   view(`<div class="landing">
-    <div class="lede"><div class="disp">Armory<br>Manifest</div>
-      <p>SharpSharp RPG에 들어 있는 모든 방어구와 방패의 수치, 설명, 제작법, 획득처입니다. 수치는 게임을 실제로 실행해서 읽은 값이라 방어구 제어판 조정이 반영되어 있습니다.</p>
-      <p>방어구는 먼저 단계로 나누고, 그 안에서 재료 · 세트 · 고유 갑옷 · 의복으로 나눴습니다. 단계는 세트 방어도 합 기준으로 의복(10 이하) · 제작(11~20, 네더라이트까지) · 강화(20 초과)이고, 보스·던전 전용 장비는 고유, 보스 소재로 네더라이트를 다시 강화한 최종 세트는 신화입니다. 마법 능력치가 붙은 장비와 기계 갑주는 따로 묶었습니다. 얻는 차원은 세트 상세에 있습니다. 재료는 아이템 이름의 재료 단어(철, 다이아몬드 등) 기준이고, 기계 갑주는 Protection Pixel 장비입니다. 아래 표는 세트 단위 합계이며, 머리글을 누르면 정렬되고 행을 누르면 세트 상세로 이동합니다.</p></div>
+    <div class="lede"><div class="disp">방어구 위키</div>
+      <p>방어구 세트와 방패를 모았습니다. 세트를 누르면 부위별 수치와 얻는 곳이 나옵니다.</p></div>
     ${reduceNote(20,8).replace('방어도 <b>20</b>','예) 다이아몬드 세트: 방어도 <b>20</b>')}
     <section class="block" style="margin-top:22px">${blockH('세트 비교', SETS.length+'개')}
       <div class="filters"><input id="fText" type="search" placeholder="세트 이름으로 거르기" value="${esc(fText)}"><select id="fDim" aria-label="단계"><option value="">모든 단계</option>${TIERS.filter(x=>SETS.some(s=>s.tier===x.key)).map(x=>`<option value="${x.key}"${fDim===x.key?' selected':''}>${esc(x.label)}</option>`).join('')}</select><select id="fMod" aria-label="분류"><option value="">모든 분류</option>${opts}</select></div>

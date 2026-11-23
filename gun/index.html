@@ -18,7 +18,7 @@
 
 
 
-<title>SHARPSHARP Ordnance Manifest</title>
+<title>총기 위키</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Sans+Egyptian+Hieroglyphs&display=swap" rel="stylesheet">
 <style>
@@ -742,8 +742,7 @@ function buildNav(){
 
   let html = `<div class="brand">
     <div class="kicker">${esc(EDITIONS[EDITION])} // TACZ</div>
-    <div class="wiki-kind">총기 · 부착물 위키</div><h1 class="disp">Ordnance<br>Manifest</h1>
-    <div class="sub mono">FIELD REFERENCE — REV.PROTO-1</div>
+    <div class="wiki-kind">총기 · 부착물 위키</div><h1 class="disp">총기 위키</h1>
     <a class="hub-link" href="https://sharpsharprpg.github.io/hub/" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a>
     <div class="ed-switch" role="group" aria-label="팩 선택">${Object.entries(EDITIONS).map(([k,v])=>`<button type="button" class="ed-sw${k===EDITION?' on':''}" data-ed="${k}" aria-pressed="${k===EDITION}">${esc(v)}</button>`).join('')}</div>
   </div>`;
@@ -754,31 +753,31 @@ function buildNav(){
   </div>`;
 
   html += `<div class="nav-section">
-    <div class="nav-head" data-nav="leveling" data-view="leveling"><span class="disp">추억 MEMORY</span><span class="count mono">추출·주입</span></div>
+    <div class="nav-head" data-nav="leveling" data-view="leveling"><span class="disp">추억</span><span class="count mono">추출·주입</span></div>
   </div>`;
 
   html += `<div class="nav-section">
-    <div class="nav-head" data-nav="guns"><span class="disp">총기 GUNS</span><span class="count mono">${GUNS.length}</span></div>
+    <div class="nav-head" data-nav="guns"><span class="disp">총기</span><span class="count mono">${GUNS.length}</span></div>
     ${tierTypeBlocks(GUNS, 1)}
   </div>`;
 
   html += `<div class="nav-section">
-    <div class="nav-head" data-nav="attachments" data-view="attachments"><span class="disp">부착물 ATTACHMENTS</span><span class="count mono">${ATTS.length}</span></div>
+    <div class="nav-head" data-nav="attachments" data-view="attachments"><span class="disp">부착물</span><span class="count mono">${ATTS.length}</span></div>
     <div id="attNavTiers">${tierTypeBlocks(ATTS, 1, 'att', attCatOrder, catLabel)}</div>
   </div>`;
 
   html += `<div class="nav-section">
-    <div class="nav-head" data-nav="ammo"><span class="disp">탄약 AMMO</span><span class="count mono">${AMMO.length}</span></div>
+    <div class="nav-head" data-nav="ammo"><span class="disp">탄약</span><span class="count mono">${AMMO.length}</span></div>
     ${ammoNavBlocks(AMMO)}
   </div>`;
 
   html += `<div class="nav-section">
-    <div class="nav-head" data-nav="workbenches"><span class="disp">제작대 WORKBENCHES</span><span class="count mono">${WORKBENCHES.length}</span></div>
+    <div class="nav-head" data-nav="workbenches"><span class="disp">제작대</span><span class="count mono">${WORKBENCHES.length}</span></div>
     ${workbenchNavBlocks(WORKBENCHES)}
   </div>`;
 
   html += `<div class="nav-section">
-    <div class="nav-head" data-nav="ammoboxes"><span class="disp">탄약박스 AMMO BOX</span><span class="count mono">${AMMO_BOXES.length}</span></div>
+    <div class="nav-head" data-nav="ammoboxes"><span class="disp">탄약박스</span><span class="count mono">${AMMO_BOXES.length}</span></div>
     <div class="tier-group">
       ${AMMO_BOXES.slice().sort((a,b)=>a.level-b.level).map(w=>`<div class="nav-item" data-view="ammobox" data-id="${esc(w.fullId)}">
         <div class="thumb">${AMMOBOX_ICON[w.id]?`<img src="${esc(AMMOBOX_ICON[w.id])}" alt="">`:''}</div>
@@ -788,7 +787,7 @@ function buildNav(){
   </div>`;
 
   html += `<div class="nav-section">
-    <div class="nav-head" data-nav="kits" data-view="kits"><span class="disp">개조 키트 KITS</span><span class="count mono">${KITS.length}</span></div>
+    <div class="nav-head" data-nav="kits" data-view="kits"><span class="disp">개조 키트</span><span class="count mono">${KITS.length}</span></div>
     <div class="tier-group">
       ${KITS.slice().sort((a,b)=>a.tier-b.tier).map(k=>`<div class="nav-item" data-view="kit" data-id="${esc(k.fullId)}">
         <div class="thumb">${k.slotUrl?`<img src="${esc(k.slotUrl)}" alt="">`:''}</div>
@@ -1263,8 +1262,8 @@ function showLanding(){
   const main = document.getElementById('main');
   main.innerHTML = `<div class="landing">
     <div class="lede">
-      <div class="wiki-kind">총기 · 부착물 위키</div><div class="disp">Ordnance<br>Manifest</div>
-      <p>SharpSharp RPG 통합 건팩의 총기·부착물 야전 참고 자료. 아래는 필드에서 노획할 수 있는 야생 총기이며, 전체 총기와 부착물은 왼쪽 목록에서 선택하십시오.</p>
+      <div class="wiki-kind">총기 · 부착물 위키</div><div class="disp">총기 위키</div>
+      <p>아래는 필드에서 주울 수 있는 총기입니다. 다른 총기와 부착물은 왼쪽 목록에서 고르세요.</p>
     </div>
     <div class="grid-cards">
       ${GUNS.filter(g=>g.tier===0).sort((a,b)=> stripColor(a.name).localeCompare(stripColor(b.name), 'ko')).map(g=>`<div class="mini" data-id="${esc(g.fullId)}"><div class="thumb">${g.slotUrl?`<img src="${esc(g.slotUrl)}" alt="" data-name="${esc(stripColor(g.name))}">`:''}</div><div class="nm">${esc(stripColor(g.name))}</div></div>`).join('')}

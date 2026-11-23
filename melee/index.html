@@ -1,7 +1,7 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Blade Ledger</title>
+<title>냉병기 위키</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -683,8 +683,7 @@ function buildNav(){
   const side = document.getElementById('side');
   let html = `<div class="brand">
     <div class="kicker">SharpSharp RPG // MELEE</div>
-    <h1 class="disp">Blade<br>Ledger</h1>
-    <div class="sub mono">FIELD REFERENCE — ${esc(META.rev||'REV.1')}</div>
+    <h1 class="disp">냉병기 위키</h1>
     <a class="hub-link" href="https://sharpsharprpg.github.io/hub/" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a>
   </div>`;   // 2026-11-13 사용자: 모든 위키에 위키 모음 바로가기(제목 칸 작은 줄 아래). 누르면 첫 화면으로 가지 않게 아래에서 전파를 막음
   html += `<div class="search-wrap">
@@ -692,15 +691,15 @@ function buildNav(){
     <div class="search-results" id="searchResults"></div>
   </div>`;
   html += `<div class="nav-section">
-    <div class="nav-head" data-nav="compare" data-view="compare"><span class="disp">전체 비교 COMPARE</span><span class="count mono">${LIST.length}</span></div>
+    <div class="nav-head" data-nav="compare" data-view="compare"><span class="disp">전체 비교</span><span class="count mono">${LIST.length}</span></div>
   </div>`;
   html += `<div class="nav-section">
-    <div class="nav-head" data-nav="weapons"><span class="disp">냉병기 WEAPONS</span><span class="count mono">${LIST.length}</span></div>
+    <div class="nav-head" data-nav="weapons"><span class="disp">냉병기</span><span class="count mono">${LIST.length}</span></div>
     ${navBlocks()}
   </div>`;
   const UNIQ = LIST.filter(w=>w.motion==='unique');
   if(UNIQ.length) html += `<div class="nav-section">
-    <div class="nav-head" data-nav="unique"><span class="disp">고유 모션 UNIQUE MOVESET</span><span class="count mono">${UNIQ.length}</span></div>
+    <div class="nav-head" data-nav="unique"><span class="disp">고유 모션</span><span class="count mono">${UNIQ.length}</span></div>
     ${navBlocks(UNIQ)}
   </div>`;
   side.innerHTML = html;
@@ -792,9 +791,9 @@ function showLanding(){
   }).join('');
   main.innerHTML = `<div class="landing">
     <div class="lede">
-      <div class="disp">Blade<br>Ledger</div>
-      <p>SharpSharp RPG 모드팩의 냉병기 ${LIST.length}종 야전 참고 자료. 수치는 게임 안에서 직접 읽은 값(${esc(META.source||'')})입니다. 분류를 고르거나 왼쪽 목록·검색에서 무기를 선택하십시오.</p>
-      <div class="wiki-links"><a href="${GUN_WIKI}" target="_blank" rel="noopener">총기 위키 Ordnance Manifest ↗</a></div>
+      <div class="disp">냉병기 위키</div>
+      <p>냉병기 ${LIST.length}종입니다. 분류를 고르거나 왼쪽 목록에서 무기를 고르세요.</p>
+      <div class="wiki-links"><a href="${GUN_WIKI}" target="_blank" rel="noopener">총기 위키 ↗</a></div>
     </div>
     <div class="cat-cards">${cards}</div>
   </div>`;

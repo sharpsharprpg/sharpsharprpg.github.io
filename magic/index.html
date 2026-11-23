@@ -1,6 +1,6 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <meta charset="utf-8">
-<title>SharpSharp 마법 위키</title>
+<title>마법 위키</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
@@ -391,7 +391,7 @@ section.block{margin-bottom:34px;}
 @media (prefers-reduced-motion:reduce){.horror{animation:none}}
 
 
-/* ---------- spell wiki (Ordnance Manifest 와 같은 디자인, 단일 다크 테마) ---------- */
+/* ---------- spell wiki (총기 위키 와 같은 디자인, 단일 다크 테마) ---------- */
 :root{
   color-scheme:dark;
   /* ISB 희귀도 색 (게임 내 SpellRarity 색 계열을 위키 톤에 맞춰 채도만 낮춤) */
@@ -735,7 +735,7 @@ function buildNav(){
   let h = `<div class="brand" tabindex="0" role="link" aria-label="홈으로">
     <div class="wiki-kind">마법 · 마법 장비 위키</div>
     <div class="kicker">SharpSharp RPG // Spells</div>
-    <h1 class="disp">Spell<br>Codex</h1>
+    <h1 class="disp">마법 위키</h1>
     <div class="sub mono">마법 ${SPELLS.filter(s => !s.disabled).length}종 · 학파 ${schools.filter(k => k !== 'disabled').length}개</div>
     <a class="hub-link" href="https://sharpsharprpg.github.io/hub/" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a>
   </div>

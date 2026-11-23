@@ -1,6 +1,6 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <meta charset="utf-8">
-<title>SharpSharp RPG Augment Wiki</title>
+<title>증강 위키</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -332,7 +332,7 @@ function block(cls, title, list, badgeFn){
   return `<div class="tier-block"><div class="tier-summary ${cls}">${esc(title)}<span class="count">${list.length}</span></div><div class="tier-slide"><div>${list.sort(byName).map(a=>navItem(a,badgeFn(a))).join('')}</div></div></div>`;
 }
 function renderSide(){
-  let h = `<div class="brand" data-go=""><div class="kicker">SharpSharp RPG · Augments</div><h1 class="disp">Augment Wiki</h1><div class="sub">증강 ${AUGS.length}종 · U 키로 고르는 3장 카드</div><a class="hub-link" href="https://sharpsharprpg.github.io/hub/" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a></div>`;
+  let h = `<div class="brand" data-go=""><div class="kicker">SharpSharp RPG · Augments</div><h1 class="disp">증강 위키</h1><div class="sub">증강 ${AUGS.length}종 · U 키로 고르는 3장 카드</div><a class="hub-link" href="https://sharpsharprpg.github.io/hub/" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a></div>`;
   h += `<div class="search-wrap"><input class="search-input" id="q" type="search" placeholder="증강 이름이나 효과로 찾기" autocomplete="off" aria-label="증강 검색"><div class="search-results" id="qr"></div></div>`;
   h += `<div class="nav-section"><div class="nav-head"><span class="disp">등급별</span><span class="count">${AUGS.length}</span></div>`;
   RORDER.forEach(r=>{ h += block(r, `${RAR[r][0]} ${RAR[r][1]}`, AUGS.filter(a=>a.rarity===r), a=>FAM[a.fam].ko); });
