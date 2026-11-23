@@ -1,0 +1,958 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta charset="utf-8">
+<title>SharpSharp RPG Augment Wiki</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* 몹 위키·총기 위키와 같은 야전 교범 톤: 왼쪽 목록 + 오른쪽 기록 카드. 한 가지 어두운 화면으로 고정.
+   등급 색(실버·골드·다이아몬드)만 따로 둔다 */
+:root{
+  color-scheme:dark;
+  --ink:#15170f; --panel:#1d2016; --panel-2:#262a1c; --panel-3:#2e321f;
+  --line:#3a3f2c; --line-soft:#282c1c;
+  --paper:#ece7d6; --paper-dim:#a29c81; --paper-faint:#6f6a53;
+  --stamp:#c9622a; --stamp-dim:#7a3f1e; --stamp-glow:rgba(201,98,42,.16);
+  --brass:#c7a233; --brass-dim:#8a6f22;
+  --r-silver:#c4c7b8; --r-silver-dim:#6c6f63; --r-gold:#e0b43c; --r-gold-dim:#8a6f22; --r-diamond:#5fcac3; --r-diamond-dim:#2f6f6b;
+  /* 2026-11-11 위키 공통: 글꼴은 IBM Plex Sans KR 한 가지 (영문·고정폭 글꼴 따로 쓰지 않음) */
+  --f-body:'IBM Plex Sans KR','IBM Plex Sans','Noto Sans Egyptian Hieroglyphs','Segoe UI Historic',sans-serif;
+  --f-mono:'IBM Plex Sans KR','IBM Plex Sans','Noto Sans Egyptian Hieroglyphs','Segoe UI Historic',sans-serif;
+  --f-disp:'IBM Plex Sans KR','IBM Plex Sans','Noto Sans Egyptian Hieroglyphs','Segoe UI Historic',sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{background:var(--ink);}
+body{margin:0; color:var(--paper); font-family:var(--f-body); font-size:14px; line-height:1.55;}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:70; background:var(--panel);}
+::selection{background:var(--stamp); color:var(--ink);}
+h1,h2,h3,h4{margin:0; text-wrap:balance;}
+.mono{font-family:var(--f-mono); font-variant-numeric:tabular-nums;}
+.disp{font-family:var(--f-disp); text-transform:uppercase; letter-spacing:.02em;}
+a{color:inherit;}
+button{font:inherit;}
+:focus-visible{outline:2px solid var(--stamp); outline-offset:2px;}
+
+.app{display:grid; grid-template-columns:340px 1fr; min-height:100vh;}
+.side{position:sticky; top:0; height:100vh; overflow-y:auto; background:var(--panel); border-right:1px solid var(--line); display:flex; flex-direction:column;}
+.side::-webkit-scrollbar{width:8px;} .side::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px;}
+.side-toggle{display:none; position:fixed; top:calc(12px + env(safe-area-inset-top,0px)); left:calc(12px + env(safe-area-inset-left,0px)); z-index:60; width:42px; height:42px; align-items:center; justify-content:center; background:var(--panel-3); border:1px solid var(--line); color:var(--paper); font-size:18px; cursor:pointer;}
+.side-backdrop{display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:50;}
+.side-backdrop.show{display:block;}
+@media (max-width:1100px){
+  .app{grid-template-columns:1fr;}
+  .side-toggle{display:flex;}
+  .side{position:fixed; top:0; left:0; width:80vw; max-width:330px; height:100vh; z-index:55; transform:translateX(-100%); transition:transform .2s ease; box-shadow:4px 0 26px rgba(0,0,0,.5); padding-left:env(safe-area-inset-left,0px);}
+  .side.open{transform:translateX(0);}
+  .main{padding-top:72px !important;}
+}
+@media (prefers-reduced-motion:reduce){ .side, .tier-slide{transition:none !important;} }
+
+.brand{padding:20px 18px 16px; border-bottom:1px solid var(--line); background:repeating-linear-gradient(135deg, transparent 0 8px, rgba(0,0,0,.12) 8px 9px); cursor:pointer;}
+.brand .kicker{font-family:var(--f-mono); font-size:10px; letter-spacing:.18em; color:var(--stamp); text-transform:uppercase; margin-bottom:6px;}
+.brand h1{font-size:22px; font-weight:700; letter-spacing:.03em; line-height:1.15;}
+.hub-link{display:inline-block;margin-top:10px;font-size:12px;color:var(--brass);border:1px solid var(--brass-dim);padding:4px 10px;text-decoration:none;white-space:nowrap}.hub-link:hover{border-color:var(--brass);color:var(--paper)}
+.brand .sub{font-family:var(--f-mono); font-size:10.5px; color:var(--paper-faint); margin-top:6px; letter-spacing:.03em;}
+
+.search-wrap{position:relative; padding:14px 18px; border-bottom:1px solid var(--line);}
+.search-input{width:100%; background:var(--ink); border:1px solid var(--line); color:var(--paper); font-family:var(--f-body); font-size:13px; padding:9px 12px; outline:none;}
+.search-input::placeholder{color:var(--paper-faint);}
+.search-input:focus{border-color:var(--stamp);}
+.search-results{position:absolute; left:18px; right:18px; top:calc(100% - 4px); z-index:40; background:var(--panel-3); border:1px solid var(--stamp-dim); box-shadow:0 8px 24px rgba(0,0,0,.5); max-height:60vh; overflow-y:auto; display:none;}
+.search-results.show{display:block;}
+.search-item{display:flex; align-items:center; gap:9px; padding:7px 12px; cursor:pointer; border-bottom:1px solid var(--line-soft);}
+.search-item:last-child{border-bottom:none;}
+.search-item:hover,.search-item.hi{background:var(--panel-2);}
+.search-item .nm{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px;}
+.search-empty{padding:14px 12px; font-family:var(--f-mono); font-size:11px; color:var(--paper-faint);}
+
+.ico{display:block; flex:0 0 auto; object-fit:contain;}
+.ico.px{image-rendering:pixelated;}
+.thumb{width:28px; height:28px; flex:0 0 auto; background:var(--ink); border:1px solid var(--line-soft); display:flex; align-items:center; justify-content:center; overflow:hidden;}
+.thumb.silver{border-color:var(--r-silver-dim);} .thumb.gold{border-color:var(--r-gold-dim);} .thumb.diamond{border-color:var(--r-diamond-dim);}
+
+.nav-section{padding:12px 0 3px;}
+.nav-head{display:flex; align-items:center; gap:8px; padding:7px 17px; cursor:pointer; user-select:none;}
+.nav-head:hover{background:var(--panel-2);}
+.nav-head .disp{font-size:18px; color:var(--paper-dim); letter-spacing:.08em;}
+.nav-head .count{margin-left:auto; font-family:var(--f-mono); font-size:15px; color:var(--paper-faint);}
+.nav-head.active .disp{color:var(--stamp);}
+.tier-block{border-top:1px solid var(--line-soft);}
+.tier-block:first-of-type{border-top:none;}
+.tier-summary{display:flex; align-items:center; gap:7px; cursor:pointer; user-select:none; padding:7px 17px; font-family:var(--f-mono); font-size:14.5px; letter-spacing:.06em; color:var(--brass);}
+.tier-summary::before{content:"▸"; display:inline-block; transition:transform .18s; color:var(--paper-faint); font-size:11px;}
+.tier-block.is-open > .tier-summary::before{transform:rotate(90deg);}
+.tier-summary .count{margin-left:auto; color:var(--paper-faint);}
+.tier-summary.silver{color:var(--r-silver);} .tier-summary.gold{color:var(--r-gold);} .tier-summary.diamond{color:var(--r-diamond);}
+.tier-slide{display:grid; grid-template-rows:0fr; transition:grid-template-rows .22s ease;}
+.tier-block.is-open > .tier-slide{grid-template-rows:1fr;}
+.tier-slide > div{overflow:hidden; min-height:0;}
+.nav-item{display:flex; align-items:center; gap:10px; padding:6px 17px 6px 24px; cursor:pointer; border-left:2px solid transparent; font-size:16px; color:var(--paper-dim);}
+.nav-item:hover{background:var(--panel-2); color:var(--paper);}
+.nav-item.sel{background:var(--panel-3); border-left-color:var(--stamp); color:var(--paper);}
+.nav-item .nm{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.nav-item .badge{font-family:var(--f-mono); font-size:10.5px; padding:1px 5px; border:1px solid var(--line); color:var(--paper-faint); flex:0 0 auto;}
+.nav-link{display:flex; align-items:center; gap:10px; padding:9px 17px; cursor:pointer; font-family:var(--f-disp); font-size:17px; letter-spacing:.08em; text-transform:uppercase; color:var(--paper-dim); border-top:1px solid var(--line);}
+.nav-link:hover{background:var(--panel-2); color:var(--paper);}
+.nav-link.sel{color:var(--stamp);}
+
+.main{min-width:0; padding:34px 40px 80px; padding-left:max(40px, env(safe-area-inset-left,0px)); padding-right:max(40px, env(safe-area-inset-right,0px)); max-width:1080px;}
+@media (min-width:1500px){ .main{zoom:1.25;} }
+@media (max-width:860px){ .main{padding-top:22px; padding-bottom:60px; padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px));} }
+
+.tag{display:inline-flex; align-items:center; gap:5px; font-family:var(--f-mono); font-size:10.5px; letter-spacing:.06em; padding:3px 7px; border:1px solid var(--line); color:var(--paper-dim);}
+.tag.stamp{border-color:var(--stamp-dim); color:var(--stamp); background:var(--stamp-glow);}
+.tag.silver{border-color:var(--r-silver-dim); color:var(--r-silver);}
+.tag.gold{border-color:var(--r-gold-dim); color:var(--r-gold); background:rgba(224,180,60,.08);}
+.tag.diamond{border-color:var(--r-diamond-dim); color:var(--r-diamond); background:rgba(95,202,195,.08);}
+.tag.link{cursor:pointer;} .tag.link:hover{border-color:var(--stamp); color:var(--paper);}
+
+/* ---------- landing ---------- */
+.landing .kick{font-family:var(--f-mono); font-size:10.5px; letter-spacing:.18em; color:var(--stamp); text-transform:uppercase; margin-bottom:8px;}
+.landing .disp.big{font-size:38px; font-weight:700; margin-bottom:10px;}
+.landing p{color:var(--paper-dim); font-size:15px; max-width:66ch; margin:0 0 10px;}
+.count-row{display:flex; flex-wrap:wrap; border:1px solid var(--line); border-right:none; margin:22px 0 30px; max-width:720px;}
+.count-row .cell{flex:1 1 120px; padding:12px 14px; border-right:1px solid var(--line); cursor:pointer; background:none; border-top:none; border-bottom:none; border-left:none; text-align:left; color:inherit;}
+.count-row .cell:hover{background:var(--panel);}
+.count-row .lbl{font-family:var(--f-mono); font-size:9.5px; letter-spacing:.1em; color:var(--paper-faint); text-transform:uppercase;}
+.count-row .val{font-family:var(--f-mono); font-size:22px; font-weight:600; color:var(--brass);}
+.count-row .val.silver{color:var(--r-silver);} .count-row .val.gold{color:var(--r-gold);} .count-row .val.diamond{color:var(--r-diamond);}
+
+.steps{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px;}
+.step{border:1px solid var(--line); background:var(--panel); padding:12px 14px; min-width:0;}
+.step .sn{font-family:var(--f-mono); font-size:10.5px; letter-spacing:.1em; color:var(--stamp);}
+.step .st{font-weight:600; margin:4px 0 4px;}
+.step .sb{font-size:13px; color:var(--paper-dim);}
+kbd{font-family:var(--f-mono); font-size:11.5px; border:1px solid var(--line); border-bottom-width:2px; padding:0 5px; background:var(--ink); color:var(--paper);}
+
+.odds{display:flex; height:30px; border:1px solid var(--line); margin:4px 0 8px; max-width:720px;}
+.odds div{display:flex; align-items:center; padding:0 10px; font-family:var(--f-mono); font-size:11.5px; color:var(--ink); font-weight:600; white-space:nowrap; overflow:hidden; min-width:0;}
+.odds .silver{background:var(--r-silver);} .odds .gold{background:var(--r-gold);} .odds .diamond{background:var(--r-diamond);}
+
+.grid-cards{display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:10px;}
+.card{border:1px solid var(--line); background:var(--panel); padding:11px 12px; display:flex; gap:11px; cursor:pointer; min-width:0; text-align:left; color:inherit; align-items:flex-start;}
+.card:hover{border-color:var(--stamp);}
+.card.silver{border-top:2px solid var(--r-silver-dim);} .card.gold{border-top:2px solid var(--r-gold);} .card.diamond{border-top:2px solid var(--r-diamond);}
+.card .cb{min-width:0; flex:1;}
+.card .nm{font-size:13.5px; font-weight:600;}
+.card .ds{font-size:11.5px; color:var(--paper-faint); margin-top:3px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+
+.tree{display:flex; flex-direction:column; gap:8px;}
+.chain{display:flex; flex-wrap:wrap; align-items:center; gap:8px; border:1px solid var(--line); background:var(--panel); padding:9px 12px;}
+.chain .arrow{color:var(--paper-faint); font-family:var(--f-mono);}
+
+/* ---------- augment detail ---------- */
+.spec-head{display:flex; gap:22px; padding-bottom:22px; border-bottom:1px solid var(--line); margin-bottom:26px;}
+@media (max-width:620px){ .spec-head{flex-direction:column;} }
+.spec-plate{width:160px; height:160px; flex:0 0 auto; background:var(--panel); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; position:relative; max-width:100%;}
+.spec-plate::before{content:""; position:absolute; inset:6px; border:1px dashed var(--line-soft); pointer-events:none;}
+.spec-plate.silver{border-color:var(--r-silver-dim);} .spec-plate.gold{border-color:var(--r-gold); box-shadow:inset 0 0 28px rgba(224,180,60,.12);} .spec-plate.diamond{border-color:var(--r-diamond); box-shadow:inset 0 0 30px rgba(95,202,195,.14);}
+.spec-info{flex:1; min-width:0; display:flex; flex-direction:column; gap:8px; justify-content:center;}
+.spec-tags{display:flex; gap:6px; flex-wrap:wrap;}
+.spec-info h1{font-size:32px; font-weight:600;}
+.spec-info .en{font-family:var(--f-mono); font-size:12px; color:var(--paper-faint); overflow-wrap:anywhere;}
+.spec-info .desc{font-size:15.5px; line-height:1.6; max-width:60ch;}
+
+/* 2026-11-11 위키 공통: 칸 수 고정 금지, 최소 너비 아래로 좁아지면 다음 줄로 */
+.stat-strip{display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); border:1px solid var(--line); border-right:none; border-bottom:none; margin-bottom:30px;}
+.stat .lbl, .stat .val{white-space:nowrap;}
+.stat{min-width:0; padding:12px 14px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); display:flex; flex-direction:column; gap:4px; overflow:hidden;}
+.stat .lbl{font-family:var(--f-mono); font-size:9.5px; letter-spacing:.1em; color:var(--paper-faint); text-transform:uppercase;}
+.stat .val{font-family:var(--f-mono); font-size:19px; font-weight:600; overflow-wrap:anywhere;}
+.stat .val.brass{color:var(--brass);} .stat .val.dim{color:var(--paper-faint);}
+.stat .val.silver{color:var(--r-silver);} .stat .val.gold{color:var(--r-gold);} .stat .val.diamond{color:var(--r-diamond);}
+.stat .hint{font-family:var(--f-mono); font-size:9.5px; color:var(--paper-faint);}
+
+section.block{margin-bottom:34px;}
+.block-h{display:flex; align-items:baseline; gap:10px; margin-bottom:14px;}
+.block-h .disp{font-size:14px; letter-spacing:.08em;}
+.block-h .rule{flex:1; height:1px; background:var(--line);}
+.block-h .n{font-family:var(--f-mono); font-size:10.5px; color:var(--paper-faint);}
+
+.note{border:1px solid var(--line); background:var(--panel); padding:10px 14px; margin-bottom:8px;}
+.note .nl{font-family:var(--f-mono); font-size:10.5px; letter-spacing:.08em; color:var(--brass); margin-bottom:4px;}
+.note .nb{font-size:13.5px; line-height:1.65;}
+.note.warn{border-left:3px solid var(--stamp);}
+.chips{display:flex; flex-wrap:wrap; gap:6px;}
+
+.rule{border:1px solid var(--line); background:var(--panel); margin-bottom:10px;}
+.rule-h{display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px; padding:9px 14px; border-bottom:1px solid var(--line-soft);}
+.rule-h .when{font-family:var(--f-disp); font-size:16px; letter-spacing:.04em;}
+.rule-b{padding:10px 14px; display:flex; flex-direction:column; gap:8px;}
+.rule-b .row{display:grid; grid-template-columns:52px 1fr; gap:10px; font-size:13.5px;}
+.rule-b .k{font-family:var(--f-mono); font-size:10.5px; letter-spacing:.08em; color:var(--paper-faint); padding-top:2px;}
+.rule-b ul{margin:0; padding-left:18px;} .rule-b li{margin:2px 0;}
+
+.tbl-wrap{overflow-x:auto; border:1px solid var(--line);}
+table.tbl{width:100%; border-collapse:collapse; font-size:13px;}
+table.tbl th{font-family:var(--f-mono); font-size:9.5px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--paper-faint); text-align:left; padding:8px 12px; border-bottom:1px solid var(--line); background:var(--panel); white-space:nowrap;}
+table.tbl th.num{text-align:right;}
+table.tbl td{padding:8px 12px; border-bottom:1px solid var(--line-soft); vertical-align:top;}
+table.tbl tr:last-child td{border-bottom:none;}
+table.tbl td.num{font-family:var(--f-mono); font-variant-numeric:tabular-nums; white-space:nowrap; text-align:right;}
+table.tbl td.hl{color:var(--brass); font-weight:600;}
+.small{font-size:11.5px; color:var(--paper-faint);}
+.capped{font-family:var(--f-mono); font-size:9.5px; color:var(--stamp); border:1px solid var(--stamp-dim); padding:0 4px; margin-left:6px;}
+
+.filter-row{display:flex; flex-wrap:wrap; gap:6px; margin:0 0 14px; align-items:center;}
+.fbtn{font-family:var(--f-mono); font-size:11px; padding:5px 10px; border:1px solid var(--line); background:var(--panel); color:var(--paper-dim); cursor:pointer;}
+.fbtn.on{border-color:var(--stamp); color:var(--stamp); background:var(--stamp-glow);}
+.filter-row .search-input{max-width:260px; padding:6px 10px;}
+.more-btn{margin-top:10px;}
+.two-col{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px;}
+.two-col > div{min-width:0;}
+
+.foot-note{margin-top:50px; padding-top:16px; border-top:1px solid var(--line); font-family:var(--f-mono); font-size:10.5px; color:var(--paper-faint); overflow-wrap:anywhere;}
+
+.nav-fabs{position:fixed; top:calc(10px + env(safe-area-inset-top,0px)); left:calc(340px - 12px); transform:translateX(-100%); z-index:58; display:flex; gap:6px;}
+@media (max-width:1100px){ .nav-fabs{left:calc(62px + env(safe-area-inset-left,0px)); transform:none; top:calc(12px + env(safe-area-inset-top,0px));} }
+.fab-btn{width:38px; height:38px; padding:0; display:inline-flex; align-items:center; justify-content:center; background:var(--panel-3); border:1px solid var(--stamp-dim); color:var(--paper); cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,.45);}
+.fab-btn svg{width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:3.2; stroke-linecap:round; stroke-linejoin:round;}
+.fab-btn:hover{border-color:var(--stamp); background:var(--panel-2); color:var(--stamp);}
+#backFab:not(.show){opacity:.35; pointer-events:none;}
+/* 2026-11-15 위키 공통: 모바일(사이드바가 숨는 폭)에서만 홈 옆에 위키 모음(허브) 버튼 */
+.fab-btn.hub-fab{display:none; text-decoration:none;}
+@media (max-width:1100px){ .fab-btn.hub-fab{display:inline-flex;} }
+
+/* ---------- 수정자 모드 실시간 편집 ---------- */
+.ed{white-space:pre-wrap;}
+body.editing [data-edit]{outline:1px dashed var(--stamp-dim); outline-offset:3px; cursor:text; min-height:1.3em; display:inline-block; min-width:4ch;}
+body.editing div[data-edit], body.editing p[data-edit]{display:block;}
+body.editing [data-edit]:focus{outline:2px solid var(--stamp); background:var(--stamp-glow);}
+body.editing [data-edit].edited{box-shadow:-4px 0 0 var(--brass);}
+[data-edit]:empty::before{content:attr(data-ph); color:var(--paper-faint);}
+.edit-bar{position:fixed; z-index:65; right:calc(14px + env(safe-area-inset-right,0px)); bottom:calc(14px + env(safe-area-inset-bottom,0px)); display:flex; align-items:center; gap:10px; background:var(--panel-3); border:1px solid var(--stamp-dim); padding:6px 6px 6px 12px; box-shadow:0 4px 18px rgba(0,0,0,.5); max-width:calc(100vw - 28px);}
+.edit-bar .st{font-family:var(--f-mono); font-size:11px; color:var(--paper-dim); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.edit-bar .st.err{color:#e07b6f;}
+.edit-btn{font-family:var(--f-mono); font-size:12px; padding:6px 12px; border:1px solid var(--stamp); background:var(--stamp-glow); color:var(--stamp); cursor:pointer; flex:0 0 auto;}
+body.editing .edit-btn{background:var(--stamp); color:var(--ink);}
+/* ---------- 수치 수정 칸 (2026-11-11 위키 공통) ---------- */
+.edit-box{border:1px solid var(--stamp-dim); background:var(--panel); padding:12px 14px; margin-bottom:30px;}
+.edit-box.ro{border-color:var(--line);}
+.ed-h{font-family:var(--f-disp); font-size:15px; letter-spacing:.06em; margin-bottom:10px; display:flex; flex-wrap:wrap; gap:6px 12px; align-items:baseline;}
+.ed-hint{font-family:var(--f-mono); font-size:10.5px; color:var(--paper-faint); letter-spacing:0;}
+.ed-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:8px 14px; margin-bottom:10px;}
+.ed-grid label{display:flex; flex-direction:column; gap:3px; font-size:12px; color:var(--paper-dim); min-width:0;}
+.ed-grid label .o{font-family:var(--f-mono); font-size:10.5px; color:var(--paper-faint);}
+.ed-grid input, .ed-note input{background:var(--ink); border:1px solid var(--line); color:var(--paper); font-family:var(--f-mono); font-size:13px; padding:6px 8px; width:100%; min-width:0;}
+.ed-grid input:focus, .ed-note input:focus{outline:none; border-color:var(--stamp);}
+.ed-grid input.chg{border-color:var(--brass); color:var(--brass);}
+.ed-note{display:flex; flex-direction:column; gap:3px; font-size:12px; color:var(--paper-dim); margin-bottom:10px;}
+.ed-row{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
+.ed-btn{font-family:var(--f-mono); font-size:12px; padding:6px 12px; border:1px solid var(--line); background:var(--panel-2); color:var(--paper); cursor:pointer;}
+.ed-btn.pri{border-color:var(--stamp); background:var(--stamp-glow); color:var(--stamp);}
+.ed-btn:disabled{opacity:.5; cursor:default;}
+.ed-msg{font-family:var(--f-mono); font-size:11px; color:var(--paper-dim);}
+.ed-msg.err{color:#e07b6f;}
+.ed-foot, .ed-local{font-size:11.5px; color:var(--paper-faint); margin-top:8px;}
+.ed-local{color:var(--brass);}
+.ed-ro{font-size:13px;} .ed-ro li{margin:2px 0;}
+.ed-copy{width:100%; margin-top:8px; background:var(--ink); color:var(--paper); border:1px solid var(--line); font-family:var(--f-mono); font-size:11px;}
+.nav-item .badge.ed, .tag.ed{border-color:var(--brass-dim); color:var(--brass);}
+#modeToast{position:fixed; z-index:90; left:50%; transform:translateX(-50%); bottom:calc(24px + env(safe-area-inset-bottom,0px)); background:var(--panel-3); border:1px solid var(--stamp); color:var(--paper); font-family:var(--f-mono); font-size:13px; padding:8px 16px; opacity:0; pointer-events:none; transition:opacity .15s;}
+#modeToast.show{opacity:1;}
+/* 2026-11-11 위키 공통 글꼴 통일: 한 글꼴, 숫자 자릿수 맞춤, 한글 라벨에 자간·대문자 변환 없음 */
+html body, html body *{font-family:'IBM Plex Sans KR','IBM Plex Sans','Noto Sans Egyptian Hieroglyphs','Segoe UI Historic',sans-serif !important;}
+html body *{font-variant-numeric:tabular-nums;}
+.disp, .brand .kicker, .landing .kick, .count-row .lbl, .stat .lbl, table.tbl th, .tag, .nav-head .disp, .tier-summary, .block-h .disp, .rule-h .when, .ed-h, .step .sn, .nav-link, .badge{letter-spacing:normal !important; text-transform:none !important;}
+[hidden]{display:none !important;}   /* hidden 속성이 .edit-bar 등의 display 에 덮이지 않게 (게시 기본 스타일에 기대지 않음) */
+/* 2026-11-16 위키 공통: 모바일(사이드바가 숨는 1100px 이하) 목록 크기 — 펼침 버튼·항목 줄 누르는 높이 44px 이상, 글자 16/15px 이상, 보조 글자 13px 이상 */
+@media (max-width:1100px){
+  .tier-summary{min-height:44px; font-size:16px; padding-top:8px; padding-bottom:8px;}
+  .tier-summary::before{font-size:22px; line-height:1; width:1em; text-align:center;}
+  .brand{padding-top:calc(62px + env(safe-area-inset-top,0px));}   /* 사이드바를 열었을 때 위쪽 버튼 줄(메뉴·뒤로·홈·허브)이 제목을 가리지 않게 */
+  .nav-head{min-height:44px;}
+  .nav-head .count{font-size:15px;}
+  .nav-item{min-height:44px; font-size:16px; padding-top:6px; padding-bottom:6px;}
+  .nav-item .badge{font-size:13px; padding:2px 6px;}
+  .nav-link{min-height:44px;}
+  .search-input{font-size:16px; min-height:44px;}
+  .search-item{min-height:44px;}
+  .search-item .nm{font-size:15px;}
+  .search-item .tag{font-size:13px;}
+  .search-empty{font-size:13px;}
+}
+</style>
+
+<div class="app">
+  <button class="side-toggle" id="sideToggle" aria-label="메뉴 열기/닫기">☰</button>
+  <div class="side-backdrop" id="sideBackdrop"></div>
+  <nav class="side" id="side"></nav>
+  <main class="main" id="main"></main>
+</div>
+<div class="edit-bar" id="editBar" hidden><span class="st" id="editStatus">수정 내용 불러오는 중</span><button class="edit-btn" id="editBtn" type="button">문구 편집</button></div>
+<div class="nav-fabs"><button class="fab-btn" id="backFab" type="button" aria-label="뒤로가기" title="뒤로가기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 L8 12 L15 19"/></svg></button><button class="fab-btn" id="homeFab" type="button" aria-label="홈" title="홈"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 L12 4.5 L20 11.5"/><path d="M6.5 10 V19.5 H17.5 V10"/></svg></button><a class="fab-btn hub-fab" id="hubFab" href="https://claude.ai/artifact/Ms7AaGc4EpWaVbBbcyqHPK" target="_blank" rel="noopener" aria-label="위키 모음으로 가기" title="위키 모음으로 가기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 H10 V10 H5 Z"/><path d="M14 5 H19 V10 H14 Z"/><path d="M5 14 H10 V19 H5 Z"/><path d="M14 14 H19 V19 H14 Z"/></svg></a></div>
+
+<script id="wiki-data" type="application/json">{"augs":[{"fields":[{"p":"max_stacks","l":"최대 중첩","v":2,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"탄약 절약 확률 (1중첩)","v":0.15,"s":100,"u":"%","i":false,"st":0.1}],"id":"ammo_saver","name":"탄약 절약","desc":"사격할 때 15% 확률로 탄약을 소모하지 않습니다.","rarity":"gold","icon":"kubejs:augment_icon_ammo_mod_slug","max":2,"weight":60,"mods":["tacz"],"pre":[],"fam":"gun","attrs":[{"name":"탄약 절약 확률","one":"+15%","max":"+30%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"주문력 (1중첩)","v":0.15,"s":100,"u":"%","i":false,"st":0.1},{"p":"attributes/1/amount","l":"시전 시간 감소 (1중첩)","v":0.15,"s":100,"u":"%","i":false,"st":0.1}],"id":"archmage","name":"대마도사","desc":"주문력 +15%, 시전 시간 감소 +15%","rarity":"diamond","icon":"kubejs:augment_icon_charged","max":1,"weight":60,"mods":["irons_spellbooks"],"pre":["elemental"],"fam":"magic","attrs":[{"name":"주문력","one":"+15%","max":"+15%"},{"name":"시전 시간 감소","one":"+15%","max":"+15%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"생명력 흡수 (1중첩)","v":0.02,"s":100,"u":"%","i":false,"st":0.1}],"id":"bloodthirst","name":"흡혈","desc":"생명력 흡수 +2%","rarity":"silver","icon":"irons_spellbooks:blood_vial","max":3,"weight":60,"mods":[],"pre":[],"fam":"survival","attrs":[{"name":"생명력 흡수","one":"+2%","max":"+6%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/conditions/0/min","l":"피해 이상 조건","v":12,"s":1,"u":"","i":false,"st":0.5},{"p":"rules/0/actions/0/multiplier","l":"피해 배율","v":0.8,"s":1,"u":"배","i":false,"st":0.05}],"id":"bulwark","name":"불굴","desc":"한 번에 12 이상 들어오는 피해를 20% 줄입니다.","rarity":"gold","icon":"kubejs:augment_icon_fortify","max":1,"weight":60,"mods":[],"pre":[],"fam":"survival","attrs":[],"rules":[{"when":"피해를 받기 직전","conds":["받는 피해 12 이상"],"acts":["그 피해 ×0.8"],"cd":null,"chance":null}],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/actions/0/duration_ticks","l":"횟수 유지","v":100,"s":0.05,"u":"초","i":false,"st":0.5},{"p":"rules/0/actions/1/condition/min","l":"필요 횟수","v":4,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/actions/1/actions/0/multiplier","l":"피해 배율","v":1.6,"s":1,"u":"배","i":false,"st":0.05}],"id":"combo_mark","name":"연격 표식","desc":"같은 대상을 4번 공격할 때마다 그 공격의 피해 1.6배. 표식은 5초 동안 유지됩니다.","rarity":"gold","icon":"kubejs:augment_icon_attack_speed_increase","max":1,"weight":60,"mods":[],"pre":[],"fam":"melee","attrs":[],"rules":[{"when":"공격할 때 (피해 계산 전)","conds":[],"acts":["대상마다 횟수 +1 (5초 유지)","쌓인 횟수 4 이상이면 → 그 피해 ×1.6, 쌓인 횟수 초기화"],"cd":null,"chance":null}],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/cooldown_ticks","l":"재사용 대기","v":1200,"s":0.05,"u":"초","i":false,"st":0.5},{"p":"rules/0/conditions/0/max","l":"생명력 이하 조건","v":0.35,"s":100,"u":"%","i":false,"st":1},{"p":"rules/0/actions/0/amount","l":"흡수","v":8,"s":1,"u":"","i":false,"st":0.5},{"p":"rules/0/actions/1/duration_ticks","l":"효과 지속","v":100,"s":0.05,"u":"초","i":false,"st":0.5},{"p":"rules/0/actions/1/amplifier","l":"효과 단계 (0=I)","v":1,"s":1,"u":"","i":true,"st":1}],"id":"crisis","name":"위기 돌파","desc":"생명력이 35% 이하로 떨어지면 흡수 8, 속도 증가 II 5초. 재사용 대기시간 60초.","rarity":"gold","icon":"kubejs:augment_icon_lava_walker","max":1,"weight":60,"mods":[],"pre":[],"fam":"survival","attrs":[],"rules":[{"when":"피해를 받았을 때","conds":["내 생명력 35% 이하"],"acts":["흡수 8","나에게 속도 증가 II 5초"],"cd":"1분","chance":null}],"summons":[],"cd":"1분","chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"치명타 확률 (1중첩)","v":0.08,"s":100,"u":"%","i":false,"st":0.1},{"p":"attributes/1/amount","l":"치명타 피해 (1중첩)","v":0.25,"s":100,"u":"%","i":false,"st":0.1}],"id":"crit_mastery","name":"치명적인 일격","desc":"치명타 확률 +8%, 치명타 피해 +25%","rarity":"diamond","icon":"kubejs:augment_icon_raging","max":1,"weight":60,"mods":[],"pre":["keen_eye"],"fam":"crit","attrs":[{"name":"치명타 확률","one":"+8%","max":"+8%"},{"name":"치명타 피해","one":"+25%","max":"+25%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"치명타 피해 (1중첩)","v":0.1,"s":100,"u":"%","i":false,"st":0.1}],"id":"deep_cut","name":"깊은 상처","desc":"치명타 피해 +10%","rarity":"silver","icon":"kubejs:augment_icon_fury","max":3,"weight":60,"mods":[],"pre":[],"fam":"crit","attrs":[{"name":"치명타 피해","one":"+10%","max":"+30%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"화염 주문력 (1중첩)","v":0.08,"s":100,"u":"%","i":false,"st":0.1},{"p":"attributes/1/amount","l":"얼음 주문력 (1중첩)","v":0.08,"s":100,"u":"%","i":false,"st":0.1},{"p":"attributes/2/amount","l":"번개 주문력 (1중첩)","v":0.08,"s":100,"u":"%","i":false,"st":0.1},{"p":"attributes/3/amount","l":"irons_spellbooks:holy_spell_power (1중첩)","v":0.08,"s":1,"u":"","i":false,"st":0.1},{"p":"attributes/4/amount","l":"irons_spellbooks:ender_spell_power (1중첩)","v":0.08,"s":1,"u":"","i":false,"st":0.1},{"p":"attributes/5/amount","l":"irons_spellbooks:blood_spell_power (1중첩)","v":0.08,"s":1,"u":"","i":false,"st":0.1},{"p":"attributes/6/amount","l":"irons_spellbooks:evocation_spell_power (1중첩)","v":0.08,"s":1,"u":"","i":false,"st":0.1},{"p":"attributes/7/amount","l":"irons_spellbooks:nature_spell_power (1중첩)","v":0.08,"s":1,"u":"","i":false,"st":0.1},{"p":"attributes/8/amount","l":"irons_spellbooks:eldritch_spell_power (1중첩)","v":0.08,"s":1,"u":"","i":false,"st":0.1},{"p":"attributes/9/amount","l":"traveloptics:aqua_spell_power (1중첩)","v":0.08,"s":1,"u":"","i":false,"st":0.1},{"p":"attributes/10/amount","l":"familiarslib:sound_spell_power (1중첩)","v":0.08,"s":1,"u":"","i":false,"st":0.1},{"p":"attributes/11/amount","l":"gtbcs_geomancy_plus:geo_spell_power (1중첩)","v":0.08,"s":1,"u":"","i":false,"st":0.1}],"id":"elemental","name":"원소 공명","desc":"모든 속성 주문력 +8% (마나 공명·전투의 함성 제외)","rarity":"gold","icon":"irons_spellbooks:upgrade_orb","max":1,"weight":60,"mods":["irons_spellbooks"],"pre":[],"fam":"magic","attrs":[{"name":"화염 주문력","one":"+8%","max":"+8%"},{"name":"얼음 주문력","one":"+8%","max":"+8%"},{"name":"번개 주문력","one":"+8%","max":"+8%"},{"name":"irons_spellbooks:holy_spell_power","one":"+0.08","max":"+0.08"},{"name":"irons_spellbooks:ender_spell_power","one":"+0.08","max":"+0.08"},{"name":"irons_spellbooks:blood_spell_power","one":"+0.08","max":"+0.08"},{"name":"irons_spellbooks:evocation_spell_power","one":"+0.08","max":"+0.08"},{"name":"irons_spellbooks:nature_spell_power","one":"+0.08","max":"+0.08"},{"name":"irons_spellbooks:eldritch_spell_power","one":"+0.08","max":"+0.08"},{"name":"traveloptics:aqua_spell_power","one":"+0.08","max":"+0.08"},{"name":"familiarslib:sound_spell_power","one":"+0.08","max":"+0.08"},{"name":"gtbcs_geomancy_plus:geo_spell_power","one":"+0.08","max":"+0.08"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"스태미나 (1중첩)","v":2,"s":1,"u":"","i":false,"st":0.1},{"p":"attributes/1/amount","l":"스태미나 재생 (1중첩)","v":0.1,"s":100,"u":"%","i":false,"st":0.1}],"id":"endurance","name":"지구력","desc":"스태미나 +2, 스태미나 재생 +10%","rarity":"silver","icon":"alexsmobs:soul_heart","max":3,"weight":60,"mods":["epicfight"],"pre":[],"fam":"melee","attrs":[{"name":"스태미나","one":"+2","max":"+6"},{"name":"스태미나 재생","one":"+10%","max":"+30%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"회피 확률 (1중첩)","v":0.03,"s":100,"u":"%","i":false,"st":0.1}],"id":"evasion","name":"회피 본능","desc":"회피 확률 +3%","rarity":"silver","icon":"kubejs:augment_icon_fleet_footed","max":3,"weight":60,"mods":[],"pre":[],"fam":"survival","attrs":[{"name":"회피 확률","one":"+3%","max":"+9%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/conditions/0/max","l":"생명력 이하 조건","v":0.3,"s":100,"u":"%","i":false,"st":1},{"p":"rules/0/actions/0/multiplier","l":"피해 배율","v":1.25,"s":1,"u":"배","i":false,"st":0.05}],"id":"executioner","name":"최후의 일격","desc":"생명력이 30% 이하인 대상에게 주는 피해 +25%","rarity":"gold","icon":"simplyswords:soulrender","max":1,"weight":60,"mods":[],"pre":[],"fam":"melee","attrs":[],"rules":[{"when":"공격할 때 (피해 계산 전)","conds":["대상 생명력 30% 이하"],"acts":["그 피해 ×1.25"],"cd":null,"chance":null}],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":2,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/cooldown_ticks","l":"재사용 대기","v":10,"s":0.05,"u":"초","i":false,"st":0.5}],"id":"feast","name":"피의 향연","desc":"공격한 대상에게 출혈을 1스택씩 쌓습니다(최대 10스택). 적을 처치하면 최대 생명력의 5% 회복(중첩당).","rarity":"gold","icon":"simplyswords:bloodwake","max":2,"weight":60,"mods":[],"pre":[],"fam":"survival","attrs":[],"rules":[{"when":"적을 처치했을 때","conds":[],"acts":["stacks이면 → function","stacks이면 → function"],"cd":"0.5초","chance":null}],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/cooldown_ticks","l":"재사용 대기","v":40,"s":0.05,"u":"초","i":false,"st":0.5},{"p":"rules/0/chance","l":"발동 확률","v":0.3,"s":100,"u":"%","i":false,"st":1},{"p":"rules/0/actions/0/radius","l":"범위 반경","v":3,"s":1,"u":"칸","i":false,"st":0.5},{"p":"rules/0/actions/0/limit","l":"범위 최대 대상","v":6,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/actions/0/actions/0/duration_ticks","l":"범위 → 효과 지속","v":60,"s":0.05,"u":"초","i":false,"st":0.5},{"p":"rules/0/actions/0/actions/0/amplifier","l":"범위 → 효과 단계 (0=I)","v":1,"s":1,"u":"","i":true,"st":1}],"id":"frost_blade","name":"서리 칼날","desc":"공격 시 30% 확률로 대상 주변 3칸의 적에게 속도 감소 II 3초와 냉기 피해 10. 재사용 대기시간 2초.","rarity":"gold","icon":"kubejs:augment_icon_frostbite","max":1,"weight":60,"mods":[],"pre":[],"fam":"general","attrs":[],"rules":[{"when":"공격이 들어갔을 때","conds":[],"acts":["대상 주변 3칸의 적 최대 6마리에게 → 그 적들에게 속도 감소 II 3초, function"],"cd":"2초","chance":"30%"}],"summons":[],"cd":"2초","chance":"30%"},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/actions/0/multiplier","l":"피해 배율","v":1.2,"s":1,"u":"배","i":false,"st":0.05}],"id":"giant_slayer","name":"거인 학살자","desc":"보스에게 주는 피해 +20%","rarity":"diamond","icon":"kubejs:augment_icon_earthquake","max":1,"weight":60,"mods":[],"pre":[],"fam":"general","attrs":[],"rules":[{"when":"공격할 때 (피해 계산 전)","conds":["대상이 보스"],"acts":["그 피해 ×1.2"],"cd":null,"chance":null}],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"최대 생명력 (1중첩)","v":-0.3,"s":100,"u":"%","i":false,"st":0.1},{"p":"rules/0/actions/0/multiplier","l":"피해 배율","v":1.35,"s":1,"u":"배","i":false,"st":0.05}],"id":"glass_cannon","name":"유리 대포","desc":"모든 공격 피해 +35%, 최대 생명력 -30%","rarity":"diamond","icon":"kubejs:augment_icon_creeper_effect","max":1,"weight":60,"mods":[],"pre":[],"fam":"general","attrs":[{"name":"최대 생명력","one":"-30% (최종)","max":"-30% (최종)"}],"rules":[{"when":"공격할 때 (피해 계산 전)","conds":[],"acts":["그 피해 ×1.35"],"cd":null,"chance":null}],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1}],"id":"gluttony","name":"식탐","desc":"먹고 마시는 시간 10% 감소(중첩당)","rarity":"gold","icon":"alexscaves:sack_of_sating","max":3,"weight":60,"mods":[],"pre":["survival_body"],"fam":"survival","attrs":[],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"총기 데미지 (1중첩)","v":0.06,"s":100,"u":"%","i":false,"st":0.1}],"id":"gun_power","name":"총구 화력","desc":"총기 데미지 +6%","rarity":"silver","icon":"kubejs:augment_icon_crossfire","max":3,"weight":60,"mods":["tacz"],"pre":[],"fam":"gun","attrs":[{"name":"총기 데미지","one":"+6%","max":"+18%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1}],"id":"gut_production","name":"장내생산","desc":"총알과 화살을 소비하지 않고 대신 배고픔이 줄어듭니다. 총은 발당 \"그 총의 기본 데미지÷30\" 만큼, 화살은 발당 0.05 만큼 닳습니다. 허기가 바닥이면 평소처럼 소비합니다.","rarity":"diamond","icon":"kubejs:augment_icon_pyreheart_curse","max":1,"weight":60,"mods":[],"pre":["gluttony"],"fam":"survival","attrs":[],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/cooldown_ticks","l":"재사용 대기","v":100,"s":0.05,"u":"초","i":false,"st":0.5},{"p":"rules/0/chance","l":"발동 확률","v":0.35,"s":100,"u":"%","i":false,"st":1},{"p":"summon:hound/health","l":"사냥개 생명력","v":80,"s":1,"u":"","i":false,"st":1},{"p":"summon:hound/damage","l":"사냥개 피해","v":10,"s":1,"u":"","i":false,"st":0.5},{"p":"summon:hound/lifetime_ticks","l":"사냥개 유지","v":900,"s":0.05,"u":"초","i":false,"st":1},{"p":"summon:hound/max_count","l":"사냥개 최대 수","v":3,"s":1,"u":"","i":true,"st":1}],"id":"hound_pack","name":"사냥개 무리","desc":"적을 처치하면 35% 확률로 늑대를 불러냅니다(최대 3마리, 45초).","rarity":"diamond","icon":"dungeonnowloading:skull_of_chaos","max":1,"weight":60,"mods":[],"pre":["executioner"],"fam":"melee","attrs":[],"rules":[{"when":"적을 처치했을 때","conds":[],"acts":["소환: 사냥개"],"cd":"5초","chance":"35%"}],"summons":[{"name":"사냥개","entity":"minecraft:wolf","mode":"melee","hp":80,"dmg":10,"life":"45초","max":3,"range":16,"interval":"1초"}],"cd":"5초","chance":"35%"},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"방어 (1중첩)","v":2,"s":1,"u":"","i":false,"st":0.1},{"p":"attributes/1/amount","l":"방어 강도 (1중첩)","v":1,"s":1,"u":"","i":false,"st":0.1}],"id":"iron_skin","name":"철갑","desc":"방어 +2, 방어 강도 +1","rarity":"silver","icon":"deep_aether:wind_shield","max":3,"weight":60,"mods":[],"pre":[],"fam":"survival","attrs":[{"name":"방어","one":"+2","max":"+6"},{"name":"방어 강도","one":"+1","max":"+3"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"치명타 확률 (1중첩)","v":0.04,"s":100,"u":"%","i":false,"st":0.1}],"id":"keen_eye","name":"예리한 눈","desc":"치명타 확률 +4%","rarity":"silver","icon":"kubejs:augment_icon_volatility","max":3,"weight":60,"mods":[],"pre":[],"fam":"crit","attrs":[{"name":"치명타 확률","one":"+4%","max":"+12%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"최대 마나 (1중첩)","v":50,"s":1,"u":"","i":false,"st":0.1},{"p":"attributes/1/amount","l":"마나 재생 (1중첩)","v":0.1,"s":100,"u":"%","i":false,"st":0.1}],"id":"mana_well","name":"마나 샘","desc":"최대 마나 +50, 마나 재생 +10%","rarity":"silver","icon":"irons_spellbooks:arcane_essence","max":3,"weight":60,"mods":["irons_spellbooks"],"pre":[],"fam":"magic","attrs":[{"name":"최대 마나","one":"+50","max":"+150"},{"name":"마나 재생","one":"+10%","max":"+30%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"소총 데미지 (1중첩)","v":0.12,"s":100,"u":"%","i":false,"st":0.1},{"p":"attributes/1/amount","l":"저격소총 데미지 (1중첩)","v":0.12,"s":100,"u":"%","i":false,"st":0.1}],"id":"marksman","name":"명사수","desc":"소총·저격소총 데미지 +12%","rarity":"gold","icon":"kubejs:augment_icon_m700","max":1,"weight":60,"mods":["tacz"],"pre":[],"fam":"gun","attrs":[{"name":"소총 데미지","one":"+12%","max":"+12%"},{"name":"저격소총 데미지","one":"+12%","max":"+12%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":2,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"채굴 속도 (1중첩)","v":0.15,"s":100,"u":"%","i":false,"st":0.1}],"id":"miner","name":"광부의 손","desc":"채굴 속도 +15%","rarity":"silver","icon":"minecraft:iron_pickaxe","max":2,"weight":60,"mods":[],"pre":[],"fam":"general","attrs":[{"name":"채굴 속도","one":"+15%","max":"+30%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"taa:pierce (1중첩)","v":1,"s":1,"u":"","i":false,"st":0.1}],"id":"piercing_rounds","name":"관통","desc":"총알이 꿰뚫는 적의 수 배율 +1(중첩당)","rarity":"gold","icon":"kubejs:augment_icon_ammo_mod_fmj","max":3,"weight":60,"mods":["taa"],"pre":[],"fam":"general","attrs":[{"name":"taa:pierce","one":"+1","max":"+3"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"쿨타임 감소 (1중첩)","v":0.05,"s":100,"u":"%","i":false,"st":0.1}],"id":"quick_cast","name":"영창 단축","desc":"쿨타임 감소 +5%","rarity":"silver","icon":"irons_spellbooks:wayward_compass","max":3,"weight":60,"mods":["irons_spellbooks"],"pre":[],"fam":"magic","attrs":[{"name":"쿨타임 감소","one":"+5%","max":"+15%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"재장전 속도 (1중첩)","v":0.1,"s":100,"u":"%","i":false,"st":0.1}],"id":"quick_reload","name":"탄창 숙련","desc":"재장전 속도 +10%","rarity":"silver","icon":"kubejs:augment_icon_light_extended_mag_1","max":3,"weight":60,"mods":["tacz"],"pre":[],"fam":"gun","attrs":[{"name":"재장전 속도","one":"+10%","max":"+30%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"받는 치유 (1중첩)","v":0.1,"s":100,"u":"%","i":false,"st":0.1}],"id":"recovery","name":"회복 체질","desc":"받는 치유 +10%","rarity":"silver","icon":"kubejs:augment_icon_healingtouch","max":3,"weight":60,"mods":[],"pre":[],"fam":"survival","attrs":[{"name":"받는 치유","one":"+10%","max":"+30%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":2,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"획득 경험치 (1중첩)","v":0.15,"s":100,"u":"%","i":false,"st":0.1}],"id":"scholar","name":"학자","desc":"획득 경험치 +15%","rarity":"silver","icon":"create:experience_nugget","max":2,"weight":60,"mods":[],"pre":[],"fam":"general","attrs":[{"name":"획득 경험치","one":"+15%","max":"+30%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/actions/1/amount","l":"흡수","v":4,"s":1,"u":"","i":false,"st":0.5}],"id":"second_breath","name":"숨 고르기","desc":"적을 처치하면 스태미나 3 회복, 흡수 4","rarity":"gold","icon":"kubejs:augment_icon_guided","max":1,"weight":60,"mods":["epicfight"],"pre":[],"fam":"melee","attrs":[],"rules":[{"when":"적을 처치했을 때","conds":[],"acts":["스태미나 +3","흡수 4"],"cd":null,"chance":null}],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"주문력 (1중첩)","v":0.05,"s":100,"u":"%","i":false,"st":0.1}],"id":"spell_amp","name":"마력 증폭","desc":"주문력 +5%","rarity":"silver","icon":"irons_spellbooks:eldritch_manuscript","max":3,"weight":60,"mods":["irons_spellbooks"],"pre":[],"fam":"magic","attrs":[{"name":"주문력","one":"+5%","max":"+15%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"밀치기 저항 (1중첩)","v":0.1,"s":100,"u":"%","i":false,"st":0.1}],"id":"steady","name":"굳건함","desc":"밀치기 저항 +10%","rarity":"silver","icon":"kubejs:augment_icon_resistance","max":3,"weight":60,"mods":[],"pre":[],"fam":"survival","attrs":[{"name":"밀치기 저항","one":"+10%","max":"+30%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1}],"id":"survival_body","name":"생존형신체","desc":"허기와 갈증이 줄어드는 속도 10% 감소(중첩당)","rarity":"silver","icon":"farmersdelight:ham","max":3,"weight":60,"mods":[],"pre":[],"fam":"survival","attrs":[],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"속도 (1중첩)","v":0.05,"s":100,"u":"%","i":false,"st":0.1}],"id":"swift","name":"날렵함","desc":"속도 +5%","rarity":"silver","icon":"kubejs:augment_icon_speed","max":3,"weight":60,"mods":[],"pre":[],"fam":"general","attrs":[{"name":"속도","one":"+5%","max":"+15%"}],"rules":[],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/actions/0/duration_ticks","l":"횟수 유지","v":100,"s":0.05,"u":"초","i":false,"st":0.5},{"p":"rules/0/actions/1/condition/min","l":"필요 횟수","v":4,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/actions/1/actions/0/radius","l":"범위 반경","v":4,"s":1,"u":"칸","i":false,"st":0.5},{"p":"rules/0/actions/1/actions/0/limit","l":"범위 최대 대상","v":8,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/actions/1/actions/0/actions/0/amount/damage_factor","l":"범위 → 피해 (피해 대비)","v":0.5,"s":100,"u":"%","i":false,"st":1}],"id":"sword_saint","name":"검성","desc":"4번 공격할 때마다 대상 주변 4칸의 적에게 그 공격 피해의 50%를 퍼뜨립니다.","rarity":"diamond","icon":"cdmoveset:s_diamond_greatsword","max":1,"weight":60,"mods":[],"pre":["combo_mark"],"fam":"melee","attrs":[],"rules":[{"when":"공격할 때 (피해 계산 전)","conds":[],"acts":["나에게 횟수 +1 (5초 유지)","쌓인 횟수 4 이상이면 → 대상 주변 4칸의 적 최대 8마리에게 → 그 적들에게 공격 피해의 50% 피해, 쌓인 횟수 초기화"],"cd":null,"chance":null}],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/cooldown_ticks","l":"재사용 대기","v":10,"s":0.05,"u":"초","i":false,"st":0.5},{"p":"rules/0/actions/0/amount/damage_factor","l":"피해 (피해 대비)","v":0.3,"s":100,"u":"%","i":false,"st":1}],"id":"thorns","name":"가시 갑옷","desc":"피격 시 받은 피해의 30%를 공격자에게 되돌려 줍니다.","rarity":"gold","icon":"kubejs:augment_icon_rend","max":1,"weight":60,"mods":[],"pre":[],"fam":"survival","attrs":[],"rules":[{"when":"피해를 받았을 때","conds":[],"acts":["공격자에게 받은 피해의 30% 피해"],"cd":"0.5초","chance":null}],"summons":[],"cd":null,"chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/cooldown_ticks","l":"재사용 대기","v":400,"s":0.05,"u":"초","i":false,"st":0.5},{"p":"summon:turret/health","l":"포탑 생명력","v":100,"s":1,"u":"","i":false,"st":1},{"p":"summon:turret/damage","l":"포탑 피해","v":12,"s":1,"u":"","i":false,"st":0.5},{"p":"summon:turret/lifetime_ticks","l":"포탑 유지","v":400,"s":0.05,"u":"초","i":false,"st":1},{"p":"summon:turret/max_count","l":"포탑 최대 수","v":1,"s":1,"u":"","i":true,"st":1}],"id":"turret_engineer","name":"포탑 기술자","desc":"공격하면 20초마다 20초 동안 싸우는 포탑을 설치합니다.","rarity":"diamond","icon":"immersive_aircraft:heavy_crossbow","max":1,"weight":60,"mods":[],"pre":["marksman"],"fam":"gun","attrs":[],"rules":[{"when":"공격이 들어갔을 때","conds":[],"acts":["소환: 포탑"],"cd":"20초","chance":null}],"summons":[{"name":"포탑","entity":"minecraft:skeleton","mode":"turret","hp":100,"dmg":12,"life":"20초","max":1,"range":24,"interval":"1초"}],"cd":"20초","chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":1,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/cooldown_ticks","l":"재사용 대기","v":3600,"s":0.05,"u":"초","i":false,"st":0.5},{"p":"rules/0/conditions/0/max","l":"생명력 이하 조건","v":0.25,"s":100,"u":"%","i":false,"st":1},{"p":"rules/0/actions/0/amount","l":"흡수","v":20,"s":1,"u":"","i":false,"st":0.5},{"p":"rules/0/actions/1/duration_ticks","l":"효과 지속","v":60,"s":0.05,"u":"초","i":false,"st":0.5},{"p":"rules/0/actions/1/amplifier","l":"효과 단계 (0=I)","v":3,"s":1,"u":"","i":true,"st":1},{"p":"rules/0/actions/2/duration_ticks","l":"효과 지속","v":100,"s":0.05,"u":"초","i":false,"st":0.5},{"p":"rules/0/actions/2/amplifier","l":"효과 단계 (0=I)","v":2,"s":1,"u":"","i":true,"st":1}],"id":"undying","name":"불사","desc":"생명력이 25% 이하로 떨어지면 흡수 20, 저항 IV 3초, 재생 III 5초. 재사용 대기시간 3분.","rarity":"diamond","icon":"legendarysurvivaloverhaul:heart_container","max":1,"weight":60,"mods":[],"pre":["crisis"],"fam":"survival","attrs":[],"rules":[{"when":"피해를 받았을 때","conds":["내 생명력 25% 이하"],"acts":["흡수 20","나에게 저항 IV 3초","나에게 재생 III 5초"],"cd":"3분","chance":null}],"summons":[],"cd":"3분","chance":null},{"fields":[{"p":"max_stacks","l":"최대 중첩","v":3,"s":1,"u":"","i":true,"st":1},{"p":"weight","l":"출현 가중치 (같은 등급 안)","v":60,"s":1,"u":"","i":true,"st":1},{"p":"attributes/0/amount","l":"최대 생명력 (1중첩)","v":4,"s":1,"u":"","i":false,"st":0.1}],"id":"vitality","name":"단련된 육체","desc":"최대 생명력 +4","rarity":"silver","icon":"kubejs:augment_icon_vigor_siphon","max":3,"weight":60,"mods":[],"pre":[],"fam":"survival","attrs":[{"name":"최대 생명력","one":"+4","max":"+12"}],"rules":[],"summons":[],"cd":null,"chance":null}],"icons":{"kubejs:augment_icon_ammo_mod_slug":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABxklEQVR42s1Xv0vDQBT+IgHTdnLSycHNoYIgdqxIEYcrCHZwcPRfuMml+3X0j1DJ4JCCCIV2rD8W+0eIxVHITT6HkJIml+TSpp4HISR3+d573/vu3YtFRASDwwb5qO8dGjE+eX/GGkiaC5+keQdsYDEHPM+bexZCYDQaFUSRWAP5SxsHAM45ms1mQQb8/6ABGHQAGSJU0bzMUOJRhgYYY4kPl3EqxItrwCLpUv2gq/RY+VGBiKNBqLAmr930FDDGEhGrGEhbk2dcuxBFDaicyqI6N2V5uyAahUoL8bvruon12WmUwWGUF1GchTRhdTqd1RSiOK1hxQsjjb4DgHa7rRF9kAKLvq+pcfSg7fS920/HI0Kv18PLeKiFNR6ewQZJVJ1yehLLsgAAtUrgjN5pSD5qTrlNUXX9R1sDNlAeAzMHtPFkkIKyGdDGIxlqACUzULAjMsZAWIiMaYD84tvw7qaVOb9dWaApLZICdjXInBdCYHfjcW6tEAKc88T8bBf8tQhn82FHVHNI6zq+HOQa55zj7eM0k9UQL+iIvrbIu63AxGAXfliInJUY2GkNlRo43+9HTsOpQ+OnTSMMNE4+YdEURn/PfwEp1hPigyQ+pgAAAABJRU5ErkJggg==","px":true},"kubejs:augment_icon_charged":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADM0lEQVR42l2Sb2jUBRjHP7+/99v9Z2673HbLtTbrttYa2piu3CXm2pICB7M/IsxemNGEmjp6ES160zJCCJLA/kCEWWM5aL3oaKChWUwpc4JIKVdnzKt1N3d3u/v9fk8vxgb1efO8eHg+fHmeRzFrj8tScpDOgW/JzV/nz5tJ8qkJjLI76B4+yZanTF69v49i7ga6GUbcIk2bRrh6/giO9TTqUnIQ686TmJ4wVQ29uJmLKEoIVfxk/05wrqAwkjiFbgTRtQDV6/uXh0t5cslhVABl/jAXpvZi+cLYTgZNMQhanSg1cY5Vwts9/VhWDTM/fU3q2pc4pTyusQEAtXPgO3TDixLcy12NCuLYWL4wka3VjO8O0H7fu7jiUCym6Wh/Dk2xAJfTZ48ycPACSiDypKDXohrNWPpvnDszyrYto3jC5WhWEx990cMT3a8ht/9iqZQC1WBRi5O7MUSg7mWU8ubPxFlKoxYmMfQyNN3LPbtbmE/48fpC+MojuHse4dqLB3HUBTQjyPWf3wGgbf83KCIiibNz7Nl/AqdYwG+madi1FknHGH9jKwCvX8qzGHKZ6H0Bs6wK1vZyYHAdL+26G6Ibv5IV6lpH5XKmJNl8SV45f1tC9V0Squ+SXxdcyeZLcmXelop7h6Ry3eNS0/KmfL9QFFUtTQHQt+8HvEGFqAnRWJyRVg8rVOgO0VicGkvwGeAvb2Ds430MbB5Cb9zZDoAe1FANi23PfEJydppoLL4qiMbiJGeneajvfVSPxY6xQ3z4wY8Utc2o4VutAATDbTR1HCBQWceh9+ZIzk6vCpKz0zw7fJlAZYTGth08YAb54+IZHhtoQf386AY29p/G1POYWpEHezoIxfz8n8j6WjZtj6PpHo4dGccsMzl+uG35E5cWf2Hu1gytD1s82u0j2uRdjb1Cc3OQ6lqD4JowFXVRqiKNyw0RkZ1jKRmeyIqIyExeJGeLhOq7JJsvrdYrN22ZvFQQEZG3JjMy+mlKREQQEXk+8Y+IiKQLIpmSK46I2I5IwRax3WVZuiCyWHRFRGTq99zq6ZWZq7ZURFV8isIaD9gCugLuSnZZSQolFyz9v7v5F1y8ehAei9LwAAAAAElFTkSuQmCC","px":true},"irons_spellbooks:blood_vial":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABR0lEQVR42qWTTUsCURSGnyuCLYQMZMpFEwpWEhF9BxHRonWt+wVB0N9oF/2E/oIbdyFCxKSLGCrCmYU0LkyRRimxWd0Wg5Ofmfmu7td5znvuPVdIKRlH/u4FIYQ33j089ujx5YS4vrwAoD2p6HbQAlydnUuxsQ3Aw+MT9u0dgEhmMx0A/yBr6ZxO1bC8eXjAOd8gwMHmigjXbQDRzOtUJ6fESIB0Tv/fJXYrXLcpAs28TtIq/N0BIIGWbQHINTX6N8DR1r48VaLs2Y4M6i8yUW7IkJu9B+LvF/yRzfAcd1haWORzQnE3DA2sAjU12u6sv4NIQPECTUNzG2l+h0hAGV5C8c2i5FQwDY3713cPEvyqUHIqw19hdkYVRZBYBdc2sKrGSJkaNTVKotzo6IeeVl6fixH6qbVDJ4FpkTI1bn77C6PKx5j6BoT8f9yrWojaAAAAAElFTkSuQmCC","px":true},"kubejs:augment_icon_fortify":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAACnElEQVR42p2TP2hTYRTFf/clNbVpNUhMa8FawTRt08RS0aJQoSr4dxC6iKODIA7iIh0cnSoODi6Kq7g4KCg6+AcqFQVLTattSbRJ//HeI5bXxMY0Eq9DTLSoWHqmD757znfvOd8VgAunttF3rAOfO6k7Og7K5KfPzEwn0UKa7Y1uTTvIy3cFOsMBtvjdeEirk6uWqdkMwxMFrt9NYQCcOLqfe4/GNNLbz/rNu7V1a1GfDs1qeOdeAMaTqkd6wzwdmtWO0BYNhiL4avI6PFHQrtZ1AAjA2JOLhKNdmlruAWBpaYn2TcP8jvz8QxYaruE4Dl6vF4DM0HHsRa8cOvcGid0J07qrj6oNQb37wk00Gq0U1tXVrRDLZrOVh2KxGCdb7vPx05wkZxZwA0y8vaeR3n4AbNsmEAhUCH+DbduV8/dvC5oyteRRc0uX5OcfshYMjih+n4gxbYJtWgBYlrVqAcuyiE+O0h2tlbSjGClTNZeZU9aITGaJ8wMfMPw+kcERJT45uqaxcnm4cakdI+0o3dFaCYYiAJim+V+Bck1Pp5AyVQGM8wMfcLIQnxwlkUisuptEIkEwFKGpcb0ApdSSc4vcfvCFs/ue/xHvv6Jvq3lG/9VX5AqukkexO2EAWpq8DI7oqpKzLIueTqGlyctUyil5BLCn3a1+n4in2iUHArcwTfOvXdm2jWmaVM3fZHzaEL9PpM7rVqC0ImWkndKCAsStZbqPXKGhoaFi8OvHlwnWe+jpFNIOkstDytRfS/ubmI4nkWmrSI3H0Li1vKKjM4ermUgVxb/Rhd+HlvnR0+9Lu1YWAaStGdKOQfZrUYL1Hi3HDJC0itK6zVWulzIHWCFUUYfSJ/P7RNqa0cUvKhtrheZ6V+X+5xRSJv8ADgsvzC6kH4kAAAAASUVORK5CYII=","px":true},"kubejs:augment_icon_attack_speed_increase":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAABh0lEQVR42sWTsUsCYRjGnwsbGxqFw4ZINLhybIloyUw4XWzwf3BRUFGcKtEgl+DiGuJqcMiGO+EyaXIJNz0PNRzL/+NtqO+4PAs8gt7pg+97ft/3Pu/zAX9UnFthLlsktq6en3GuIawkWaFctkhLbiCV6imurm/d+8BeIskKERENjR4REdnbXAgyNHoWbCFQOJKwBEOjR3aP5oKCvEBBXqBZCBNLskIMytpiIIfZYlJEOJIgBonFo0jny1hb34Cm6nh6vLeMHg36ls5jh4ynJoc6KFXKAADF4lFoqo6Q4Iem6qhVCt+m1eka2NwKOUH2isWjuDy5gJgU0TcnqFUK6HQNaKruONs3J07QeGpymqpTSPDDJwTQrDeRKmWQzpcBAO1WgwOAN/OVHvS7n79IYjdCXu8qnl9M+IQAvkSfbc8MZvQ+wOHRMdqtBueZhRzs86jddJmQADAgMViQFyhVyjjNZlPyrizbIfZXOAK3t7ONdL5stWplRZIVR4Z+Cyi73LExL4z/Uh+SOQtHPemcfQAAAABJRU5ErkJggg==","px":true},"kubejs:augment_icon_lava_walker":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAABhGlDQ1BJQ0MgUHJvZmlsZQAAeJx9kT1Iw1AUhU9TpSoVBztIcchQnSyIijhqFYpQIdQKrTqYvPQPmjQkKS6OgmvBwZ/FqoOLs64OroIg+APi7OCk6CIl3pcUWsR44fE+zrvn8t55gNCoMM3qGgc03TbTyYSYza2KoVeEEUAvRERlZhlzkpSCb33dUy/VXZzP8u/7s/rVvMWAgEg8ywzTJt4gnt60Dc77xBFWklXic+Ixky5I/Mh1xeM3zkWXBT4zYmbS88QRYrHYwUoHs5KpEU8Rx1RNp/lC1mOV8xZnrVJjrXvyF4bz+soy12kNI4lFLEGijBTUUEYFNuK066RYSNN5wscfdf0SuRRylcHIsYAqNMiuH/wPfmdrFSYnvEnhBND94jgfI0BoF2jWHef72HGaJ0DwGbjS2/5qA5j5JL3e1mJHwMA2cHHd1pQ94HIHGHoyZFN2pSAtoVAA3s/om3LA4C3Qt+bl1jrH6QOQoaxSN8DBITBapNnrPu/u6czt355Wfj88FXKR9RwaygAAAbpJREFUeNqVkzFr20AYhp8TMh2ioKGDazD1kA6xBAYP/gkmCBxC/0DpT+jsueSHdC50KRjTPYsHQ+DUoaHQIlA0dBCWh7YmX4fmrjpLxvTguBN8eu793vdOcWS8Uk/E7N/JT3Wozj8G6Z+ccnV2zl2Rk99/l0/8boV5ADqJ5BhEVyU95TGlI0OUDFHOP0onkURjn3S9I16kykAuun1bpKuSbLuhf3JKHIToqmRVlWTs+IwoAC9epKoOqf9cX426F92erXkZPMUo84AGJJcHsu3GQrLtBoC7IgcgDkJnBXBVJJEY6JSO9aCnPOqtLouMi26ft/dfbWuqDtn3qg6cPJ5uvPpQ/bAQJ7Vo7MNsQDT2bYptkFweGtHLfCQHFU3pyCQIbUoAq6pkEoSOGmOHvZDxIlWafx4ZM01KyyJrKDGHayJpvaX7Rpt2Xj97zrLIWMmvhiK132u63vFm8YVJEHJ1du7EbiDvkyFt1waZj6wCubkUmY/sM9ifOonEqTd7ubmUNqCRXZ+HDtdJJM7rV9e3qg5uxDz2BSBd71DXt01/TTv855D5yCptmM1s4FZ//Aazwd/VjMfvuqo/e8MQL5n5a7wAAAAASUVORK5CYII=","px":true},"kubejs:augment_icon_raging":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAABeElEQVR42rWUv0vDQBTHv9fUhNgiOEgCShQcrKSCOEh269AiXTvp2tK/wE06ighdWpydnVzbQTI5lQoOIhS0ODSDi1SkpdfnEC4kbdT+wC8cL/fIfe77Xh4B/kuXi1Hyx0kVGU1sr60G4qSK+p2MHi7KjACg2icmcqlUigCgXq+zUGJckkissL2ACAngmKOSwrxyMs+vKCnuha0BR5W77iq1GmzbhqZpP5d21iOg9YYTaegBrnkEQARFeUhHGwZs2wYAOI6DhY8HFLIGXd22WQDU5dy1IDEazTVkhfDSxmb6AK0BR7JcwenFDfLHGc8RC+tVl3MmoshbquJdsMf7SJYrME0TuVwOnU6HjX1+cdgPAYD7rx5b3lnC7qGGhiTDNM3ZBjW9v0Ln+S2yVIXikkRFmZGu6zQ1pJA1yFIVErPlLzXQ7N8g67qKZs3BY38AyDKAnvs8bTkJIxYY1LB32V9O7prveGp/srkamzBiNNevJGHE5ofMqm9C+qQ6viecAAAAAABJRU5ErkJggg==","px":true},"kubejs:augment_icon_fury":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB20lEQVR42pWTMWhTURSGv4TiyyqmbzAh2ZLXKcmQQCAJlkgchFZcJEOFCNbJSQrOUoi4uBSlg9Ut7w2G4lLFrSEidoihQmIWY2h9JCFPHQKZPA5yH7UJsR643J8D5+f/z3+v5+rtu2LbNgD9fp/jg5qH/6gF27ap/vgEQOVriK1kVowvQwBGjsPHX4O5hF4FwrUW9/tviBhLXPaGeGZA496AuFeXuRICyayU9YKcLNM0RfW7GUPORLK8tu4StFotERGX5J8Eeb8hgWRWTNN0h9W9uqjJ6qImef8cJXm/IWW9IIFk1h3uZgyRDVySbsaYaWdBgWKkB50QwVSOujYknG7TvtWiaVnsDiYEUzmOLtXgnT6dwshxCKfbFCM96tqQSicEj4Rms0ksFsOyLOrakGsvNMIXflKK+qatxL26qKN8q0RO2xnvbYoicS389WBGutzwx//I/rCPBbwHtm/eodp4CIdjdlYm8GqGErVQtSy12OW1dfl+9FjGe5vycuWiq8A7K5VipOfaOj6oeYKpHNXyEucOx7x++oTr0W/TKbjqHYdwesAuBpVOiMT5fdl6cAVODhcS7NCYbeH0QgFKUZ/IBlKK+kRheZuQUtQnZ/66pahPnn+eeBRW/d8+DStOVciuRQAAAABJRU5ErkJggg==","px":true},"irons_spellbooks:upgrade_orb":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABxklEQVR42qWSzWoTURiGnxPbkpzqjMZWp2NCcWaKG1fdFF0qpLsQCejCnSuZQC4gV+BF5AaKuOnCha5ERFTahRQDJiN0aMiIddoEMyGUcFxNTJrJxr5wNuf7znu+n0copbiIUlxUSimUUtTrdW6mIXMJtvMG23kDy7JUfCbfuK6L67oopViYDAQDhRCC5qJUAMVSFYB2+wf9/o4CCIJAAFQqleQWLMtSxVKVldNjfnPCu8+7tNoHFJ4+Z+teAcMwpqqZqsC2bVUsVWm8fEHvhsmX1zt0u92pD2KTcrksZgwA8t5bfmkahyPwff9fwGvwIHuFb+fyRbxG27bVw8ITovev2Bul8H2fKIrGiVJKHt3OselsUP/eJgw7BEEgEtd4vuxYm84G+63mfA5+Bkcc93rkh/2Zx1EUsd9qsjdKJRvUajVx8PUD2v3HAOi6jpQSKSUAjuPQSJtotyzCsMPcIQ6HJwxyd8mc/RnfmaaJpueI+gEiSs9vwfM88enjG1ZXV1hevMzSks6aeQdNz7FwVSJEejy8RA5i0mJYstk1BtEpAOFRg0kSEw22rusArIMAOAw7Y+rWzwbi2rLEyAjKz9xZDv5XfwEUN6+cpnE5ogAAAABJRU5ErkJggg==","px":true},"alexsmobs:soul_heart":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABUElEQVR42pVSMW6DQBCci2ks/AE4uUCJ/IDIcWW5cu8qSj7hr9DwBiQsV2lSpaSK+AAorjDwgSA3QZsC9nyHTeRsA9qbmZudW4F/1KEh4v/7kRAAYF071AFcQUO0jjIAwMfrTPUtHcQAJmw7kaAh8qMM07mNPKkNV1bf5mLTqvtRhqBz5UeZ6udJNjxj0BB5YUov30Sr9EhemJIXprRKj8Rn/VHvrglVRdHac21M5zYcKZW7tebMEDhoczpSKpIjJZbjs7Dl2sZ4SuC9+zJBJ/1VFyMwEQAenySqEth/FYhPNwroYOWibJ1UJeC4bY8x6hm3IyH4vYEC+47ouMDzg+wIBRwpjac09oBVq7LLw4UKczkGYinx+dbuxG7SW2W9fsoai83MyGMoUCOD3UQI3riqOGcRn9ps8qQ2bgcAMbSRfnS5sn3yoACL6Lmwwz7uFwiksoG3XcL4AAAAAElFTkSuQmCC","px":true},"kubejs:augment_icon_fleet_footed":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAACBUlEQVR42q2UUWhSURzGfycvA6O4ILTdkSOQMRpCPYxBZCD4UE8DHyQh6DEfCsZeiib40ktDQSHYiKKHvQjCoOGjUBB4iSFCDoSwELacqGMXZJEQrtOD3judulb0vRzO/x5+fN+5HweGSLb3JX+pcycH6WRcGtXyP8EsHexuSdnel+lkXB7sbg0FJcIemQh75KmO9KyOUS2zcPc+elYfcJUIe6Sq2XHPq5yE9YFMgFEt8+ljhd6IJsQ5NYaq2bi54OiD9YGEckmYsEhimdVYCqNaJp2My6Vnm5TyDSrffgLQrB2hanYLZoGK2TVZyERlr5tIYhk9q1v752/eUco3KOZaXViL+t5hx8SoS1+NpXj0OGjNzH0s8oCJyxcBqO8dsrK+LUaCQl6XdF7zD8xv+D5TzDUtFyYEQAHYCDpkIGWIjaBDXplw8Lrwizv3vvD25Q4zc+M4p8YsWK+LXikAgZQhjlej8+UpMrB0lfebFaADK+aaIzsoTitoyOuyYDNz4zRrrZGulD+1/fh3tzB75J5XAWTvPSmFTFRev/1EFLNr0n3roShkolI5fwGA9o/vXVyGUr6BqtlRNRvN2hE+v7Mb+wzRzHiznklUzU4p3xh6ZmV9WwxEyy1Oy/kXX0VucVoC7NQNMjrMeibx+Z2oms1qNmC5Emd9GUJe19DX4NWHsuB/6jevCgW5PrGXTwAAAABJRU5ErkJggg==","px":true},"simplyswords:soulrender":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAFxElEQVR42rWXXWyT5xXHf8d2cOyFkLgxdoadhDRbEqdLcLQulHSRmASqBUgwpd1GQ6oOrxe7qdSbTdrFdlHUi970Zl8aMFG2dIVK61Y2bsouYEFkq2JgnQl0WiEmaZxYMYqLnQ/bZxfxZ2I7SaU9F7be533O+Z/zP/9zHr2ynHgICJtZXf1+1YLn4OjpjKFuwkf+jKffD5knWU5MlTXx9PtVCsydXbuL3s/8+9MC/0rw+pkNM/H0+5GMPxRM5YBRJdzeyTFPEwDvXrhC6/btuTPxWIxph5P0QgKp2oaYzat2RcwUZ+/Z5yd4/XRut71vOM9AzdM/UNE0brMw0+pGk4sYqutw3vsEBfYdPQjAH377Ad99+QgzMzNc+2Qak/1pDLX1mJp30xkcYWHhEYlQlCfsDgC5+v6pXObB0dOM3p/i1R+9Rex+mLtjb69nIJROEzv/U7EN/Uw1neSZowcF4Np7lzQUSWFqfZILH95hJXSL6p79ABgdLlLTU/zj7xN849kO4kSJzIWRTOqefScJXj+zCv7jPDiFGtj+9ZMqtRaEJM54XFQVQXIH/W9eAOCdd64oiWVctSmmTFUYzC6qWvewdPNvpKMLbNvTyJdnIlhd9QwP9ALwq5EroIq1ySYLn85wb+x8LuEcA7GP8gLK0pWtk5LX/uPx82JtO67fHDwqAO+O/EWXb82QehRF00a6U0Zq93ZzsNXOC985BEAi8ZizF6+yFrwogIJWIzj6Gzz7TkIBA139flSV9r5hXE8Y5dp7l0AgFjgnNf1+NTq202t3Ev4sxOCBpzh0eIBv7T/CB5dGGHzeV7YtS7ShZtR6ZlOz4at9J5g2bdNeu5PIXJgGu0MGDzylhw4PAHDk8HF+8cs3Gbtxm7f/eCMvzj+dAi07B3RTw6mm+4SK0UAscE48/X5tsDsEIDIX1peO7aVvbzcAYzdu8+tL16heqQKgwe6Qq++fQqSoBIWgmwDveUWrPPtJL0xS87WXtPdJlwDEJse1zV7P2YtXc2cvfnQ3B75YtUJkNqyAqIJhFTgLruuYsHQMqaVzWGs8J4pfriRWa2i28/m/zklkLkxsclyb7DZCs1G+//yA9O3tltf//E+si9sAsLrrsTl3Ym2qpysztAyZiVwic8XaflIBTHXNyI4WLF/5XlEQS4Exlj8OYHF9W82Jae1scfFgdp642S7PDvoYu3EbgMB8hJDRSG1tHbW1dcRDURxdu2nvG1ZTeZKF+N2z8qXO11Sq7CTDN8FozL1NL6cwWFfHdHoxibuhmjv3H3IzcFmy7etodOcC9toaZOrWXXU0ukmllnl4awJXT4cYNqq1GHeg8TQGcxuSWMrfBf8ZEX0cJhX5GE2tEIpECYxfzlHoaHRrZC6M19YgXluDvPHWD9nV0y6RuTAOp1tMJrOw0W1obRxSldUkDNV1PP7vz6VQrBbnC3qgx8TkbDSXOcDA0Z9otiUzXUEyuYSzsSlnnL0jKjIQ/+x3IpkLOb34CIvjuGbB93h9euyZHevAs8QVggdHT2cnYG6v7CRcNxHSachUKhH+vQB4vT71tLiKal5qZcHXrsK9kpOw0hzwen3a2bKLO/enCBSBV7JTLI4XNREeWXfAUEr9ZcF7feq215cAr2AnmR8xYHEOqcU5pBsEUNqXt9enHc27CM1FCQQui2w4LLXor9wyVbIVAdU8+ERB5qobNvBaMVGqBBXbMF/zVcGtpz1zpUrpgIr3S2ukYht6e33atNNGcA14nn6hmI3iKIqDKl0zQ6XMO5p3MTk7v67VytMvW9C0lg/A6/Wpe2c9Ew9KqX2LSyt/pKwLYI/Xpx0tGbWPbwSuW45HpJgWw1rw5p02Jh5MF4BrBVBBtsjP2vIZCmn3tLiYnJsnMP5XKV9EKeNQv0gtkDbvcyoitNUkmJydL9tq/69lQoSEaZk7jwzcKyk4+YLK25ydKZlcoiopbK2YGwFs3tf/ANUJmN6r7bf5AAAAAElFTkSuQmCC","px":true},"simplyswords:bloodwake":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABhklEQVR42r2TTyjDYRjHP+/PL34kbSls8ucgZXZQzNhwIRcO2nlNlHaQk1pKGsrBYQdunFhuclRIUjvIn5NajaK2Yi5Iq5HZXqffsjLm4ltvPfU+n2/fnvd94O9SxsG6W1T0BqAWCgEZgDWFpWSG2FA6rekXefWkqftXpVpsBcYBAVAnlGpFoUrvET8ZxMu0xP37+2JKiOXbtJwvcbsXSl/fSJlNPDQ34Z2cEj8aHKjK9OBHJrDj8UienkkKBYPDwfCMD4A+hy3/DEbAMPiRCWy6XDL5/ILB2YPRbsuCAKGTi7wJ1CNNS905nDwUa7T7pgHwz/qyYLbxO3rdan28rKrB2GLBdH6G2WxmYsydA359nhxtdXatvhgrK4wtFq5CITqCG3nhHAX9XqkfKaV0WVplJBKRvd0d8tdfMjpgl1/roN9bMJwTq7WhWZpM9dSWJ+h3tuFZWBMFG+hwPB4jHL0WeqrNw1Pxq0FgblImYjdsH98Sjl6Lv2yWClBd2whAOLon+G99At/Zjh8/OezSAAAAAElFTkSuQmCC","px":true},"kubejs:augment_icon_frostbite":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAABMElEQVR42r2TT0rDQBTGv1fqwgPURdx4hRoQDHiACu5Tj6AXyA3MyjvYTQriVvdSsstG6DYgtg3UA4j9w+eifemkmZhSxA+GvMljfvO9eTPAH0nMCUnmCRExprVqKEAh3f58L0dNDbr9OSL/YOeFrhfmdpM4kMY+u7teyCQOkMRBMUGSfjSjqfX/0jg9v9M8SbLldDZHawIUaANVQQqgOkfbkJuHsR1kAoySKyGDtOioqXem7mBFBCRx25sAAE4Ol/b2my60ta4XYhtyfeGUIFZpGaqz+2+S5ChbcJCuvqNsUSir9AIU8vi2pB/N8ga0nE6+2AYhCeuFfBqurKfZZqe2e7XbEwGAj/dXAEEO+JoOAbQBANPxswDA0fElNf5Va9u5bGXYhlTBNP6cvAj+Uz8II5F/7bTh3gAAAABJRU5ErkJggg==","px":true},"kubejs:augment_icon_earthquake":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAABp0lEQVR42rWUsUsbYRjGf9+RRC1iA/aIUFBEcMrSQSl0bIhk1U1w6PKtdfBPcAgGdTWUThGLS6ci5Zpu3VJKKQgqaLEhQzyH85RwGMjbpXfGz1zagj7Lwb0vv/f57n2+g3uSMl94zVNJZyYUgPs+LwDXriJlC8kXbwhrpqw4SKiB7AopW7h2FenMhPKap/JXkAl5/uEkeqZsoVGeiwaZQNXPkX/kSOenYE0qOhdN2vUK9ryjevWrOEj5y7oAHP9qAPD6cp+ULZSCLGuLG3e+U8I8ln/kyOrXj1HD1PhT/FYbLvcpBdnIKcDIdF71PFrY0Llokp5ZUiWnKCOPkvitNu75GWuLG8qrVQTAepyhG5YwLYYQgHe7OwDkXuZuFvKn5tUqEsJ65qhbJaco7vkZ1c9VAL69/RHbn+gHapR3CXwh9yoXgvgnUPfmlheeSeALV17A1eYew+nB2NDeCmQcZLt2oJ6MD90Kba90W+b6tdZy2BoDYLt2EE3uTM7G3oA7V0RrLfV6HYCtT9+jya3RGQAKhYL892/BtK+1ln4gK65g2g+dPrh+A/zWzrwMESoYAAAAAElFTkSuQmCC","px":true},"kubejs:augment_icon_creeper_effect":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAABaUlEQVR42o1UsWrDMBB9FobgDNkyq5BNgULIYn9CwEM7lkz9CRcKgUJxIf6JTCE/YJpPSDdDIdo6eC6k0CElIFAHR6ocS3YPjGWf7t27dyd5cNiShlKtH8o3Dx3mtzlj9n1ehbILrNW5pKFUYDkfoI0h6aLMJr6FYdNIJ5uYdoI4gRQIW4yAvLSyW9JQmg3xXZ0yg9jEBy+EwaxKZOpGbMKaJan3pVbqWyUnNmHNoOzuE9m6j2zdbxWftLG5vfnC7sfXjw3MLrYq5wwSBQLp9KD/mWCIaQ2QuMqKAgElaBQIRIFoMM7WfT2cRE0qL0TV6pjiFN1r0GR+RDI/AgDS6QE5H1T+81jsZ0w656i3WyHZDHXLeSG0sMlmqPepBLU5Gm+5tweTDCVO6RMAYPQKZFfZX8sXI80WMa0Na+Pw7WdM1gIcjJGX4IXAeMs95+lXdV8C9narqtTnD13Fv64R+XgtrXfPy3sj7hc/FKhKg1oA2AAAAABJRU5ErkJggg==","px":true},"alexscaves:sack_of_sating":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABtUlEQVR42qWSMUhbURSGv6uuSTGQpi+WEB4NzRIoIS5JacWlg4NLB0UQ3FpLXboWCS6F4OQUii6C1K0qOAmlrVEomiAVSiDwCIEkhEBCk6FD0dPh8Z7v9SV16F3u4T/3/89/zznwn0cNSzRmd8SKw/sLQ9+NDSNqmbiNFdpZeXyaVbfaaczuiOSKIrmi/Pq5K8ef3sry3SmRXFE24osyiDPiJGvzk7xaf0Mh9ZH0nfd8X05z/Xsaqr3be1BIZ0UPxtDmJ02g1uflu0MSoRRX7LJS3lYvxtckEUpx2Ton311VniZaNpMBnVLH4EfrgS1gxUflAwDujYfJd1fViFNgpbytAPRgjGRA51v3M5etc0aZIxFKsVleZ4+82iOvho5xI74or6eX4MkEzQ9nzOxv2bml+H1XIY9AIZ2VzKOnEPVDxAdf6zTrDYx2BcuZ0a5Q6hi2iHJWfv7wmTn/iO9GtdY372qPk4svNmyJjLnIE2H3f2p9qPZsF3owBmA7cm2iBWpRv0mM+GwnWtQPJ3jInlU22hW0atjsgcN6s94YSPb0IBnQXcm/LZc6hmfkAxfpX8c5QoA/9Re8L2QQha8AAAAASUVORK5CYII=","px":true},"kubejs:augment_icon_crossfire":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAABtklEQVR42s2UsUsbYRTAf69EIQ6uhSRgOqQxuBik4o1BghSilB4ihWYrpYSCctWlf0C2Hi0UB9ebHHSJICJyQ4eIIHdL8Y4sFUK2Li4OFV6HxNOYUxcFv/F97/t9v+99jyeqykOsZzzQehxQ3Uxr3UwrgGmMxR64jJvGWJQ7ADruJJibKdBL0FtgWjfT+vVtjuNOIt5oq3kq9e0WczMFplIXnCFaNrLw91dkMZW66F623QKQWNClwd7hCcXZV+QySQAFqC0W9EO1yLvV9+wdngxoJmLUxe0MadsNWbMWCLyQ2qePOl/KM17ME3ghbmeIUVRuLfZW8xSAUuqftNrnBF5Iowd8vfSFwAuxHZ8Ne0nuNXqeGcFtn5PLJKXhhrpmLfDiZYXdzW/Yjo9VnZTACzlD2G/+ufNpUW1iINiOr4Bch9zVkLGQ8WIeqzoZfcB9xR6A5DJJsR1fLejCgLKR7TPrM6otFnS+lAeIIPs7jvRiYjs+gRfGmvUZDadmabgHANiODyARsHuzlI2sWr39ienKVc9cHyMry58B9PfRTtS1N4u6u/4G2/F1YrrC9x8/JRb0JMbIf/UzxfmNWjvPAAAAAElFTkSuQmCC","px":true},"kubejs:augment_icon_pyreheart_curse":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAACHUlEQVR42nVTMWjbQBR9Ui2Z6ohCgyBkcCgyBRfXFo6GQNYsWTK0pZROTQldRYcswQLTEm+ZshtlKJRScApd2qE0YzvEwkqCPQScxi0lEChxqwwO0XWI7yyp0gNxp/8/791/9w8IwZF0ihgsUqKOpFOLlGi4LqkWANAyJZoUS4qHBdh/JkziSDpd7izy4pPH22h7OViE0EMa4K23AAA4eP8JzdpYbG7vUsiEFZc7i5gv7nCiRn0Grzs3gRFJNAc0a5MwRmRCy5Ro28txkts3pnnx8dUpGnUFALBavUjM6b//4uzjHwisnTgJK7YDFRviAAAS8426gt56BqIrk0Tzj69OAQAb4gB2oMIOVB6Lw5UJxDQSO1ABgK9GuR8RiEPc8veFpIRR7uPdvXO+f3QwiTRUhj5Ei5ToK+Mrvh3e52p2oEJbmuAk2tIEJ2Ur80d98wtGuX/dWmXoJyoxMrb/shYk1rW93HhKLVKiZ0fPaT6rUTbRJ9UpGhyZ/GuZEs1nNZrPanR3czbybARH0qkrE6y9+AkAUJ49xHxxB3ag4mnnVkT5TvH7aBgVNGtjz7b8fUE0yn2sFLo8+OHuZzTqCp8dhh9Oj5P01jPcZHZZAntjrkywUuii7eXgygQPXp5jtXoRIWPmhjG3dymkXifzbHdz9j9PmH8tU4p6lEQSbnXwZAbA9QNlt+vKBPH5E9JOVBn6fJq3uwVualoX/wC/GhIA8Qh5QQAAAABJRU5ErkJggg==","px":true},"dungeonnowloading:skull_of_chaos":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABhGlDQ1BJQ0MgUHJvZmlsZQAAeJx9kT1Iw0AcxV/TSkUqDgYs4pChOtlFRRxLFYtgobQVWnUwufQLmrQkKS6OgmvBwY/FqoOLs64OroIg+AHi7OCk6CIl/i8ptIjx4Lgf7+497t4BQqvKNDMQAzTdMtKJuJTLr0rBV/gRxggCEGVm1pOZxSw8x9c9fHy9i/Is73N/jkG1YDLAJxHHWN2wiDeIZzetOud9YpGVZZX4nHjSoAsSP3JdcfmNc8lhgWeKRjY9TywSS6UeVnqYlQ2NeIY4omo65Qs5l1XOW5y1aoN17slfGCroKxmu0xxDAktIIgUJChqooAoLUVp1UkykaT/u4R91/ClyKeSqgJFjATVokB0/+B/87tYsTk+5SaE40Pdi2x/jQHAXaDdt+/vYttsngP8ZuNK7/loLmPskvdnVIkfA0DZwcd3VlD3gcgcIP9VlQ3YkP02hWATez+ib8sDwLTCw5vbW2cfpA5ClrpZvgINDYKJE2ese7+7v7e3fM53+fgB26nKoICxJtwAAAVBJREFUeNqtkj9Lw1AUxX9pLIRAqUUlQ2hBQRDEWb+D30Dc6+ziB3BxEZzcdPQLKEhBcK9DNzuUDk1aMLV/LMHXl6YxDiXBQtNW8Sz3wnvnXM65V2EGTNMMc7kcAP1+HwDP8+h0OgrLIrO5G0a9ZhTCpH8rSQ++cEln10OAQAr+BM0ohJFIElKLLKiaziKRxOlRP09AmTfdFy5pPYMvXACkYymJAtHEtJ4B4Ozimla7S7VSpm3Vqb08o2p6HKg/mKw09ZN8cHgEwPHpOU+lx5jce2uylt8GiGtkKxWtKZCCtlXHFy7VSpmTYjEmX93cMR5JAikm1RsSeMNpC5Giquls7e3HHntvTcYjCcDAsWPil/xUEkPUjEK4umHy8d4ikIKskWfg2LHvpe6ga9d4LTa43Lll4Ni/OyTpWIqq6TyU7rEa1lTqS91BlMmstf07vgEsGqNj5uTBzwAAAABJRU5ErkJggg==","px":true},"deep_aether:wind_shield":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABfElEQVR42rWTvUtCURjGf1cuBA3RINzIdJAibmGDUy2BIESLQ5QEtQQOYYN/QItrY0u0tUZDQw0tQiC0uoj3IlwEzT6u+YWD4HSazsGPKxTROz2H53m/npcDfwxt+HF5cy8kzpzsjXDp7LXirrKnitOHReVqg7OjXdxmVxUrVxsA7O9sYfjnyZxfjEygj4/kNrushAximxsA1N9dev2B4sZD99qr1x9gObWJpMZX27vA7cOzAMgXyj8yTuoPEzHNJ0HEDE/totZrdQCImGEOEzENQH99+xRLi8avTre2HEIIIervLj6vZC+zvCZbWjTwyYfl1NiOrpIvlD3FbqvD41OO1PGBMhhAt5waRbuidpNGus0uhn9+onvEDFO0KxTtChEzjD43O6NIiaVZsoDb6uBUP0Y0EvuCgQVNXqLXH7AdXeXxKcdLwaJoV2h8tXGqH9hWidTxAb3+QF0gGFjQtGlOx5NpYa6tA2BbJXJ3V9qvf1o8mRbxZFrwn/EN9LWiNt1qY1wAAAAASUVORK5CYII=","px":true},"kubejs:augment_icon_volatility":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAB4ElEQVR42n1UsU4bQRB9c8K6Gj7AHS5OriiQqdJdYV1Bha6IIE0KN5YTubNEYekKJEtYFPgHQnJyB0SWnB9IhFEqROFLgz8A6uiMHsXe7u0aw0invZ2be/Pmzc4Ca4z1NtlsEQDMWm+T9TbxhnnrfkY1BwK/BLb9ls8G9tahy2QkjmNRcfwGuCDgAhXZ2O0QAGQwVGCBr75ZbAx4NYfcnQkAeBpRJiNxyhmnKuv9f+X49MEpU+7OxGbuoZq/YsGkT7MGPhD4kINYdJyTUJdm6tZBm1tKj4PYZDNlFiAyGAqbLdod9UzgbkMFbtdcLQpgzVIGQ8VsUTFNQDWH0x2OU2omHKdENof0jsXxdzs0ulkMxQYIo9i0dXq4D2TzkmE2B54elfiFRnbJ5iWMYian39D78hHT8xPgz2+gsadWDbK5BTw9OgBa7A0NMr3+ge9Xs5KyDQIAuw2nAWWJeXmAwyjmxeUNZ9mSJBlGMbl4UKs+T4UE9v7VDIZRTG2zbMmLyxtqcK0bkz6Z9Mluh/aIaNuwN7f/njG//4tasIOjz19RC3bK+esdl10LfDAoSltUzJgYVrNs6TyGzTilZvTWNeKcI7v9APDrZypstiiTkTDp07R/lcV7pkVdvcy0Rqv+Fy9xSgsyXPMOAAAAAElFTkSuQmCC","px":true},"irons_spellbooks:arcane_essence":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABaklEQVR42t2Su0tCcRTHP79eXKlBi6AhTIIaSnApbIkilKCIBocg6YXW3u7Qf+DWZODSFK0tRQ9avEhRkLkU3RsOFUI30HKJ03SvWdRQQ9BZDhzO+ZzH9ygR4TdWxy/tHwAQEb47ZHciKT8CeNeS0p1IysL5rdiQocXPsIavus7ORCkXKjQ3aUQDETYTyPRUFEAy6VVl5yq7u1KKtsmY9LT7mfNHeA1oPHRCuVAhWNDQOyvcn5gUj3JcPmdxP8BFfkPVTOAqwfxohONXk+GzLkoKrm5MWjxdXCR3GFqaQBT0HYL3sY4ODXEAIS0mqnmQ+m2TYmuO9Zs0jWMDLPsmuT41kf0sz95+irc55CAL7mB1hbArLj53EMPSee8zHp3xkUV6zyBr5J04gGHp7L6knBWUYenicweVYemyV9lQIQvpsODpMc+WpQNgxwF2X1Iq7Io7Ezjk1N1KjSIhLSZ28Ue1QlqsqsKfvfIboPCobBQAVFkAAAAASUVORK5CYII=","px":true},"kubejs:augment_icon_m700":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAJQUlEQVR42u3aW2wcVxkH8P85Z87M3i9eO44TJ75t6jhxTGhK1D5UIqWoBVpVlAdAINFWpVErVRVFggdEESAhJBBUESDoAyoXASUqBYoQUpuXXuJcSNwmaXyJb4njtWPvfXcuO3MuPNgNVKIqD6iNkzkvu9KemaP9zfnOfHO+IVpr3MiN4gZvIUAIEAKEACFACBAChAAhQAgQAoQAIcCN2MhDDz+Cudnph0ulcrJUKh7q69she3r6AELgt1oANAihIIQAWgME6OvvRyQaQbVSQc+2bbgwcwGHDx9Gb38/IpEYfNeDaZmgVCMIfEilYJoWHMdBPBaD1/KgFEMsGker5QEgMAwKrQQajQa4ycEYRSKZBDRQqZRBKQMAmNyEEBJaSxBK4LktZLNZgGg4jgNCCCiliMUSaLU8+H4LgS9AKUUmk0UgfLiuA62AQAgYlmUl0+nswdXVYtK27bLW+tdaa00IuTFCoFQqfj+WSNxCCB3cv//WZ7du7S64rvsjKeWmGwGBzs7MiPPnzsDzXOzbtx+33PKRzb29vV8h0HOu4zwlhMhd1wCe5z3favkIAoFXX30Fb75xGqbJMTQ0FOvr7/u2ZZoLnuf9UErZdV0C+K1gIQgCbVocXivA+PgERkePYm52Fpl0GruHh6MD+YGvMsO46LruN5VSbZwbeLfwoJSCkI1zc6FKaQUFraSCkAEINeC4LZw9dw6jo8cwP38RqWQSIyN7eH5H/juB71+uVqtPcM5BCGAYBhijqFarkFJCKPkhKYKtjBkbAsAgBJsJNWggWmh5LhKJNBilUIqgWquhfu4cLs7NYyCfx87dO0ENIzo9NfW0HwQvUWCyUq2OcG5++e677xoqLK9ML1xceDhmmYuUs+5IxARwbS+kBoDVIGjNa616KaEQIoAAATfWrqAQArV6HadPn4LjOPjwvr1wbRvlcvlYLpdzisVS5+TUBDZ3diIWT300m8qgXCluLa4uH+nc3PU0Y+xFqeQ1C8Da2tornuceklJOGYx7SqkRpSWUUtBag1IKZjAEgUDTbkL4PpqNJmzHsYIgSEihkEwkUKmUwShFuVJER3s7Dhy4o+/KlZXPz83O3GtZ1qVoLDYdBAE45xBSQGsKzk1IKQAQUEoAreD7PhhjoJTAtCwAgOe5V9cVxhiU0usJGoEQEtFoFCBAEAQghIAQcvXcUkooqUAIQSQShVISQgSABpRSYG1t7RBCgBCcpZT9CZr8Rmt9REn5BoCCFMINgiACreNSSZTLFdTrddRqNZTLFVxaWICQApu7OpFNtyGZSIIyCsdpIpvJon9gYAsB+WKpWPxYq9UqRKPRGakkCGHg3ITv+4Bey96A9x/gHSvV+sGzBGSWEPIitIbSGtCK+VJ+RgPPxaJxxGIxAIBt20hn0ki3ZXDu7FuwbQf5HTehZ3sPPM9F065DqQDxRBy5XMftjUbtH77v/1MEwVO+lMvRSGwxHk+sCCEBSEihP5AQWBOBhmGYoJRdVVy7KgAhRGuNt7TWViQavZ0ShnqtCs91wLjxYLVa7aCEdpumWSkVi9H5+XkwZmBb93ZwbqJaq6JZb6Bry1a0b9q0pbC48oW65x5Ugad94b9MiILJGaTS7/sMeM8bNiEEawVUDUrJdwM/eNPzXAgRwLSsk47dfLa0uvpkKpWigP5Zo1G/wDnDxUvzOPLyS7h06TK2b+vF7uFhUEKwVFjCtp5uHLjtVpicfXx5cSHr2A0orUEovTZngNYaWmsQAgGQZwB0SCGeI4Q8ZJocUorFYql0wm42byMET0ei0cMRyxrkhtFVqZYxMzMPy4pgIN+PjlwWjBI0bBsdnZ1d+R03Pea3WrxSrpxmjPlSCFBG3+9F8H8GAKWGppT8XQTB6FofAiEFCCHTjLK/UMqmCPSEVOIXBuevc25wQsmeUrGE2dk5SKmQz+eRSSXhNJtwXNfK5nIH+vr6HqtVa8bK8vIY54bPTQ7TNK9FgLXfxfpglNH1uwhZDxnAtCwwSiGkmJVSPR+NRn+rlXzOb/mrhaXlofHxyRhjDDsHB5GMx1GrVOELP5Jpy96xZWv3wSDwxerqyqlkIiUZY3Bd59oH+M81g3MOun48IQSMsYqSYkEEwRGDG4cYZcXFxcLQ5NR0BoRgR34HErEYnGYDnt+Ktm/adFdPb+8jdrPJyuXSSSmlNNYTsw0FsDYrCAzDgJIKUiloQGjo49wwDlFKK0vLV3rGxyc7TMvEzsGdSESjqFerUBqJWDJxZzbT9qDneU65VDrFGINlRSCl2ogAElJK6PU+IERDqePMYD+llI4XCktbJqcubGcGRz6fR9SyIHwfruukYvH4Pdt6er7keS1VrVTGKGOKUgIQbEyA9Z5XxwHwlsHoL0Fw5srySueF6ZlebpoYvGkQbZkMXNuGH/jZbC73iVyu/SHHcYrVauVNZjBoDUQikQ0KsPaxNt7a1wnG6K+g9cuFwlJ6fGJyFyjFrt27kU1nUC2X4LhOalNn56e3dnc/2mjUy8XV4lgqlQIzGHzf35gA70jFKQWgFwxK/6i1fmGpsJQ8Pz4+Eo0n0LO9F/OzcygUFhGLxxL5gR33ZTPZrzuuO1+vV89qrcEY2+AAb8+GtRzjCmPkBWj9u7m5OVIqV/a3t3cgYsUePXN27HOXL18S7e0dd3Zt2XJ/Jp19wLabV+r12jnOTVhWBEL8H1LhD7hsAUIoGGUXLNN43LEbva7rjVBKfp5MZWzH9b517PhR88Tx0a+5rtu7Z2Tv7/fu3VdmjH22Ua9DKYX32tneGJt3/555FwGcffvZhHOOZDIV+EHwgxMnjydee+2Vb9i2nRzeM/KHXcPD04zS+xqNOqSU776HuaHKWO/yJwzDQDKZtF3X/d6Jk8f46NHXn6jVqwNDu4f/fPPN+wuc8/sbjcZ/Pcd1VRvknCOVzsBx3UMnjx83R0dff9Jx7eyu4d3PD+3aNa6U+pTdbL4jNK6/4qheC410OhO4nvfjY8eORsfGTh2USgx2bMr9rae3Z55zfq/ntUApvX6rwxoa3DCQSqXhea1nxsbG6PjE+ONey2vr7x/4a0dH7ozruPfcEOVxwzCQSCQghfzJ+fPjqcmpiQdq9Vqf5zmfJOHr8gjfEAkBQoAQIAQIAUKAECAECAFCgBAgBAgBQoAbrP0Ly3hj/x+wsVUAAAAASUVORK5CYII=","px":true},"minecraft:iron_pickaxe":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA5klEQVR42sVSIQ7CQBCca4JocCTkThVJLSFBIy4kGILrDwDRj/ADHI6kFoNoReuQkFRcbYOpwJCgF9UGaKEHCMbdbWZ2ZneBf4O9Kkgp6fkvCAKmJSClJN/3kSQJsiwDAHDO4bouGpcjOsLEapuyWgdxHBdvz/MAAPvNDOvdCSq9so+yjgdtUkpRFEUkhCjiGbrkjjAxHfUBAGEYIhcxdMjDXgvh4QyVXpnjOMVcagXyzu8yG7qd72uc83rbi4lFttUs3YIQgojoYZAl8nLerSTfi1QeUp65yrbWquo6v4VtNb8n/4Ib3/NpNJlv+JYAAAAASUVORK5CYII=","px":true},"kubejs:augment_icon_ammo_mod_fmj":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACQUlEQVR42s1XPUwUQRT+9nLFcFuZkGhlYWeIGBpMbC4kcOaS6UyIsdPQUcJQWVBc966EGgtjlFgOAocI15ggFRgLOi252KjFrtWz4GayP3O7e+CxvmSS+f/e+97PznrMzChRquAA9yanSwH/cvoZFXBYnvkc/g8KoEQFEKICDkpkIED1si7QWqfmiAjdbnd0LtBa2zYI3KzX63V7xvRdLshlIApGRFBKZYLnseTIguIxoJQCEeXuG6SoKwZyXSClzFQiaj0RQUoZA8+Oi/DyQSiljFFsFDVzhQKSr6CAix3DQuFMKJoFBshQ7AKIgmdHfsoFwVDWJinWWkNKmVr/p4UoeWmU5qQbhv0WVIEQNZF+Emy+2xqYYsdHh6gJ936zDiC1x+UCj38v8Uxz27n88tX7GPDXkwM7b8bJvkthcy4pB9vNi0LkC3a2xYWmveTb2Uf4gmMgfp85pRQm7s/Y/VFwc87VwAE8/vWc559+KuQyWtuxF/e+79txFNDMm36WbL5+eBGEvsh/Fq62d2PjQWd8wVhdftTvo1ghyguWldZuzEr++SGlkJH8wHNkQR4D660GAGDxRcdaud5q2LFRrPZnDxDDvYiq4MCZhi7ZaM9h3IMF2WjP4dnyHogI415nSPBIISqqgEvers3i9tgVC5EvRvNvIhf2U+8DIsLdGzvxz3FN4FrF4nE/BnxRuVYFLOMcwOMft1i/GUMZIp8EphCNxgd3Zg+dMfB4asu6wOOe4KPOzVIYeNA4h8c9lPp7/hcaTHK2KJUdqQAAAABJRU5ErkJggg==","px":true},"irons_spellbooks:wayward_compass":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABZklEQVR42qWSPUvDUBiFn1vc6uaQOjRTrXQylhY3Kwg6+YG/QHQQVLRQxM3BH+Cm4E9oJ7GDn11UBKlonSRxEG4GE0FE0fl1KEbTRpee5XJzz3lu7stRIkIn6gJQSoU+5vP5SGq9Xg8ZRaQJaA2WSiUAqrVTtKsxkyav72/kQVpBASBhGJLJZEilUsyvLIZuvrm5BmB6agYAV2vxfF8BKBGhN5GQsfFxHp+9wPwt88pGD/UH+2w2h5k0qe1XefI8FfxBVDhKrZ7Yf+bP4YXmOr35pycALM3Okc3mQofxs13u17aI7220PaFtiI7jcHZwBEC30ROCfGt9uQjAyeVFOwDAtm0APvwXAMrlMpZlAVCpVLBdjXZ1e5E831c729uSTqexLCsAOY7zA/8VfLi9o29wQIVm4Pm+Kq6uMlIo0Gg0IgdW26+GwkEPWqucMIzIKo9OTigA7WrOD48RkSagE8XoUB0DvgBkn5GB1Dfl9AAAAABJRU5ErkJggg==","px":true},"kubejs:augment_icon_light_extended_mag_1":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACZElEQVR42u2Wv4riUBTGPwcTY7GICANTWQ5YqZBCENlCoxYWdoLYWNvoSwxoYWNtoz6BoBmr0QeIiOi4nTYDLmwhQhoTssWSMPl3YzRgswcOObk3Off4u989xne5XBSfzwej3TPmxvyyLCORSOARttls8CTLMh5lsiz/LwB+SZIsJ7fbrWksFot5X4CRwHA4RDKZxOFw8Gyh80cEP37+MY1LkmS9BYIgIBqNmsan0ylqtZrmRlrG600EeJ5HoVCwfel4PJrGVFrG6/kjoqMAQEfCUoTD4dBEYTQaafPNZlOLOY4j/sKvt098vX2aYsdTwPO87r5ard6096/vz3h9fzbF3wvw7XY7pVwum15WSdgJstvtavFsNiMW8iv/27Q4AEwmE/s+YKRwj1ktTjwFXmvh5k7olRaIBcTjcSiKYumDwYDYF5rNpvZsLpezzWPnsizDDwAMwxApkPoCTdNaTMpjS0B90c7H4zFRC41GAxRFgaIoFItFYi6jx+PxfwQCgQCxUiMFoxYoitJip1xGcyTAMAwWiwVRC/V6XaOQzWavJgDAWQPXauE7BTdaeFKxOflqtSJSqFQqGoVMJnNVzqu3QHVSd4xGo2i1WqBpGjRNu9uCa4Wz3+81CpFIREdC/b8olUqYTqdIpVIQBMH5s9ztnvX7ffR6Pd2iVr0hFAohn89jPp97W0C73SZ+rnU6HXAch9PpBABgWRbr9ZpcgJuz22g0iPPpdBqiKF7dG1wTeHl50d2zLIvz+Wz7/HK5RDAY9K4Ao6l4RVG0nA+Hw84acNs+rezWHHcTuNd8iqIoeKD9BT15afy1Qsq9AAAAAElFTkSuQmCC","px":true},"kubejs:augment_icon_healingtouch":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAABwklEQVR42pWSPUsjURSGnxuCIKQIRLAKEbFSs07qaAKDwSKxEMHKwiJahIiQwmY/wjBbb7OwTeZfhK02DIyK2PmFnWAkYGe9Fitni5k7jJMY9cKBM/ec89z3PQx84Jx9PhC7WpJRtQSAXS2JjnGQ/MoMuj9eT9rVklSMAgB/Ls6xqyX5+vtIRQEA840aP/ZsWvsbuvSiLxmltvY3uD7uAwhAxSiQX5nhdmmZ1toO9fVVDg6dkYqT94NHMPyP6+M+840a/ILJ5jYAt8DPtR1y2QxOt0d9fRVtkUNHnKsbBaAA6p8WJNrwnF/kLpGGAAKQy2aoGAWcbi9UoSGhteBC6OK/CLC0zNzlSTh0P3jEGfTIZTN+fnWjxDRFua56saMIPQD2eW7UwsHO1DTfJ/9RMQp6FUK5DK47vOw4sB4knalpKJf54nnsBtY6m1s87X5DQPC8YdCoo1xXCYQ2/AfbCIhqt9VIRTFlEoUNNXne2yrENIf+XpmYkGY6JQDNdEqKyYS8DbIsiUPEsvwI8tPZ4uswMU0Ry5K/D+IPBcqa6ZSczhZ9SBBjQa8pisPeBYnvKArVsHdB4sq0TX33Ycg4m/HzH2rh7UbjNfitAAAAAElFTkSuQmCC","px":true},"create:experience_nugget":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABXUlEQVR42sWSP0gCYRjGf5/kZEiB0IVdt0SDNNjgEq5BTV7hUiAIDjYEDkWLc1NBSItCURDUEuVW4HTR0BoEUkhw2AnCBS5m5HANcYeef2gIeqaP93t+D+/78sJ/Swz7PLUKlu1LivTvA2zwvngGQFRNMChIDANj6jbv1LnI3QCwllnuCRKdsBvslGRoHFx+ICsmUTVBUqQFgKfTVNUDpNT9LlgyNCRDczqo6oGu4BH3/M88MscKAA8vSSrA6GwMezTTUIYHAOSLqwBsqFe0eWVz55BAsIms9Ho97oJkaIRDfgCeuHZgwKn3DZAMDdPwUWk2usw2LCsmAGa55uykp4P5BZ2To3FmfGPO3DYcDvnZ22qxmGoP3IGIR6ateMQimxPAHbsZC1kxKR17KdGikJ8EoPH5Jfoe0u3buv20ALI5gVmuOaBRRwQnfgxLU+eDT9kdpOttoSjeLvDP9A2QGICd2uiq8gAAAABJRU5ErkJggg==","px":true},"kubejs:augment_icon_guided":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABUklEQVR42rVWS26DMBB9jiKRm6QXyDVYlcpSRS7CMurGvQVSBWpZ9RpcADY5R3avCxJiY/xrFEuWAI/n8+bNDCCJlN2UGVPkN3jyerqBJFiaMiOHgikwRUTwSVmf0B53BADsDwAwvY9vDN0WpF+mPe4o6y/H2TtkfRG++1ufYsMT8bqAtrs7UOXA/ltEJVlXLKs8CKCscrQfv6lJVkZSyY4AjE12JBWbMqNBgoWu1QKantVVSecxMG3diNPATfEs7PDcFYlOX92gDc9VcBKIM7CMQH+2k2wk7BxRqmfI+mQQRKfuZo1BssrnS1Fr7C0jXhbdc6AiIFLeJDtbhZfbC++XsAQLbRYee3AoQKqV+lHGdwsaXy9aq2bx8mMZwNjPkTp7krfd3rg9FDb22tn/27WjgaXk6uGJFmrXUdOsKTMLotipFhw4PoYEvY+dyY/8tvwBuyLTz4ajl14AAAAASUVORK5CYII=","px":true},"irons_spellbooks:eldritch_manuscript":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABnElEQVR42sWTPUgDQRSEvxXBRvyDxAQSwQORi56BiI2dpBEt0ggXGzGthSiYwliIhTYRFAvFSrEyYGOhCBLERhQxEPwDCwvv4GICUcHatfEO4yEWKXzVwL6dfTOzT0gpqaZqqLKqJqi1QTqVsKEESC5tiWwmLUvFAh6vD0XVxN5uRgLCMC0JiLWdI/cEhmkRCYdIpxIyl7/D4/WRy99xcXosI+EQhmnJ6Zkp56EKgkg45ODZ81dG4jqKqjES1zGssnP2eH/tlvC9SsWCgztH56h/e+HqcJ293Qyx4SilYoH+vi7hmsC+6PH6qHl+ons+w0drG1eH6448RdU4u7z9PYVgwA/AR2sbNws6dY1NdExt/p1C0N/C2eWt7O/rQlE1Gh42ALhZ0AFYWV4lNhy1ZYionnR7EAz48Xh9hAfGyZ9s0zs0AcB7YzOLsR4UVWP/IFthdiWBvwWA/Mk2gKP98f6a/YOs06eompvAsMrSMC2CgbLLUBvb8V2cHtPeMwiA+LlMk2OD0pZjmJYjLbm0JdKphPz6odgeiH/fxk/LnJ8YundFRwAAAABJRU5ErkJggg==","px":true},"kubejs:augment_icon_resistance":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAABxUlEQVR42pWSTUsCQRjH/xMetGQc200UNBBlL3WsQxAdqkN+gKBzH6xz0AfIQ3oIq0MWFHmRDSOFxPbNwZdu28WZdtZV6H/aZ57//J6XWYKZDk7OEdZt9UKJl3mIMBTyWXR7fV8Y0owS1+PKpTSjcD0uPYV8lnR7fdxWLxATh91e3z87rQAALNvDTf3BD1d3PY7jwz3oGgMAXF5d+6KZWNB4//AEwyhB1xjOTivIZnQF1B9YslC7/a7kYuGqtuXIb8v2EKWgR2glylirN1CrN/AfKaAhn86WmAOlDI/Nt4UXhVcBjUfqCIZRQoomAEDCavXG3F6Cd2egIT7M16UwShkMo6R4PsxXjEfDP9BkFgCA7biRMM69SM8kCBIKmsU4Qz4F5x4oZcpoYa8ExROrpGO2lOct5HPY3dnG0eG+7EzkOmYL8cQqUUCfZhM/08ncawR3YhglGQvPz3SCT7M5P1qKaeTl+Q6240b+dLblwHZcvDzfIcU0EswpwWZ5B/pGBtb3wC+Wt1DI56Ctp+WCu70vdMwW9I0Msb4Hsps5kICtJSnGI+4Xy1tKrmO2sJakZDziCiQSFIYFzxdBFoIELEpREAD4BW854Tr+TgZEAAAAAElFTkSuQmCC","px":true},"farmersdelight:ham":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABV0lEQVR42sWTsUtCURTGf68MA6mQcGpTB/E9x4QaJOgfCBwqcopGwaExkAIb3tAQODdIUQjypvZwcBBcejwMs2iJEomHDcEL5DSYkGmaNPQt93Lu+X0HDt+FP0oZ1XAYi4nf5wNgs1Do63eNgtdnqwSCS51CPC7fjSaGwWEpYbbsTiEaZSMYZNEpcv5pNNQAIDLnBeDOOoFymYt6nYC63dMzOQjMaB5Rpx8IazvMvN1itmymXm+IhVYhGkWLRAi12/uFavXANWp69262bMzSEWvsAnDfbA5f4nxwi5f6GQBmy8ay3QBYl1lUrwPK8vAdXFWyfTCA6nXINfzsFYvKwBxkNI+oXgfLdtM9u6q8LwBg1GrKjzlQ02lWSk9QyZJr+HvevoIDZeR1EWlLMpWQjOaRX+fZyOti5HV5fryWZCohY3+IZCohIm0x8vrYsAsge3yqAMJ/6AN1hIWYpSwJSAAAAABJRU5ErkJggg==","px":true},"kubejs:augment_icon_speed":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAABoklEQVR42s2UMWvbQBiGnys22IaqcAJLcdrSBBssVJfOCWjokqlwv8EZ+kf6O7oEMhtCIC1kiEIImRuRwSXpFFsGaXDBDoRyne6wEiXx0CEfCO50d6+eT9/7HTy3EGUvlVJ6MBgIpZR2pQQgy3P+nh7bPXtpJp4UKovPnqujtXcADLOc0XRaEBMAcRzrKIpEHMcaoNvtWoHtXgBAPpsT+h5bvfcAfP95XhArJWrXqjp45XCXIJ/NUWHAeqvF5fU1APHVb/bSTFTKRL58/MAguWC91Sqs5bM5wyy388XxizIiI2C+akI26iTjlGGWFygfTc1QqTAoECTjFNmoW8KTPzMBUCkr9dHuTuFwx5WWQDbqlsKIPFr+dq2qP715TTJOCX0PwKayKGCisoyHRtMpK45jH0j1XSL7s42HJpOJBvj245CvJ2eEvmdTAei4EhUGhL7H5suGvicURZEAaDabwsw33q4WqDqutBXtuJKlW8QYc8VxSMaptcAioUmxUtas2/2+No16frAPQOh7lsj4y9hh6aZt16r6obVfN7fiv95H/wBk7dFTJvf/yQAAAABJRU5ErkJggg==","px":true},"cdmoveset:s_diamond_greatsword":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABWElEQVR42pWSv0tCYRSGn3sJfywiURZCaZFYQ2AEruYY/htN7eXQ0NRiQ5uLQw4tQrS1CJnRlovQkHJF1EHiiiGG6BXia7ofXVPrnvE933N4z3k/BRvliUXFpKbYgdOFvEU72o6wYAe++tCk1n0uAaDagU+XwnSubxn3+rKv2oFPLi9wRnb+v/PNV0/sd0oiJ/piPZUUoXxW7GoPIniXFq5QUFge/7ywHVge0ZuIA4hxW2eabdfGGp+vVd6TKUZaQ6aneGJR4U3EGVbruMObAPTuH6W7lbPjmbB0MKzWMWpNJtygZ3JzYTnAqDXpP70oHpC7mW7mwb9+4mF0WQRW3WTfVBx+H95EHD2TmwkDqOb1TbhY7srmsFr/M27VjO1gb5FiuUulNVBGWkMZt3UAHH4flsynDXBuBTgvGFRaAwXAFQoKh9+HUWtiDppVyuT0kdawaPP2B/gGEovHCDmTXKoAAAAASUVORK5CYII=","px":true},"kubejs:augment_icon_rend":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAACEElEQVR42q2UzWsaURTFf0+6cRzR8WORjMuoSajdldJCStdSgxC6aRftooRCV/1LuipIceMmEEpJaNNCoYt+LEwi2RgacXQZ3diZ0Wrj8nUR3uio6SoXHrzhvnvmnHPve0JKyXXEDbV59XKbbrfjoUYiUTEY9AHY3fsEwPazJwwGfe/M8rIpXr956wfqdjtys7gFgOvY/PzxTd780yVzfgEgdrNZOVhfYeP+A4xYHIAP++8lIAAC0/Rqx4e4jo0Ri6NArZTm5TeLWxixOK5jUzs+9EkLzGq1bRvXuVzGw8eX0rJZqZi6jo1t21d7NBufP+7ztPMbd4rR/8LH6O9o6O3zhSJWSlMeUTETJEvlhWcXSlPhHuxQlZrnU75QnANbCNRotnyyqlLzWCmvFFig+mWuZs4j13XIF4red+b8Akplei+eTxqyeptO49fV0vr9gS+ZLJWpmAmslOZJUj8JhSOLgYLBoGi22pMRONihYibIF4pUpebNk2p9s9UmGAyKOaDxeOzrhvLIJ3GmY6pmTpoRjYqj2gmu63Dn3gYLh9V1OKqdUD+zxHROqNsvhCC3liaZTNLr9WQ2vYKZSmEYMVbf7WGlNOr6Es1W2wMRQqDqfV07bbTIAfUzS9xaz0iAu1+/UzEThPQIzVabR0shsWiOfIxU5NbShHWd4Wjke6zCui6GoxGnjcn8ePXX9bD9A22j7aEIqRR+AAAAAElFTkSuQmCC","px":true},"immersive_aircraft:heavy_crossbow":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACMElEQVR42oWTz0vTYRzHX0/FloLO77fvpkunM8fWtLamKZYHg2+EejBYxU55C7t06NT/EHgSPSRSFAXDSyQklZMSvZQhlqRkqRWZjbEfTbL1g6fD2hdXut6358frzef5fN6P4I90nyIBtMM6sZeR3DaRFwlBAe3JwU7NjMtmBr8ffj0D4E00YxjnjM739kqTycRwf78wDABWYxkAtFSaEpNCvVXiqcyeDTx6j+5TZLH3FEf8fnpCIaLRqBwNh0VeeY2uEpn8+pOyYsOX4PE66q2SvjkrwWCQnlCIm+Ew98fGiIyO5j9veuKh3Lo+sL9I2lWT1H2K7GhT5cTUlOwbHJQnurpkXg92kruimNOttVyfeo1HLefqlW7SRY3sjT437uzaCe5s0mRHY1UWrilnPRbjR1pyqWE9b2rbGuh+VR50WrnzdMWAO+urSH6TrHxOc65Z276CVCJOoK5UNnkqmV76aMDHXLXcmvxAYiPD0GQUhMCpmdF9iswzsCgqZ9q9PF58Z8DtXje3I4vMLiXF8tqmAEhsZLKZ2dpEPWCTqUScezMLBnzUWc3A3Vk+xb+Lgkk8GbDJFm8VFkU14Aa7nRsPFv6BHYqZZF2IMksJ2u45RLNHkaE2ByMzq7hryrl4eYBUIo5FUXcc7+S1CwCMv/qCaPWqstquUtFylvnxIQ45bIw8eVuw7NzfWY1lEAFXmXQ59iGEwG0vZXhsviCcSyjA8tpm9i/YVZMRzf/Bf+s3T7HY9rFKcLYAAAAASUVORK5CYII=","px":true},"legendarysurvivaloverhaul:heart_container":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADPElEQVR42lWTTWyUVRSGn3vvzDD0ZwbtVIhhptBS66JNqzTRoEADRsvCGBYtujBGE0XLQkMXJGiiIeBPTEzEGp1aIjExpaQ1CBVaphWQFI0iAhGr1nbkz1LGFtpCZ+ab737HRW2NZ3vO8+bkvO9RIgJATXMfoVixKKXw+Xx4noeIKBFBay3GGFzXRSnFxMioOvPuOrTWaAARQSkl/U1lNDdVEnQzVJSE8fv9IiJSHi2kgCxrNlSxanMlxhgxxqCUwhdPJIkfTcrAjvs5ovK4MHgTz/MYvz7FsiX5GJNP6tokjmO5MW6JeIYNb66jemtCNj+6XKnKl3vk+7ceIOEP8cvgJCf6h9nZVEsXcD7+E67rUvXCSp7ya1776EfKHqwhssjglMKR7V/j8/l88/DJY0l2banF3fg4G29lUIkE2azl+dX3ceGOCDt7+nmj9RzUVsIZZm9S9UqvLFuxmFwux64ttYTr1xNwFxA9sI3pZ3ZjrSX72xh+f5pz2RgFgwfZ8clZjNFcHE6hjTGEi0NE7i5iv4UiAkQPbEOuTuC6LovGZ3CmZgjn34nnecRvQjgSojASwlqLT2tNLuehxOPa1TTnLwUpb9hOMBAhnLpFajKD1hovm0ZkIX+lLAUZBxMIoLVGiQjVWxOysnoFt69kWNAY4+n1DYQmxondBaHGNvKz1zl+cDef9rYz056kMJbH2Z+T/PD2WqX5t6aDQaKPlJHp+JPPj3WRXryEyylFXt40h99/lb1H93Hj8Chl9RWks7PhM8bMbgBwT+uIPLephIVjwnddQwQ3LeeJ8nqsZ+keTjCZGGV13VJU1PDZ68cpHjCq99Ra9JxAUbdRezsv4Yv5eLihgtt9Wb4c6uGLwa+Y6XdYUxfFlBg+br/I0tN5SimF53nMZR4RIZ4TKtpG5FROpGXISmPrpDy5Z0o++N2Vb63IvXuSUv/QN3Q6wouHLiMizMMiQkfasm/GpaJtRAZyIh/+YeW9Xx0Zc0RKW4bk2ZEM+zMenc5/zP8ERISXuq/QkbaUx4fl75zISceT0pYheWzVCTqd2b61dn5eiQie56GUYu4zAbTW1DT3idaa0+/UKa3nDQPAWgvAPxVSuIwArnCdAAAAAElFTkSuQmCC","px":true},"kubejs:augment_icon_vigor_siphon":{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACaklEQVR42m2SS2yMURTHf/d+95tvvs6jM9qOoUzVa0RoQ2lIkBAipBFNPRKxkEjEjhWxsbAQdpYisZTY2EgISzupeC0UDUHqWY9KqTHTdv4W085McZOzuef+/+ec3z0GEP85SaAVQ4vXCMkGHo+8Z/Q/j83fdw7IEaEj0YTJZnn9u0Dz5k30LZjP5TNnGEaMYfjCeFWj6XAYrSSqU7SqK5VTfW7xsrxuZNdpG57yJlq9t/XV01g6TJI+EmSKM5t98ew54dzZLGaSCQmLAcACpGJxYmFIDLAqk6TIucIijOfNMMk++MZs0uQJCKcMHEChVKQrnmHFpGFpyWMhjXizEmikIow6R5hIMm8koJvvDJGmCccYpRqDJYRqxeksaIhuOetmMMB5SsUSet26U/sJlHaR6Ryy1iqHVU+qTbd7DsszZqa4Loy1OkpG7fg1iOVymRSGHaOzOPZxABoCMOB7rjp/WxBnLRFULhPiiFXwUf2F38bnVvkhG4a+8ejtS07s2st43Yq8Gy/Q33GQN8xngiKfKNf2wIB80G4b049Xg9Kdfm2jMmMSr9r+vrZOfWSFdpNQs/FrDAAtXdOlwuCAhncc0nHiVdFN8tpq0wIUN1bXyWs1gRqwdQYOne3eomLPEZ0krmBKvJG0xHLtqoN4nhblMMJQM9jjt+gXnSrRoZ9sqtA1VoX1B6RLV/Tk2lURVFqeEwk12NWr02SVsU62xY/S7TdzN9PIizDBZu4DkMNyMfmVJVcv0P7hM3e29wLwoVTg/KenTBqfFA5ixinnoloYaaiwwFMngdJBKM+vVJ0HukdOq2z4z178AR8aC5MvlRKYAAAAAElFTkSuQmCC","px":true}},"rarity":{"silver":["실버","SILVER",80],"gold":["골드","GOLD",15],"diamond":["다이아몬드","DIAMOND",5]},"fam":[["melee","근접","MELEE"],["gun","총기","FIREARMS"],["magic","마법","MAGIC"],["crit","치명타","CRITICAL"],["survival","생존","SURVIVAL"],["general","공용","GENERAL"]],"mods":{"tacz":"TACZ 총기","irons_spellbooks":"Iron's 마법","epicfight":"Epic Fight"},"tactics":{"step":5,"max":20,"rows":[[1,5,1563,1563],[2,10,2550,4113],[3,15,3750,7863],[4,20,5520,13383]],"rate":0.4,"mech":0.5,"farmLimit":30,"farmSeconds":90}}</script>
+<script>
+const D = JSON.parse(document.getElementById('wiki-data').textContent);
+const AUGS = D.augs;
+const BY = {}; AUGS.forEach(a=>BY[a.id]=a);
+const RAR = D.rarity;            // key -> [한글, EN, 카드 확률 가중치]
+const RORDER = ['silver','gold','diamond'];
+const FAM = {}; D.fam.forEach(f=>FAM[f[0]]={ko:f[1], en:f[2]});
+const UNLOCKS = {}; AUGS.forEach(a=>a.pre.forEach(p=>{ (UNLOCKS[p]=UNLOCKS[p]||[]).push(a.id); }));
+const RSUM = RORDER.reduce((s,r)=>s+RAR[r][2],0);
+
+// 실시간 편집: 덮어쓰기 값은 db 의 edits/<키> 문서 {text, at}. 칸을 비우면 원래 문구로 돌아감.
+let EDITS = {}, EDITING = false, DB = null, IS_OWNER = false, PENDING_RENDER = false;
+let NUM = {}, LOCAL = false, LOCAL_WHY = '', CAN_EDIT = false;   // CAN_EDIT = 수정 칸을 보여 줄지(= 수정자 모드). 공유 저장 권한은 IS_EDITOR
+let IS_EDITOR = false;   // 확인된 편집자 = canEdit / isOwner 만(can('data.write') 는 interact 수준이라 편집자 판정에 쓰지 않음). 공유 쓰기가 한 번 성공해도 true
+let TRY_SHARED = false;  // 편집자인지 모르거나 interact 수준 → 저장 때 공유 쓰기를 한 번 시도, 거부되면 false 로 바꾸고 브라우저에 보관
+let NO_DB = false, UPLOADING = false, SW_ERR = '', SW_UNKNOWN = false, EDIT_STATE = 'loading';
+// 수정자 모드: 검색 칸에 비밀 코드(해시로만 비교)를 넣으면 켜고/끔. 일반 모드에선 수정 칸·수정 표시·문구 편집 버튼을 아예 숨김.
+// 2026-11-14 사용자 지시: 증강 위키는 다른 위키와 별도의 코드(원문은 어디에도 쓰지 않음). 입력은 앞뒤 공백 제거 + 소문자로 바꾼 뒤 비교
+// 2026-11-15 사용자 답: 공통 수정자 코드도 받음(전역 CLAUDE.md 해시). 증강 위키 전용 코드(11-14)도 계속 받음
+const EDIT_CODE_SHAS = ['aa895dfd415d13f697aa7b499fdb956c8f931fbd2ad94cf9da8e13cc8cf419d1', 'dafe102170e9c727d0274ac92beae8c69dec0b4b926e6985f0d05c8829b55561'];
+const MODE_KEY = 'sharpsharp_augment_wiki_editmode';
+let EDIT_MODE = false;
+try { EDIT_MODE = localStorage.getItem(MODE_KEY) === '1'; } catch (e) {}
+let DB_DOCS = {};   // 공유 저장소에서 읽은 문서 (브라우저 저장분은 그 위에 덮어 보여 줌)   // NUM = 수치 수정 문서 edits/<증강 id> {kind:'stats', vals, orig, note}
+function T(key, orig){ const v = EDITS[key]; return (typeof v === 'string' && v !== '') ? v : orig; }
+function rich(s){ return esc(s).replace(/\[([A-Za-z0-9]{1,3})\]/g, '<kbd>$1</kbd>'); }   // [U] → 키 모양
+function ed(key, orig, tag, cls, ph){
+  tag = tag || 'span'; const v = T(key, orig); const edited = Object.prototype.hasOwnProperty.call(EDITS, key);
+  return `<${tag} class="ed${cls?' '+cls:''}${edited?' edited':''}" data-edit="${esc(key)}" data-orig="${esc(orig)}"${ph?` data-ph="${esc(ph)}"`:''}${EDITING?' contenteditable="plaintext-only" spellcheck="false"':''}>${EDITING?esc(v):rich(v)}</${tag}>`;
+}
+function nm(a){ return T('aug.'+a.id+'.name', a.name); }
+function ds(a){ return T('aug.'+a.id+'.desc', a.desc); }
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmt(n){ if(n==null||n==='') return '—'; const v=Number(n); if(!isFinite(v)) return String(n); return (Math.round(v*100)/100).toLocaleString('ko-KR'); }
+function byName(a,b){ return nm(a).localeCompare(nm(b),'ko'); }
+function icon(a, px){ const i=D.icons[a.icon]; return `<img class="ico${i.px?' px':''}" src="${i.src}" width="${px}" height="${px}" alt="">`; }
+function thumb(a){ return `<div class="thumb ${a.rarity}">${icon(a,22)}</div>`; }
+function rtag(r){ return `<span class="tag ${r}">${esc(RAR[r][0])}</span>`; }
+function hashOf(id){ return 'aug-'+id.replace(/_/g,'-'); }
+function idOfHash(h){ return h.startsWith('aug-') ? h.slice(4).replace(/-/g,'_') : null; }
+function augLink(id){ const a=BY[id]; return a?`<span class="tag link ${a.rarity}" data-go="${hashOf(id)}">${esc(nm(a))}</span>`:''; }
+
+// ---------- 왼쪽 목록 ----------
+const side = document.getElementById('side');
+function navItem(a, badge){ return `<div class="nav-item" data-id="${esc(a.id)}">${thumb(a)}<span class="nm">${esc(nm(a))}</span>${EDIT_MODE && NUM[a.id]?'<span class="badge ed">수정</span>':''}${badge?`<span class="badge">${esc(badge)}</span>`:''}</div>`; }
+function block(cls, title, list, badgeFn){
+  return `<div class="tier-block"><div class="tier-summary ${cls}">${esc(title)}<span class="count">${list.length}</span></div><div class="tier-slide"><div>${list.sort(byName).map(a=>navItem(a,badgeFn(a))).join('')}</div></div></div>`;
+}
+function renderSide(){
+  let h = `<div class="brand" data-go=""><div class="kicker">SharpSharp RPG · Augments</div><h1 class="disp">Augment Wiki</h1><div class="sub">증강 ${AUGS.length}종 · U 키로 고르는 3장 카드</div><a class="hub-link" href="https://claude.ai/artifact/Ms7AaGc4EpWaVbBbcyqHPK" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a></div>`;
+  h += `<div class="search-wrap"><input class="search-input" id="q" type="search" placeholder="증강 이름이나 효과로 찾기" autocomplete="off" aria-label="증강 검색"><div class="search-results" id="qr"></div></div>`;
+  h += `<div class="nav-section"><div class="nav-head"><span class="disp">등급별</span><span class="count">${AUGS.length}</span></div>`;
+  RORDER.forEach(r=>{ h += block(r, `${RAR[r][0]} ${RAR[r][1]}`, AUGS.filter(a=>a.rarity===r), a=>FAM[a.fam].ko); });
+  h += `</div><div class="nav-section"><div class="nav-head"><span class="disp">계열별</span><span class="count">${D.fam.length}</span></div>`;
+  D.fam.forEach(f=>{ h += block('', `${f[1]} ${f[2]}`, AUGS.filter(a=>a.fam===f[0]), a=>RAR[a.rarity][0]); });
+  h += `</div>`;   // 2026-11-23 사용자: '선택권 얻는 법' 설명 화면은 필요 없음
+  side.innerHTML = h;
+  side.querySelectorAll('.tier-summary').forEach(s=>s.addEventListener('click',()=>s.parentElement.classList.toggle('is-open')));
+  side.querySelectorAll('.nav-item').forEach(n=>n.addEventListener('click',()=>go(hashOf(n.dataset.id))));
+  setupSearch();
+}
+function setupSearch(){
+  const q=document.getElementById('q'), qr=document.getElementById('qr'); let hi=-1, res=[];
+  function draw(){
+    const s=q.value.trim().toLowerCase();
+    if(!s){ qr.classList.remove('show'); return; }
+    res = AUGS.filter(a=>(nm(a)+' '+ds(a)+' '+a.attrs.map(x=>x.name).join(' ')).toLowerCase().includes(s)).sort(byName);
+    qr.innerHTML = res.length ? res.map((a,i)=>`<div class="search-item${i===hi?' hi':''}" data-id="${esc(a.id)}">${thumb(a)}<span class="nm">${esc(nm(a))}</span>${rtag(a.rarity)}</div>`).join('') : `<div class="search-empty">"${esc(q.value)}" 에 맞는 증강이 없습니다.</div>`;
+    qr.classList.add('show');
+    qr.querySelectorAll('.search-item').forEach(n=>n.addEventListener('mousedown',e=>{ e.preventDefault(); pick(n.dataset.id); }));
+  }
+  function pick(id){ q.value=''; qr.classList.remove('show'); go(hashOf(id)); }
+  q.addEventListener('input',()=>{ hi=-1; draw(); });
+  q.addEventListener('keydown',e=>{
+    if(e.key==='ArrowDown'){ hi=Math.min(res.length-1,hi+1); draw(); e.preventDefault(); }
+    else if(e.key==='ArrowUp'){ hi=Math.max(0,hi-1); draw(); e.preventDefault(); }
+    else if(e.key==='Enter' && res.length){ pick(res[Math.max(0,hi)].id); }
+    else if(e.key==='Escape'){ q.value=''; qr.classList.remove('show'); }
+  });
+  q.addEventListener('blur',()=>setTimeout(()=>qr.classList.remove('show'),120));
+}
+function markSel(id, view){
+  side.querySelectorAll('.nav-item').forEach(n=>{
+    const on = n.dataset.id===id; n.classList.toggle('sel', on);
+    if(on) n.closest('.tier-block').classList.add('is-open');
+  });
+  side.querySelectorAll('.nav-link').forEach(n=>n.classList.toggle('sel', n.dataset.go===view));
+}
+
+// ---------- 화면 ----------
+const main = document.getElementById('main');
+function blockH(title, n){ return `<div class="block-h"><span class="disp">${esc(title)}</span><span class="rule"></span>${n!=null?`<span class="n">${esc(n)}</span>`:''}</div>`; }
+function cardHtml(a){ return `<button class="card ${a.rarity}" type="button" data-go="${hashOf(a.id)}"><div class="thumb ${a.rarity}" style="width:36px;height:36px">${icon(a,30)}</div><div class="cb"><div class="nm">${esc(nm(a))}</div><div class="ds">${esc(ds(a))}</div></div></button>`; }
+
+let homeFilter = 'all';
+function viewHome(){
+  const cnt = r=>AUGS.filter(a=>a.rarity===r).length;
+  const P = D.tactics;
+  let h = `<div class="landing"><div class="kick">SharpSharp RPG · Roguelike Augments</div><h1 class="disp big">증강 위키</h1><a class="hub-link" href="https://claude.ai/artifact/Ms7AaGc4EpWaVbBbcyqHPK" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a>
+  ${ed('home.intro', `몬스터를 사냥하여 진행도를 올리면 선택권을 얻고, [U] 키를 눌러 카드 3장 중 하나를 고릅니다. 고른 증강은 그 월드에서 계속 유지되고, 같은 증강을 다시 고르면 중첩됩니다.`, 'p')}
+  <div class="count-row">
+    <button class="cell" type="button" data-filter="all"><div class="lbl">전체</div><div class="val">${AUGS.length}</div></button>
+    ${RORDER.map(r=>`<button class="cell" type="button" data-filter="${r}"><div class="lbl">${esc(RAR[r][0])}</div><div class="val ${r}">${cnt(r)}</div></button>`).join('')}
+  </div></div>`;
+
+  h += `<section class="block">${blockH('증강을 얻는 순서')}<div class="steps">
+    ${[['몬스터 사냥', '몬스터를 사냥하여 진행도를 올릴 수 있습니다.'],
+       ['선택권 얻기', '처음 접속할 때 3회를 받고, 그 뒤로는 진행도가 오를 때마다 선택권을 얻습니다.'],
+       ['[U] 키로 열기', '증강 화면에서 카드 3장이 나옵니다. 카드를 누르거나 [1] [2] [3] 키로 고릅니다.'],
+       ['마음에 안 들면 리롤', '칸마다 한 번씩 다시 뽑을 수 있습니다. 다시 뽑아도 같은 등급 안에서만 바뀝니다.']]
+      .map((x,i)=>`<div class="step"><div class="sn">${i+1}</div>${ed('home.step'+(i+1)+'.title', x[0], 'div', 'st')}${ed('home.step'+(i+1)+'.body', x[1], 'div', 'sb')}</div>`).join('')}
+  </div></section>`;
+
+  h += `<section class="block">${blockH('등급과 카드')}
+    <div class="odds">${RORDER.map(r=>`<div class="${r}" style="flex:${RAR[r][2]}" title="${esc(RAR[r][0])} ${Math.round(RAR[r][2]/RSUM*100)}%">${esc(RAR[r][0])} ${Math.round(RAR[r][2]/RSUM*100)}%</div>`).join('')}</div>
+    <div class="note">${ed('home.rule1', '카드를 뽑을 때는 등급을 먼저 정하고, 그 등급 안에서 3장을 뽑습니다. 그래서 한 번에 나오는 3장은 언제나 같은 등급입니다. 이미 최대로 중첩한 증강과 선행 조건을 못 채운 증강은 나오지 않고, 어떤 등급에 나올 증강이 하나도 남지 않으면 그 등급은 건너뜁니다.', 'div', 'nb')}</div>
+    <div class="note">${ed('home.rule2', '처음 접속하면 선택권 3회를 받습니다. 월드에 처음 들어가면 증강을 쓸지 묻는 창이 뜨고, 이 선택은 되돌릴 수 없습니다. 같은 단계의 선택권은 한 번만 받습니다.', 'div', 'nb')}</div>
+  </section>`;
+
+  const chains = AUGS.filter(a=>a.pre.length).sort((a,b)=>byName(BY[a.pre[0]],BY[b.pre[0]]));
+  h += `<section class="block">${blockH('빌드 계보', chains.length+'개')}<p class="small" style="margin:-4px 0 12px">오른쪽 증강은 왼쪽 증강을 가지고 있어야 카드에 나옵니다.</p><div class="tree">${
+    chains.map(a=>`<div class="chain">${a.pre.map(augLink).join(' ')}<span class="arrow">→</span>${augLink(a.id)}<span class="small">${esc(ds(a))}</span></div>`).join('')}</div></section>`;
+
+  h += `<section class="block">${blockH('전체 증강')}<div class="filter-row" id="homeFilter">${
+    [['all','전체']].concat(RORDER.map(r=>[r,RAR[r][0]])).map(([k2,l])=>`<button class="fbtn${homeFilter===k2?' on':''}" type="button" data-filter="${k2}">${esc(l)}</button>`).join('')
+  }</div><div class="grid-cards" id="homeGrid"></div></section>`;
+  h += `<div class="foot-note">${ed('home.foot', '증강 정의는 팩 데이터팩(sharpsharp:augments)에서 바로 읽어 만들었습니다. 수치는 시험용 값이라 바뀔 수 있습니다.')}</div>`;
+  main.innerHTML = h;
+  drawHomeGrid();
+  main.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{ homeFilter=b.dataset.filter; drawHomeGrid(); if(b.classList.contains('cell')) document.getElementById('homeGrid').scrollIntoView({behavior:'smooth', block:'start'}); }));
+}
+function drawHomeGrid(){
+  const list = AUGS.filter(a=>homeFilter==='all'||a.rarity===homeFilter).sort((a,b)=>RORDER.indexOf(a.rarity)-RORDER.indexOf(b.rarity)||byName(a,b));
+  document.getElementById('homeGrid').innerHTML = list.map(cardHtml).join('');
+  document.querySelectorAll('#homeFilter .fbtn').forEach(b=>b.classList.toggle('on', b.dataset.filter===homeFilter));
+}
+
+function viewAug(a){
+  const same = AUGS.filter(x=>x.rarity===a.rarity).length;
+  const tags = [rtag(a.rarity), `<span class="tag">${esc(FAM[a.fam].ko)}</span>`]
+    .concat(a.mods.map(m=>`<span class="tag stamp">${esc(D.mods[m]||m)} 필요</span>`));
+  let h = `<div class="spec-head"><div class="spec-plate ${a.rarity}">${icon(a,96)}</div><div class="spec-info">
+    <div class="spec-tags">${tags.join('')}</div><h1>${ed('aug.'+a.id+'.name', a.name)}</h1><div class="en">sharpsharp:${esc(a.id)}</div>
+    ${ed('aug.'+a.id+'.desc', a.desc, 'div', 'desc')}</div></div>`;
+  const noteKey = 'aug.'+a.id+'.note';
+  h += (EDITING || T(noteKey, '')) ? `<section class="block">${blockH('메모')}<div class="note">${ed(noteKey, '', 'div', 'nb', '이 증강에 대한 메모를 적어 보세요')}</div></section>` : '';
+  h += `<div class="stat-strip">
+    <div class="stat"><span class="lbl">등급</span><span class="val ${a.rarity}">${esc(RAR[a.rarity][0])}</span><span class="hint">이 등급 카드 ${Math.round(RAR[a.rarity][2]/RSUM*100)}%</span></div>
+    <div class="stat"><span class="lbl">같은 등급</span><span class="val">${same}<span class="small">종</span></span><span class="hint">이 중 3장</span></div>
+    <div class="stat"><span class="lbl">최대 중첩</span><span class="val brass">${a.max}</span><span class="hint">${a.max>1?'다시 고를 수 있음':'1번만'}</span></div>
+    <div class="stat"><span class="lbl">재사용 대기</span><span class="val${a.cd?'':' dim'}">${esc(a.cd||'—')}</span></div>
+    <div class="stat"><span class="lbl">발동 확률</span><span class="val${a.chance?'':' dim'}">${esc(a.chance||(a.rules.length?'100%':'—'))}</span></div>
+    <div class="stat"><span class="lbl">선행 조건</span><span class="val${a.pre.length?'':' dim'}">${a.pre.length?a.pre.length+'개':'없음'}</span></div>
+  </div>`;
+  h += numEditHtml(a);
+  if(a.attrs.length){
+    h += `<section class="block">${blockH('능력치', a.attrs.length+'개')}<div class="tbl-wrap"><table class="tbl"><thead><tr><th>능력치</th><th class="num">1중첩</th>${a.max>1?`<th class="num">${a.max}중첩</th>`:''}</tr></thead><tbody>${
+      a.attrs.map(x=>`<tr><td>${esc(x.name)}</td><td class="num hl">${esc(x.one)}</td>${a.max>1?`<td class="num">${esc(x.max)}</td>`:''}</tr>`).join('')}</tbody></table></div></section>`;
+  }
+  if(a.rules.length){
+    h += `<section class="block">${blockH('발동 방식', a.rules.length+'개')}${a.rules.map(r=>`<div class="rule"><div class="rule-h"><span class="when">${esc(r.when)}</span>${r.chance?`<span class="tag brass">확률 ${esc(r.chance)}</span>`:''}${r.cd?`<span class="tag">재사용 ${esc(r.cd)}</span>`:''}</div><div class="rule-b">${
+      r.conds.length?`<div class="row"><span class="k">조건</span><div>${r.conds.map(esc).join('<br>')}</div></div>`:''}<div class="row"><span class="k">효과</span><ul>${r.acts.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></div></div>`).join('')}</section>`;
+  }
+  if(a.summons.length){
+    h += `<section class="block">${blockH('소환체')}<div class="tbl-wrap"><table class="tbl"><thead><tr><th>이름</th><th>방식</th><th class="num">생명력</th><th class="num">피해</th><th class="num">공격 간격</th><th class="num">거리</th><th class="num">유지</th><th class="num">최대 수</th></tr></thead><tbody>${
+      a.summons.map(s=>`<tr><td>${esc(s.name)}</td><td>${esc({melee:'근접',ranged:'원거리',turret:'고정 포탑',bomber:'자폭'}[s.mode]||s.mode)}</td><td class="num">${fmt(s.hp)}</td><td class="num">${fmt(s.dmg)}</td><td class="num">${esc(s.interval)}</td><td class="num">${fmt(s.range)}칸</td><td class="num">${esc(s.life)}</td><td class="num">${s.max}</td></tr>`).join('')}</tbody></table></div></section>`;
+  }
+  if(a.pre.length || UNLOCKS[a.id]){
+    h += `<section class="block">${blockH('빌드 계보')}`;
+    if(a.pre.length) h += `<div class="note"><div class="nl">먼저 가지고 있어야 하는 증강</div><div class="chips">${a.pre.map(augLink).join('')}</div></div>`;
+    if(UNLOCKS[a.id]) h += `<div class="note"><div class="nl">이 증강이 열어 주는 증강</div><div class="chips">${UNLOCKS[a.id].map(augLink).join('')}</div></div>`;
+    h += `</section>`;
+  }
+  const kin = AUGS.filter(x=>x.fam===a.fam && x.id!==a.id).sort((x,y)=>RORDER.indexOf(x.rarity)-RORDER.indexOf(y.rarity)||byName(x,y));
+  if(kin.length) h += `<section class="block">${blockH('같은 계열 · '+FAM[a.fam].ko, kin.length+'종')}<div class="grid-cards">${kin.map(cardHtml).join('')}</div></section>`;
+  main.innerHTML = h;
+  wireNumEdit(a);
+}
+
+function viewTactics(){
+  const P = D.tactics;
+  let h = `<div class="landing"><div class="kick">Augment Growth</div><h1 class="disp big">선택권 얻는 법</h1>
+    ${ed('tactics.intro', `처음 접속할 때 증강 선택권 3회를 받고, 그 뒤로는 「증강 성장도」가 ${P.step}단계 오를 때마다 1회씩 얻습니다. 증강 성장도는 스킬 트리 화면에는 나오지 않습니다. 지금까지 도달한 가장 높은 단계를 기준으로 주기 때문에 같은 단계의 선택권을 두 번 받지는 않습니다.`, 'p')}</div>`;
+  h += `<section class="block">${blockH('증강 성장도 경험치')}<div class="note">${ed('tactics.xp', `몬스터를 처치하면 그 몬스터에게 내가 넣은 피해만큼 경험치가 들어옵니다. 근접·마법·총 같은 공격 방식은 따지지 않고, 여럿이 함께 잡으면 각자 넣은 피해만큼 받습니다. 남은 체력보다 큰 피해는 남은 체력만큼만 셉니다.`, 'div', 'nb')}</div></section>`;
+  h += `<section class="block">${blockH('단계표', P.rows.length+'회')}<div class="tbl-wrap"><table class="tbl"><thead><tr><th class="num">선택권</th><th class="num">증강 성장도</th><th class="num">이 단계에 필요한 경험치</th><th class="num">누적 경험치</th></tr></thead><tbody>${
+    P.rows.map(r=>`<tr><td class="num">${r[0]}번째</td><td class="num hl">${r[1]}</td><td class="num">${fmt(r[2])}</td><td class="num">${fmt(r[3])}</td></tr>`).join('')}</tbody></table></div>
+    <p class="small">처음 접속할 때 받는 3회는 이 표에 들어 있지 않습니다. 증강 성장도는 최대 ${P.max}단계이고, 단계마다 필요한 경험치는 수련의 길의 3배입니다.</p></section>`;
+  main.innerHTML = h;
+}
+
+// ---------- 이동 ----------
+let depth = 0;
+function go(h){ if(('#'+h)===location.hash || (!h && !location.hash)){ route(); return; } depth++; location.hash = h; }
+function route(keepScroll){
+  const h = location.hash.slice(1);
+  const id = idOfHash(h);
+  if(id && BY[id]){ viewAug(BY[id]); markSel(id, null); }
+  else if(h==='tactics' || h==='score'){ location.replace('#'); viewHome(); markSel(null, null); }   // 옛 링크는 첫 화면으로
+  else { viewHome(); markSel(null, null); }
+  document.getElementById('backFab').classList.toggle('show', depth>0);
+  side.classList.remove('open'); document.getElementById('sideBackdrop').classList.remove('show');
+  if(!keepScroll) window.scrollTo(0,0);
+}
+function rerender(){ PENDING_RENDER = false; const y = window.scrollY; renderSide(); route(true); window.scrollTo(0, y); }
+document.addEventListener('click', e=>{ if(e.target.closest('.hub-link')) return; const t=e.target.closest('[data-go]'); if(t && !t.dataset.filter) go(t.dataset.go); });
+window.addEventListener('hashchange', ()=>route());
+document.getElementById('homeFab').addEventListener('click',()=>go(''));
+document.getElementById('backFab').addEventListener('click',()=>{ if(depth>0){ depth--; history.back(); } });
+document.getElementById('sideToggle').addEventListener('click',()=>{ side.classList.toggle('open'); document.getElementById('sideBackdrop').classList.toggle('show'); });
+document.getElementById('sideBackdrop').addEventListener('click',()=>{ side.classList.remove('open'); document.getElementById('sideBackdrop').classList.remove('show'); });
+renderSide(); route();
+
+// ---------- 저장소 (2026-11-11 위키 공통) ----------
+// 1순위: 공유 저장소 db 의 edits/ (규칙: edits read view / write admin — 2026-11-15 사용자 직접 승인 "넓혀 줘"). 문구 = edits/<키> {text}, 수치 = edits/<증강 id> {kind:'stats', ...}
+// 2순위(공유 저장소에 연결 못 할 때, 예: 로컬 미리보기): 이 브라우저에만 저장 + "수정 내용 복사" 로 채팅에 붙여 넣기.
+const LS_KEY = 'sharpsharp_augment_wiki_edits_v1';
+function lsLoad(){ try{ const s = localStorage.getItem(LS_KEY); return s ? JSON.parse(s) : {}; }catch(e){ return {}; } }
+function lsSave(o){ try{ localStorage.setItem(LS_KEY, JSON.stringify(o)); return true; }catch(e){ return false; } }
+function applyDocs(docs){   // docs = {id: body}
+  const m = {}, n = {};
+  Object.keys(docs).forEach(id=>{ const b = docs[id]; if(!b) return;
+    if(b.kind === 'stats') n[id] = b; else if(typeof b.text === 'string') m[id] = b.text; });
+  EDITS = m; NUM = n;
+}
+// 같은 항목에 이 브라우저 수정과 공유 수정이 함께 있으면 저장 시각(at)이 더 새로운 쪽. 한쪽뿐이면 그쪽(브라우저 사본이 더 새로우면 절대 숨기지 않음).
+// 이 위키가 쓰는 저장 시각은 toISOString() 형식뿐. 그 형식이 아니면(없음·'1'·'garbage 5'·숫자 등) 시각을 모르는 것으로 봄
+// (2026-11-16: Date.parse 는 '1'·'garbage 5' 도 날짜로 읽어 "시각 모르면 덮지 않음"을 빠져나갔음 — 총기 위키 v300 리뷰)
+function atMs(v){ return (typeof v === 'string' && /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(v)) ? Date.parse(v) : NaN; }
+function mergedEd(l, sh){
+  if(!l) return sh || null;
+  if(!sh) return l;
+  const tl = atMs(l.at), ts = atMs(sh.at);
+  if(isFinite(tl)) return (!isFinite(ts) || tl > ts) ? l : sh;
+  return l;   // 브라우저 사본 시각을 모르면 어느 쪽이 새로운지 알 수 없으므로 브라우저 사본을 숨기지 않음(2026-11-16 리뷰)
+}
+// 공유 삭제는 성공했는데 이 브라우저 사본을 못 지운 항목 {id: 그 사본의 at}. 그 사본은 화면·올리기에서 빼서 지운 수정이 되살아나지 않게 함
+// (2026-11-16 누이구루미 v22 리뷰). 브라우저 저장소가 막혀 있으니 메모리 + sessionStorage(되면)에 기억하고, 저장소가 풀리면 다시 지움.
+const STUCK_KEY = LS_KEY + '_stuckdel';
+const STUCK_DEL = (()=>{ try{ return JSON.parse(sessionStorage.getItem(STUCK_KEY) || '{}') || {}; }catch(e){ return {}; } })();
+function stuckSave(){ try{ sessionStorage.setItem(STUCK_KEY, JSON.stringify(STUCK_DEL)); }catch(e){} }
+function stuckRetry(){
+  const ids = Object.keys(STUCK_DEL); if(!ids.length) return;
+  const o = lsLoad(); let ch = false;
+  ids.forEach(id=>{ if(!(id in o) || atKey(o[id]) !== STUCK_DEL[id]){ delete STUCK_DEL[id]; ch = true; } });   // 이미 없거나 새로 저장됨 → 기억 해제
+  const left = Object.keys(STUCK_DEL);
+  if(left.length){ const o2 = lsLoad(); left.forEach(id=>delete o2[id]); if(lsSave(o2)){ left.forEach(id=>delete STUCK_DEL[id]); ch = true; } }
+  if(ch) stuckSave();
+}
+const NOAT = '__noat__';   // 시각 없는 옛 사본도 기억할 수 있게
+const atKey = d => (d && typeof d.at === 'string') ? d.at : NOAT;
+// 공유 삭제 기록(2026-11-16 마법 위키 v66 기준): 수정 취소는 문서를 지우지 않고 {id, deleted:true, at, del_at0, del_shared_at} 를 씀 →
+// 탭·브라우저를 다시 열어도 '지운 그 사본'(at 이 del_at0/del_shared_at 과 같음)은 되살아나지 않음. 필드 없는 옛 기록만 시각 비교.
+const SH_DEL = {};   // id → 삭제 기록 문서 {id, deleted:true, at, del_at0, del_shared_at}
+// 지운 사본 시각 이력(마법 v69): 본 모든 삭제 기록·일반 문서의 del_prev·내 삭제에서 모음. 기록이 새 저장으로 덮인 뒤에도 판정에 씀
+const DEL_HIST = {};
+function addHist(id, r){ if(!r) return; const h = DEL_HIST[id] = DEL_HIST[id] || []; [r.del_at0, r.del_shared_at].concat(Array.isArray(r.del_prev) ? r.del_prev : []).forEach(t=>{ if(typeof t === 'string' && h.indexOf(t) < 0) h.push(t); }); if(h.length > 40) h.splice(0, h.length - 40); }
+function histFor(id){ addHist(id, SH_DEL[id]); if(DB_DOCS[id]) addHist(id, {del_prev: DB_DOCS[id].del_prev}); return (DEL_HIST[id] || []).slice(-40); }
+const noPrev = x => { const y = Object.assign({}, x); delete y.del_prev; return JSON.stringify(y); };   // 같은 값 비교 때 del_prev 는 뺌
+// 지운 사본인지(at 정확 일치만): 정리 실패로 기억한 사본(STUCK_DEL), 이력(DEL_HIST), 현재 삭제 기록이 가리키는 사본
+function isTomb(id, l){
+  if(!l) return false;
+  if(STUCK_DEL[id] !== undefined && atKey(l) === STUCK_DEL[id]) return true;
+  if(typeof l.at === 'string' && DEL_HIST[id] && DEL_HIST[id].indexOf(l.at) >= 0) return true;
+  const r = SH_DEL[id]; if(!r) return false;
+  if(('id' in r) || ('del_at0' in r) || ('del_shared_at' in r) || ('del_prev' in r))   // 새 형식(저장소가 null 필드를 버려도 id 로 알아봄)
+    return typeof l.at === 'string' && (l.at === r.del_at0 || l.at === r.del_shared_at || (Array.isArray(r.del_prev) && r.del_prev.indexOf(l.at) >= 0));   // 지운 그 사본만(시각 비교 없음)
+  const td = atMs(r.at), tl = atMs(l.at);   // 옛 v65 기록(필드 없음): 삭제 시각 비교
+  return isFinite(td) && isFinite(tl) && !(tl > td);
+}
+function lsLive(){ const L = lsLoad(); Object.keys(L).forEach(id=>{ if(isTomb(id, L[id])) delete L[id]; }); return L; }
+function mergedDocs(){
+  stuckRetry();
+  const L = lsLive(), out = {};
+  Object.keys(DB_DOCS).concat(Object.keys(L)).forEach(id=>{ if(id in out) return; const d = mergedEd(L[id], DB_DOCS[id]); if(d) out[id] = d; });
+  return out;
+}
+function refreshDocs(){ applyDocs(mergedDocs()); }
+const localOnly = () => LOCAL || !DB || (!IS_EDITOR && !TRY_SHARED);
+// 쓰기가 거부됐을 때의 db 오류 코드: 권한 없음은 별도 코드가 없고 invalid_argument 로 옴. 나머지는 이 보기에서 db 를 못 쓰는 경우.
+const REFUSED_CODES = ['invalid_argument', 'not_granted', 'revoked', 'capability_disabled', 'capability_removed', 'transform_error'];
+// 늦게 성공한 공유 쓰기가 그 사이 새로 저장된 브라우저 사본까지 지우지 않게, 쓴 값과 같은 시각(at)의 사본만 지움
+function lsDropIf(id, at){ const o = lsLoad(); if(id in o && atKey(o[id]) === (at === undefined ? NOAT : at)){ delete o[id]; lsSave(o); } }
+// 모든 공유 저장소 쓰기(STORE.set/del, 올리기)의 단일 통로. 절대 던지지 않음. 성공 = true, 실패 = false.
+// 실패 사유: 거부(권한/데이터 오류) -> SW_ERR = '' / 그 밖의 오류(네트워크·timeout 등) -> SW_ERR = 이유. 20초 안에 응답 없으면 timeout.
+// 2026-11-16: 같은 항목의 공유 쓰기는 순서대로 줄 세움. 앞 쓰기가 늦게 끝나 뒤에 저장한 새 값을 공유 쪽에서 덮고,
+// 뒤 쓰기의 성공으로 브라우저 사본까지 지워져 새 수정이 사라지던 경우(가짜 저장소로 재현)를 막음. 20초 제한으로 화면에선 실패 처리돼도
+// 실제 쓰기가 끝날 때까지 다음 쓰기를 시작하지 않음.
+const SW_CHAIN = {};
+const SW_PEND = {}, LAST_SH = {};   // LAST_SH: 쓰기 줄에서 마지막으로 공유에 쓴 일반 문서 at(삭제 기록이면 null) — 마법 v71   // 항목별 진행 중인 공유 쓰기 수(스냅샷 정리가 진행 중인 쓰기의 사본을 먼저 지우지 않게)
+// res(선택): 이 쓰기 하나의 결과를 담는 그릇 {err, unknown}. 전역 SW_ERR/SW_UNKNOWN 은 await 사이 다른 쓰기가 덮을 수 있어(방어구·몬스터 리뷰)
+// 판정에는 res 만 씀. 전역은 옛 호환용으로만 남김.
+async function sharedWrite(fn, id, verb, at, res){
+  res = res || {}; res.err = ''; res.unknown = false;
+  SW_ERR = ''; SW_UNKNOWN = false;
+  let sent = false;   // 실제로 공유 저장소에 보냈는지(앞 쓰기를 기다리다 시간 초과돼 아예 안 보낸 경우와 구분)
+  SW_PEND[id] = (SW_PEND[id] || 0) + 1;
+  const run = (SW_CHAIN[id] || Promise.resolve()).then(()=>{ sent = true; return fn(); });
+  SW_CHAIN[id] = run.catch(()=>{}).then(()=>{ SW_PEND[id]--; if(SW_PEND[id] <= 0) delete SW_PEND[id]; });
+  try{ await Promise.race([run, new Promise((_, rj)=>setTimeout(()=>rj({code:'timeout', message:'응답 없음(20초)'}), 20000))]); }
+  catch(e){
+    // verb: '저장' | '삭제'(이 브라우저 사본 있음) | '삭제(공유만)'(이 브라우저에 지울 사본 없음 — 2026-11-16 장신구 v35 리뷰: 거짓 안내 방지)
+    const isDel = verb.indexOf('삭제') === 0, noLocal = verb === '삭제(공유만)', localOnlyDel = verb === '삭제(로컬만)', vw = isDel ? '삭제' : verb;
+    const delTail = noLocal ? ' 공유 값은 되돌리지 못했습니다(이 브라우저에는 지울 수정이 없음)' : localOnlyDel ? ' 이 브라우저의 수정을 지웠습니다' : ' 공유 값은 지우지 못하고 이 브라우저의 수정만 지웠습니다';
+    if(e && REFUSED_CODES.indexOf(e.code) >= 0){
+      if(IS_EDITOR) toast('공유 ' + vw + ' 실패(데이터 오류: ' + e.code + ') —' + (isDel ? delTail : ' 이 브라우저에 보관했습니다'), 6000);
+      else {
+        TRY_SHARED = false;
+        toast('공유 저장소에 쓸 권한이 없어(위키 소유자나 편집 권한을 받은 계정만 가능)' + (isDel ? delTail : ' 이 브라우저에만 저장했습니다') + '.', 6000);
+      }
+      return false;
+    }
+    SW_ERR = res.err = String((e && (e.code || e.message)) || e || '알 수 없는 오류');
+    // 보낸 뒤 시간 초과: 늦게 반영될 수 있어 결과를 모름(키 배치도 리뷰) — 실패로 단정하지 않음
+    SW_UNKNOWN = res.unknown = !!(e && e.code === 'timeout' && sent);
+    if(res.unknown) toast('공유 저장소 응답이 늦어 ' + vw + ' 결과를 모릅니다(늦게 반영될 수 있음) — 잠시 뒤 새로고침해 확인해 주세요', 7000);   // 이 브라우저 저장 여부는 칸 안내가 따로 알림
+    else toast('공유 ' + vw + ' 실패(' + res.err + ')' + (isDel ? ' — 공유·이 브라우저 모두 그대로 두었습니다' : ' — 이 브라우저에 보관됨'), 6000);
+    return false;
+  }
+  if(!IS_EDITOR){ TRY_SHARED = false; IS_EDITOR = true; }   // 권한을 몰랐는데 써졌음 → 편집자 확정
+  lsDropIf(id, at);   // 공유 쓰기가 성공한 뒤에만, 쓴 값과 같은 시각의 브라우저 사본만 지움
+  return true;
+}
+// 반환: 'shared' = 공유 저장됨, 'local' = 처음부터 브라우저 저장, 'fallback' = 공유 실패(거부·오류)로 브라우저 저장(토스트는 이미 띄움),
+//       'error-local'(del 만) = 공유 삭제가 오류로 실패해 아무것도 바꾸지 않음
+const STORE = {
+  async set(id, d){
+    d = JSON.parse(JSON.stringify(d));   // undefined 필드 제거
+    // 새 저장은 언제나 공유 삭제 기록보다 새것으로(기기 시계가 느려도 방금 저장한 값이 '지운 사본'으로 숨거나 올리기에서 정리되지 않게, 2026-11-16 리뷰)
+    if(SH_DEL[id]){ const td = atMs(SH_DEL[id].at), tn = atMs(d.at); if(isFinite(td) && !(isFinite(tn) && tn > td)) d.at = new Date(td + 1 + Math.floor(Math.random() * 1000)).toISOString(); }   // 여러 기기가 같은 값으로 맞춰지지 않게 0~999ms 흩뜨림
+    while(DEL_HIST[id] && DEL_HIST[id].indexOf(d.at) >= 0) d.at = new Date(atMs(d.at) + 1).toISOString();   // 새 저장 시각이 지운 사본 이력과 같아져 숨겨지지 않게
+    const o = lsLoad(); o[id] = d; const saved = lsSave(o);   // 먼저 이 브라우저에 기록(공유 쓰기가 실패·지연돼도 수정이 사라지지 않게)
+    // 2026-11-16 리뷰: 올리는 중에도 수정을 버리지 않음 — 브라우저에만 저장하고 공유는 건너뜀(올리기가 끝난 뒤 다시 올리면 됨)
+    if(UPLOADING){ if(!saved) throw {message:'이 브라우저에 저장할 수 없습니다'}; refreshDocs(); softRender(); return 'local'; }
+    const tryShared = !localOnly();
+    if(!tryShared && !saved) throw {message:'이 브라우저에 저장할 수 없습니다'};
+    let fb = false;
+    if(tryShared){
+      // 삭제 이력은 쓰기 줄 안, set 직전에 계산(누른 순간이 아니라) — 앞선 삭제가 늦게 끝나도 그 지운 시각이 들어가게(방어구 v63 리뷰)
+      let ds = d; const wr = {};
+      if(await sharedWrite(()=>{ const h = histFor(id); ds = h.length ? Object.assign({}, d, {del_prev: h}) : d; return DB.collection('edits').doc(id).set(ds).then(r=>{ LAST_SH[id] = d.at; return r; }); }, id, '저장', d.at, wr)){ DB_DOCS[id] = ds; refreshDocs(); softRender(); return 'shared'; }
+      if(!saved) throw wr.unknown ? {unknown:true, message:'이 브라우저에는 저장하지 못했고, 공유 저장은 응답이 늦어 결과를 모릅니다 — 잠시 뒤 새로고침해 확인해 주세요'} : {message:'공유 저장에 실패했고 이 브라우저에도 저장할 수 없습니다'};
+      if(wr.unknown){ refreshDocs(); softRender(); return 'unknown'; }
+      fb = true;
+    }
+    refreshDocs(); softRender();
+    return fb ? 'fallback' : 'local';
+  },
+  async del(id){
+    if(UPLOADING) throw {message:'공유 저장소로 올리는 중입니다. 끝난 뒤 다시 눌러 주세요'};
+    let fb = false;
+    // 같은 항목 저장이 진행 중이면 끝날 때까지(최대 10초) 기다린 뒤 '지울 것' 판단(마법 v69)
+    if(SW_PEND[id]){ await Promise.race([SW_CHAIN[id], new Promise(r=>setTimeout(r, 10000))]); await new Promise(r=>setTimeout(r, 0)); }
+    if(!localOnly() && ((id in lsLoad()) || DB_DOCS[id])){   // 지울 것이 있을 때만 공유에 기록(마법 v66)
+      const at0 = (lsLoad()[id] || {}).at;   // 삭제 시작 때의 브라우저 사본 시각: 그 사이 새로 저장된 사본은 지우지 않음
+      // 마법 v66 기준: 삭제 기록에 그때의 로컬 사본 at·공유 값 at 을 남기고, 정확히 같은 사본만 '지운 사본'으로 봄(시계 차이 무관)
+      const delDoc = {id, deleted: true, at: new Date().toISOString(), del_at0: at0 == null ? null : at0, del_shared_at: (DB_DOCS[id] && DB_DOCS[id].at) || null};
+      // del_shared_at·del_prev 는 쓰기 줄 안 set 직전에 다시 계산(앞선 느린 삭제가 10초를 넘겨도 그 이력이 빠지지 않게, 누이구루미·몬스터 리뷰 ③). del_at0 은 누른 순간의 사본 그대로
+      const fillDel = ()=>{ delDoc.del_shared_at = ((id in LAST_SH) ? LAST_SH[id] : (DB_DOCS[id] && DB_DOCS[id].at)) || null; delDoc.del_prev = histFor(id).filter(t=>t !== delDoc.del_at0 && t !== delDoc.del_shared_at).slice(-40); };   // 이전 삭제들의 사본 시각 이어받기
+      const hadLocal = id in lsLoad(), dr = {};
+      if(await sharedWrite(()=>{ fillDel(); return DB.collection('edits').doc(id).set(delDoc).then(r=>{ SH_DEL[id] = delDoc; addHist(id, delDoc); LAST_SH[id] = null; return r; }); }, id, !hadLocal ? '삭제(공유만)' : (DB_DOCS[id] ? '삭제' : '삭제(로컬만)'), at0, dr)){
+        delete DB_DOCS[id]; SH_DEL[id] = delDoc; addHist(id, delDoc); refreshDocs(); softRender();
+        const L1 = lsLoad();
+        if((id in L1) && atKey(L1[id]) === (at0 === undefined ? NOAT : at0)){ STUCK_DEL[id] = atKey(L1[id]); stuckSave(); refreshDocs(); softRender(); throw {partial:true, message:'공유 값은 원래대로 되돌렸습니다. 다만 이 브라우저 저장소에 쓸 수 없어 옛 사본이 남아 있습니다(화면과 올리기에서는 빼 두었고, 저장소가 풀리면 지웁니다)'}; }
+        return 'shared';
+      }
+      if(dr.unknown) return 'unknown';   // 보냈는데 응답이 늦음: 공유·브라우저 모두 그대로, 결과 모름
+      if(dr.err) return 'error-local';   // 오류·무응답으로 실패: 공유·브라우저 상태 모두 그대로(수정이 사라지지 않게)
+      if(!hadLocal){ refreshDocs(); softRender(); return 'refused-nolocal'; }   // 화면을 실제 공유 값으로   // 권한 거부 + 이 브라우저에 지울 사본 없음: 아무것도 안 바뀜
+      fb = true;
+    }
+    const o = lsLoad();
+    if(id in o){ delete o[id]; if(!lsSave(o)) throw {message:'이 브라우저 저장소에 쓸 수 없어 수정을 지우지 못했습니다'}; }
+    refreshDocs(); softRender();
+    return fb ? 'fallback' : 'local';
+  }
+};
+// 저장·삭제 결과를 사실대로 한국어로 (2026-11-16 리뷰: 결과와 상관없이 '저장됨'이 뜨던 것)
+function resultText(r, isDel){
+  if(r === 'unknown') return isDel ? '공유 저장소 응답이 늦어 되돌리기 결과를 모릅니다(늦게 반영될 수 있음) — 잠시 뒤 새로고침해 확인해 주세요' : '이 브라우저에 저장됨 — 공유 저장은 응답이 늦어 결과를 모릅니다(새로고침해 확인)';
+  if(isDel){
+    if(r === 'refused-nolocal') return '편집 권한이 없어 공유 값을 되돌리지 못했습니다(이 브라우저에는 지울 수정이 없습니다)';
+    if(r === 'shared') return '원래 값으로 되돌렸습니다';
+    if(r === 'error-local') return '공유 저장소 삭제에 실패해(연결 문제) 아무것도 바꾸지 않았습니다';
+    if(r === 'fallback') return '공유 값은 지우지 못했고 이 브라우저의 수정만 지웠습니다';
+    return (DB_DOCS && Object.keys(DB_DOCS).length) ? '이 브라우저의 수정을 지웠습니다(공유 저장소의 값이 있으면 그 값이 보입니다)' : '원래 값으로 되돌렸습니다';
+  }
+  if(r === 'shared') return '저장됨';
+  if(r === 'fallback') return '공유 저장에 실패해 이 브라우저에 보관했습니다';
+  return UPLOADING ? '올리는 중이라 이 브라우저에 먼저 저장했습니다' : '이 브라우저에 저장됨';
+}
+// 이 브라우저에만 저장된 수정을 공유 저장소로 올림(편집자 확정일 때만). 공유 쪽이 더 새로우면 공유 값 유지.
+function uploadBtnHtml(){
+  if(!EDIT_MODE || LOCAL || !DB || !IS_EDITOR) return '';
+  const n = Object.keys(lsLive()).length;
+  return n ? `<div class="ed-row"><button type="button" id="edUp" class="ed-btn">이 브라우저에만 저장된 수정 ${n}건을 공유 저장소로 올리기</button><span id="edUpMsg" class="ed-msg" role="status"></span></div>` : '';
+}
+// 다른 탭에서 바뀐 이 브라우저 사본을 화면에 반영(2026-11-16, 몬스터 위키와 같게)
+window.addEventListener('storage', e=>{ if(e.key === LS_KEY){ try{ refreshDocs(); softRender(); }catch(_){} } });
+function wireUpload(){
+  const b = document.getElementById('edUp'); if(!b) return;
+  const m = document.getElementById('edUpMsg');
+  b.addEventListener('click', async ()=>{
+    if(UPLOADING) return;
+    UPLOADING = true; b.disabled = true;
+    stuckRetry();
+    const o = lsLoad(), ids = Object.keys(o); let up = 0, skip = 0, dead = 0, fail = '', stopped = false; const upRes = {};   // 지운 사본도 돌면서 정리(isTomb)
+    try{
+      for(let k = 0; k < ids.length; k++){
+        const id = ids[k], mm = document.getElementById('edUpMsg') || m;
+        mm.textContent = '올리는 중… ' + (k + 1) + '/' + ids.length;
+        const ref = DB.collection('edits').doc(id), snap = await Promise.race([ref.get(), new Promise((_, rj)=>setTimeout(()=>rj({code:'timeout', message:'응답 없음(20초)'}), 20000))]), shRaw = snap.exists ? snap.data() : null;
+        if(shRaw && shRaw.deleted){ SH_DEL[id] = shRaw; addHist(id, shRaw); }   // 지운 그 사본은 아래에서 정리, 별개 사본은 기록 시각과 비교
+        else if(shRaw && Array.isArray(shRaw.del_prev)) addHist(id, {del_prev: shRaw.del_prev});
+        const sh = shRaw;
+        // 2026-11-16: 시작 때 목록이 아니라 지금 이 브라우저 사본을 씀(그 사이 다시 저장·취소했으면 그 값). 사본이 없어졌으면 건너뜀.
+        const raw = lsLoad()[id]; if(!raw){ continue; }
+        if(isTomb(id, raw)){ lsDropIf(id, raw.at); dead++; continue; }   // 공유에서 지운 뒤의 오래된 사본은 올리지 않고 정리
+        const cur = raw;
+        const tl = atMs(cur.at), ts = sh ? atMs(sh.at) : NaN;
+        if(sh && !sh.deleted && noPrev(sh) === noPrev(cur)){ lsDropIf(id, cur.at); delete SAVE_FAIL[id]; up++; continue; }   // 이미 같은 값이 공유에 있음 → 사본만 정리
+        // 공유 값이 있으면 두 시각을 모두 알고 브라우저 쪽이 더 새로울 때만 덮음. 공유 시각을 모르면(없음·NaN) 덮지 않고 브라우저에 남김(2026-11-16 리뷰).
+        if(sh && !(isFinite(tl) && isFinite(ts) && tl > ts)){ skip++; continue; }
+        // 실제로 공유에 쓴 경우에만 sharedWrite 가 같은 시각의 사본을 정리함
+        let up1 = cur;
+        if(!(await sharedWrite(()=>{ const hU = histFor(id); up1 = hU.length ? Object.assign({}, cur, {del_prev: hU}) : cur; return ref.set(up1).then(r=>{ LAST_SH[id] = cur.at; return r; }); }, id, '저장', cur.at, upRes))){ stopped = true; break; }
+        DB_DOCS[id] = up1; delete SAVE_FAIL[id]; up++;   // 올리기 성공 → 그 항목의 옛 실패 안내 지움
+      }
+    }catch(err){ fail = ' 실패: ' + ((err && (err.code || err.message)) || err); }
+    UPLOADING = false;
+    toast('공유 저장소로 ' + up + '건 올림' + (dead ? ', 공유에서 이미 되돌린 옛 수정 ' + dead + '건은 올리지 않았습니다' : '') + (skip ? ', 공유 쪽이 더 새롭거나 저장 시각을 알 수 없어 ' + skip + '건은 이 브라우저에 그대로 두었습니다' : '') + (stopped ? (upRes.unknown ? ', 공유 저장소 응답이 늦어 마지막 1건은 결과를 모릅니다(새로고침해 확인), 나머지는 이 브라우저에 그대로 두었습니다' : ', 공유 저장에 실패해 나머지는 이 브라우저에 그대로 두었습니다' + (upRes.err ? '(' + upRes.err + ')' : '')) : '') + fail, 5500);
+    refreshDocs(); softRender();   // 올리는 중 고치던 입력은 지키고, 저장·이동 때 반영
+  });
+}
+// 브라우저 저장 이유(한국어). html=true 면 <b> 강조 포함.
+function localWhy(html){
+  const B = t => html ? '<b>' + t + '</b>' : t;
+  if(!DB && NO_DB) return '이 화면에서는 공유 저장소를 쓸 수 없어(claude.ai 에 로그인하지 않았거나 이 보기에서 저장소가 열리지 않음) ' + B('이 브라우저에만') + ' 저장됩니다. 위키 소유자나 편집 권한을 받은 계정으로 claude.ai 에 로그인해 열면 공유 저장됩니다';
+  if(LOCAL) return '공유 저장소 연결·읽기에 실패해(' + (html ? esc(LOCAL_WHY) : LOCAL_WHY) + ') ' + B('이 브라우저에만') + ' 저장됩니다';
+  return '이 계정에는 이 위키의 편집 권한이 없습니다(위키 소유자나 편집 권한을 받은 계정이어야 공유 저장소에 저장됩니다). 그래서 ' + B('이 브라우저에만') + ' 저장됩니다';
+}
+// 문구 편집 상태줄의 평상시 문구
+function idleStatus(){
+  if(localOnly()) return [localWhy(false), true];
+  if(EDIT_STATE === 'slow') return ['연결이 늦어지고 있음 — 저장소에서 수정 내용을 아직 불러오지 못했습니다', true];
+  const n = Object.keys(EDITS).length + Object.keys(NUM).length;
+  return [(TRY_SHARED ? '편집 권한을 확인하지 못해 저장할 때 공유 저장소에 먼저 시도합니다 · ' : '') + '수정 ' + n + '곳', false];
+}
+function showIdleStatus(){ const r = idleStatus(); status(r[0], r[1]); }
+async function sha256hex(s){
+  try{ const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return Array.from(new Uint8Array(buf)).map(x=>x.toString(16).padStart(2,'0')).join(''); }
+  catch(e){ return ''; }
+}
+function toast(msg, ms){
+  let el = document.getElementById('modeToast');
+  if(!el){ el = document.createElement('div'); el.id = 'modeToast'; el.setAttribute('role','status'); document.body.appendChild(el); }
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(el._t); el._t = setTimeout(()=>el.classList.remove('show'), ms || 1800);
+}
+function setEditMode(on){
+  EDIT_MODE = on;
+  try{ localStorage.setItem(MODE_KEY, on ? '1' : '0'); }catch(e){}
+  if(!on && EDITING){ EDITING = false; document.body.classList.remove('editing'); document.getElementById('editBtn').textContent = '문구 편집'; }
+  CAN_EDIT = on;   // 수정자 모드면 칸을 보여 줌(저장 위치는 STORE 가 정함)
+  editBar.hidden = !on;
+  if(on) showIdleStatus();
+  toast(on ? '수정자 모드' : '일반 모드');
+  rerender();
+}
+// 수치 수정 칸에 저장 전 입력이 남아 있는지(처음 그린 값 defaultValue 와 다름). 2026-11-16 리뷰: 다른 탭·공유 변경으로
+// 다시 그리면 입력 중이던 값이 날아감 → 저장 전 입력이 있으면 다시 그리기를 미룸(저장·취소·다른 항목 열기 때 반영).
+function editDirty(){ return Array.prototype.some.call(document.querySelectorAll('.edit-box input, .edit-box textarea'), x=>x.value !== x.defaultValue || (x.validity && x.validity.badInput)); }
+// 저장·취소를 누른 순간의 수정 칸 값. 저장을 기다리는 동안 새로 친 입력이 있으면, 끝난 뒤 강제로 다시 그리지 않음(2026-11-16 키 배치도 v19 리뷰)
+function editSnap(){ return Array.prototype.map.call(document.querySelectorAll('.edit-box input, .edit-box textarea'), x=>x.id + '=' + x.value + (x.validity && x.validity.badInput ? '!bad' : '')).join('|'); }
+function flushIfSame(snap0){
+  const ae = document.activeElement;
+  if(ae && ae.dataset && ae.dataset.edit) return;   // 문구 편집 칸에서 치는 중 → 미룬 채로 둠(끝나면 focusout 에서 반영)
+  if(PENDING_RENDER && editSnap() === snap0){ PENDING_RENDER = false; rerender(); }
+}
+// 저장 결과 안내: 저장한 항목 기준. 그 사이 다른 항목으로 옮겼으면 그 항목 이름을 붙여 토스트로.
+// 실패 안내는 SAVE_FAIL 에 남겨 다시 그려도 유지(2026-11-16 누이구루미 v21 리뷰), 성공하면 지움.
+const SAVE_FAIL = {}, LAST_MSG = {};   // LAST_MSG: 항목별 마지막 결과 {text, t} — 성공 문구도 8초 동안은 다시 그려도 남김(장신구 v35)
+function numMsgNow(id){ if(SAVE_FAIL[id]) return [SAVE_FAIL[id], true]; const L = LAST_MSG[id]; return (L && Date.now() - L.t < 8000) ? [L.text, false] : ['', false]; }
+function showNumMsg(a, text, fail){
+  if(fail) SAVE_FAIL[a.id] = text; else delete SAVE_FAIL[a.id];
+  LAST_MSG[a.id] = {text, t: Date.now()};
+  const here = idOfHash(location.hash.slice(1)) === a.id, m = document.getElementById('nfMsg');
+  if(here && m){ m.textContent = text; m.classList.toggle('err', !!fail); }
+  else toast(a.name + ': ' + text, fail ? 6000 : 3500);
+}
+function softRender(){
+  const a = document.activeElement;
+  if(editDirty()){ PENDING_RENDER = true; return; }
+  if(a && a.dataset && a.dataset.edit){ PENDING_RENDER = true; return; }                       // 문구 고치는 중
+  if(a && a.closest && a.closest('.edit-box') && a.tagName === 'INPUT'){ PENDING_RENDER = true; return; }   // 수치 입력 중
+  rerender();
+}
+function editsText(){   // 이 브라우저에만 저장된 수정(문구+수치) 전부
+  const L = lsLive(), stats = [], txt = [];
+  Object.keys(L).forEach(id=>{ const e = L[id]; if(!e) return;
+    if(e.kind === 'stats') stats.push({id:e.id, name:e.name, vals:e.vals, orig:e.orig, note:e.note});
+    else if(typeof e.text === 'string') txt.push({key:id, text:e.text}); });
+  return '증강 위키 수정 내용 (수치 ' + stats.length + '건, 문구 ' + txt.length + '건)\n' + JSON.stringify({stats:stats, text:txt});
+}
+async function copyEdits(btn){
+  const s = editsText();
+  try{ await navigator.clipboard.writeText(s); btn.textContent = '복사됨 — 채팅에 붙여 넣어 주세요'; }
+  catch(e){ const ta = document.createElement('textarea'); ta.value = s; ta.className = 'ed-copy'; ta.rows = 4; btn.after(ta); ta.select(); btn.textContent = '아래 글을 복사해 채팅에 붙여 넣어 주세요'; }
+}
+function fv(f, raw){ const v = raw * f.s; return f.i ? String(Math.round(v)) : String(Math.round(v*1000)/1000); }
+function numEditHtml(a){
+  if(!EDIT_MODE) return '';
+  const e = NUM[a.id];
+  if(!CAN_EDIT){
+    if(!e) return '';
+    const items = a.fields.filter(f=>e.vals && e.vals[f.p] !== undefined)
+      .map(f=>`<li>${esc(f.l)}: ${esc(fv(f, f.v))}${esc(f.u)} → <b>${esc(fv(f, e.vals[f.p]))}${esc(f.u)}</b></li>`).join('');
+    return `<section class="edit-box ro"><div class="ed-h">수치 수정 <span class="ed-hint">보기 전용(수정은 위키 편집 권한자만)</span></div><ul class="ed-ro">${items}</ul>${e.note?`<div class="ed-foot">${esc(e.note)}</div>`:''}</section>`;
+  }
+  const vals = (e && e.vals) || {};
+  const n = Object.keys(lsLive()).length;   // 이 브라우저에만 저장된 수정(복사·올리기 대상)
+  const inputs = a.fields.map((f, i)=>{
+    const has = vals[f.p] !== undefined;
+    return `<label>${esc(f.l)}<span class="o">원래 ${esc(fv(f, f.v))}${esc(f.u)}</span><input id="nf${i}" data-i="${i}" type="number" step="${f.st}" inputmode="decimal" value="${has?esc(fv(f, vals[f.p])):''}" placeholder="${esc(fv(f, f.v))}"${has?' class="chg"':''}></label>`;
+  }).join('');
+  const foot = localOnly()
+    ? `<div class="ed-local">${localWhy(true)}. 다 고친 뒤 <b>수정 내용 복사</b>를 눌러 채팅에 붙여 넣어 주세요.</div>`
+    : `<div class="ed-foot">${TRY_SHARED ? '편집 권한을 확인하지 못해 저장할 때 공유 저장소에 먼저 시도합니다(안 되면 이 브라우저에 저장). ' : ''}${EDIT_STATE === 'slow' ? '연결이 늦어지고 있습니다. 잠시 뒤 새로고침해 주세요. ' : ''}빈칸 = 원래 값 그대로. 저장하면 이 위키에 바로 보이고, Claude 가 이 값을 읽어 게임 데이터(증강 데이터팩)에 반영합니다.</div>`;
+  return `<section class="edit-box"><div class="ed-h">수치 수정 ${e?'<span class="tag ed">수정됨</span>':''}<span class="ed-hint">화면에 보이는 단위로 적습니다(%, 초 등)</span></div>
+    <div class="ed-grid">${inputs}</div>
+    <label class="ed-note">메모 <input id="nfNote" type="text" maxlength="300" value="${esc((e && e.note) || '')}" placeholder="선택"></label>
+    <div class="ed-row">
+      <button type="button" id="nfSave" class="ed-btn pri">저장</button>
+      ${e?'<button type="button" id="nfDel" class="ed-btn">수정 취소(원래 값)</button>':''}
+      ${n?`<button type="button" id="nfCopy" class="ed-btn">수정 내용 복사 (${n}건)</button>`:''}
+      <span id="nfMsg" class="ed-msg${numMsgNow(a.id)[1]?' err':''}" role="status">${esc(numMsgNow(a.id)[0])}</span>
+    </div>${foot}${uploadBtnHtml()}</section>`;
+}
+function wireNumEdit(a){
+  const save = document.getElementById('nfSave'); if(!save) return;
+  wireUpload();
+  const msg = document.getElementById('nfMsg');
+  const cp = document.getElementById('nfCopy'); if(cp) cp.addEventListener('click', ()=>copyEdits(cp));
+  save.addEventListener('click', async ()=>{
+    const vals = {}, orig = {}; let bad = '', kept = 0, dropped = 0;
+    // 2026-11-16 리뷰: 다시 그리기를 미루는 동안 다른 탭·공유에서 같은 항목의 다른 칸이 바뀌었을 수 있음.
+    // 손대지 않은 칸(value===defaultValue)은 화면 값이 아니라 지금 최신 값(NUM)을 그대로 이어받아, 그 변경을 지우지 않음.
+    const latest = NUM[a.id] || null, lv = (latest && latest.vals) || {};
+    const untouched = el => el.value === el.defaultValue && !(el.validity && el.validity.badInput);
+    a.fields.forEach((f, i)=>{
+      const el = document.getElementById('nf'+i);
+      if(untouched(el)){
+        if(f.p in lv){ vals[f.p] = lv[f.p]; orig[f.p] = f.v; if(String(el.defaultValue) !== String(fv(f, lv[f.p]))) kept++; }
+        else if(el.defaultValue !== '') dropped++;   // 화면엔 옛 수정값이 보였지만 다른 곳에서 원래 값으로 되돌림 → 되돌린 대로 둠
+        return;
+      }
+      if(el.validity && el.validity.badInput){ bad = f.l; return; }
+      const s = el.value.trim(); if(s === '') return;
+      const x = Number(s); if(!isFinite(x)){ bad = f.l; return; }
+      const raw = f.i ? Math.round(x) / f.s : x / f.s;
+      if(Math.abs(raw - f.v) < 1e-9) return;   // 원래 값과 같으면 수정 아님
+      vals[f.p] = Math.round(raw * 1e6) / 1e6; orig[f.p] = f.v;
+    });
+    if(bad){ showNumMsg(a, bad + ': 숫자만 넣어 주세요.', true); return; }
+    const noteEl = document.getElementById('nfNote');
+    const note = untouched(noteEl) ? ((latest && latest.note) || '') : noteEl.value.trim();
+    if(untouched(noteEl) && note !== noteEl.defaultValue.trim()){ if(note) kept++; else dropped++; }
+    save.disabled = true; msg.textContent = '저장 중…';
+    const snap0 = editSnap();
+    try{
+      let r, isDel = false;
+      if(!Object.keys(vals).length && !note){ isDel = true; r = await STORE.del(a.id); }
+      else r = await STORE.set(a.id, {kind:'stats', id:a.id, name:a.name, vals, orig, note: note || '', at: new Date().toISOString()});
+      flushIfSame(snap0);   // 기다리는 동안 새로 친 입력이 있으면 지키고, 다음 저장 때 반영
+      showNumMsg(a, resultText(r, isDel) + (kept ? ' · 손대지 않은 ' + kept + '칸은 다른 곳에서 바꾼 최신 값을 이어받았습니다' : '') + (dropped ? ' · 손대지 않은 ' + dropped + '칸은 다른 곳에서 원래 값으로 되돌려 되돌린 대로 두었습니다' : ''), r === 'fallback' || r === 'error-local' || r === 'refused-nolocal' || r === 'unknown');
+    }catch(err){ if(err && (err.partial || err.unknown)){ showNumMsg(a, err.message, true); return; } showNumMsg(a, '저장 안 됨 — ' + ((err && err.code === 'invalid_argument') ? '저장 권한이 없습니다(위키 편집 권한 필요)' : ((err && (err.message || err.code)) || err)) + '. 입력한 값은 칸에 그대로 남아 있습니다', true); }
+    finally{ const s2 = document.getElementById('nfSave'); if(s2) s2.disabled = false; save.disabled = false; }
+  });
+  const del = document.getElementById('nfDel');
+  if(del) del.addEventListener('click', async ()=>{
+    del.disabled = true; msg.textContent = '되돌리는 중…';
+    const snap0 = editSnap();
+    try{ const r = await STORE.del(a.id); flushIfSame(snap0); showNumMsg(a, resultText(r, true), r === 'fallback' || r === 'error-local' || r === 'refused-nolocal' || r === 'unknown'); }
+    catch(err){ showNumMsg(a, (err && err.partial) ? err.message : '되돌리지 못함 — ' + ((err && err.message) || err), true); }
+    finally{ const d2 = document.getElementById('nfDel'); if(d2) d2.disabled = false; }
+  });
+  document.querySelectorAll('.ed-grid input').forEach(el=>el.addEventListener('input', ()=>el.classList.toggle('chg', el.value.trim() !== '')));
+}
+
+// ---------- 문구 편집 (수정자 모드, 편집 권한자는 공유 저장소·그 외는 브라우저) ----------
+const editBar = document.getElementById('editBar'), editStatus = document.getElementById('editStatus');
+function status(t, bad){ editStatus.textContent = t; editStatus.classList.toggle('err', !!bad); }
+document.getElementById('editBtn').addEventListener('click', ()=>{
+  const a = document.activeElement; if(a && a.dataset && a.dataset.edit) a.blur();
+  EDITING = !EDITING; document.body.classList.toggle('editing', EDITING);
+  document.getElementById('editBtn').textContent = EDITING ? '편집 끝내기' : '문구 편집';
+  if(EDITING) status('점선 칸을 눌러 고치세요. 칸을 비우면 원래 문구로 돌아갑니다. ' + (localOnly() ? '(' + localWhy(false) + ')' : ''), localOnly()); else showIdleStatus();
+  rerender();
+});
+document.addEventListener('keydown', e=>{
+  const el = e.target; if(!el.dataset || !el.dataset.edit) return;
+  if(e.key === 'Escape'){ el.textContent = T(el.dataset.edit, el.dataset.orig); el.blur(); }
+  else if(e.key === 'Enter' && /\.(name|title)$/.test(el.dataset.edit)){ e.preventDefault(); el.blur(); }
+});
+let saving = Promise.resolve();
+document.addEventListener('focusout', e=>{
+  const el = e.target;
+  if(el && el.closest && el.closest('.edit-box') && PENDING_RENDER){ setTimeout(()=>{ const b = document.activeElement; if(!(b && b.closest && b.closest('.edit-box')) && !editDirty()){ PENDING_RENDER = false; rerender(); } }, 0); }
+  if(!EDITING || !CAN_EDIT || !el.dataset || !el.dataset.edit) return;
+  const key = el.dataset.edit, orig = el.dataset.orig;
+  const text = el.innerText.replace(/ /g, ' ').trim();
+  const want = (text === '' || text === orig) ? null : text;
+  const cur = Object.prototype.hasOwnProperty.call(EDITS, key) ? EDITS[key] : null;
+  if(want === cur){ if(PENDING_RENDER && !editDirty()){ PENDING_RENDER = false; rerender(); } return; }
+  status('저장 중…');
+  saving = saving.then(()=> want === null ? STORE.del(key) : STORE.set(key, {text: want, at: new Date().toISOString()}))
+    .then(r=>{ status(resultText(r, want === null), r === 'fallback' || r === 'error-local' || r === 'refused-nolocal' || r === 'unknown'); if(want === null && (r === 'error-local' || r === 'refused-nolocal' || r === 'unknown')) softRender(); })   // 되돌리기 오류: 화면을 실제 저장된 문구로
+    .catch(err=>{
+      if(err && (err.partial || err.unknown)){ status(err.message, true); return; }
+      status((want === null ? '되돌리지 못함: ' : '저장 안 됨: ') + ((err && err.code === 'invalid_argument') ? '저장 권한이 없습니다(위키 편집 권한 필요)' : ((err && (err.message || err.code)) || err)), true);
+      if(want === null) softRender();   // 되돌리기 실패: 화면을 실제 저장된 문구로 돌려놓음(입력 중이면 끝난 뒤)
+    });
+});
+function goLocal(why){
+  LOCAL = true; LOCAL_WHY = why; EDIT_STATE = 'local'; TRY_SHARED = false;
+  refreshDocs();
+  CAN_EDIT = EDIT_MODE; editBar.hidden = !EDIT_MODE;
+  if(EDIT_MODE) showIdleStatus();
+  softRender();   // 저장소 실패로 바뀌어도 입력 중이던 값은 지킴
+}
+// 검색 칸: 비밀 코드(해시 일치)면 모드 전환 — 검색 칸 비우고 결과창 닫음
+(function(){
+  const q = document.getElementById('q'); if(!q) return;
+  let seq = 0;
+  q.addEventListener('input', async ()=>{
+    const v = q.value.trim().toLowerCase(); if(v.length < 2 || v.length > 64) return;
+    const my = ++seq; const h = await sha256hex(v);
+    if(my !== seq || EDIT_CODE_SHAS.indexOf(h) < 0) return;
+    q.value = ''; const qr = document.getElementById('qr'); if(qr) qr.classList.remove('show');
+    q.blur(); setEditMode(!EDIT_MODE);
+  });
+})();
+(async ()=>{
+  if(!window.claude || !window.claude.use){ goLocal('claude.ai 뷰어 밖에서 열림'); return; }
+  let db = null, user = null;
+  try{ [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]); }catch(e){}
+  IS_OWNER = user ? !!(await user.isOwner().catch(()=>false)) : false;
+  let ce = false, dw = null;
+  if(user){ try{ ce = !!(await user.canEdit()); }catch(e){} try{ dw = await user.can('data.write'); }catch(e){} }
+  IS_EDITOR = IS_OWNER || ce;   // 확인된 편집자만(canEdit/isOwner). can('data.write') 는 interact 수준이라 판정에 쓰지 않음
+  TRY_SHARED = !IS_EDITOR && dw !== false;   // 모름(null) 또는 interact 수준(true) → 저장 때 한 번 시도, 거부되면 브라우저 저장
+  if(!db){ NO_DB = true; goLocal('저장소 기능 없음'); return; }   // db 가 null: 로그인 안 됨이거나 이 보기에서 저장소가 안 열림
+  DB = db; CAN_EDIT = EDIT_MODE; editBar.hidden = !EDIT_MODE;
+  let first = true;
+  const timer = setTimeout(()=>{ if(first){ EDIT_STATE = 'slow'; if(EDIT_MODE && !EDITING) showIdleStatus(); softRender(); } }, 10000);
+  try{
+    db.collection('edits').onSnapshot(snap=>{
+      const docs = {}; Object.keys(SH_DEL).forEach(k=>delete SH_DEL[k]);
+      snap.docs.forEach(d=>{ const v = d.data(); if(!v) return; if(v.deleted){ SH_DEL[d.id] = v; addHist(d.id, v); } else { docs[d.id] = v; if(Array.isArray(v.del_prev)) addHist(d.id, {del_prev: v.del_prev}); } });   // deleted:true = 공유 삭제 기록
+      if(!(snap.metadata && snap.metadata.hasPendingWrites)){ const L0 = lsLoad(); Object.keys(L0).forEach(k=>{ if(SW_PEND[k] || UPLOADING) return; const r = SH_DEL[k], l = L0[k];   // 확정된 기록만, 쓰기 진행 중인 항목은 건너뜀
+          // 다른 탭에 남은 '지운 그 사본'(at 정확 일치: 이력 DEL_HIST 또는 현재 새 형식 기록)만 정리. 옛 형식 시각 비교·STUCK_DEL 로는 지우지 않음
+          if(!l || typeof l.at !== 'string') return;
+          const hit = (DEL_HIST[k] && DEL_HIST[k].indexOf(l.at) >= 0) || (r && (('id' in r) || ('del_at0' in r) || ('del_shared_at' in r) || ('del_prev' in r)) && (l.at === r.del_at0 || l.at === r.del_shared_at || (Array.isArray(r.del_prev) && r.del_prev.indexOf(l.at) >= 0)));
+          if(hit) lsDropIf(k, l.at); }); }
+      Object.keys(LAST_SH).forEach(k=>{ if(!SW_PEND[k]) delete LAST_SH[k]; });   // 진행 중 쓰기가 없으면 확정 공유 값이 기준
+      DB_DOCS = docs; refreshDocs();
+      if(!snap.metadata.fromCache){ clearTimeout(timer); first = false; EDIT_STATE = 'ready'; if(EDIT_MODE && !EDITING) showIdleStatus(); }
+      softRender();
+    }, err=>{ clearTimeout(timer); goLocal('저장소 읽기 실패' + (err && err.code ? ': ' + err.code : '')); });
+  }catch(e){ clearTimeout(timer); goLocal('저장소 연결 실패'); }
+})();
+</script>
+
+</body></html>

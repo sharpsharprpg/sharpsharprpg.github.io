@@ -1,0 +1,993 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>SharpSharp 키 배치도</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* 위키 허브와 같은 단일 다크 테마. 배치: 키보드 그림(가로 스크롤 상자) → 고른 키의 기능 목록 → 전체 목록 */
+:root{
+  color-scheme:dark;
+  --ink:#15170f; --panel:#1d2016; --panel-2:#262a1c; --line:#3a3f2c; --line-soft:#282c1c;
+  --paper:#ece7d6; --paper-dim:#a29c81; --paper-faint:#6f6a53;
+  --brass:#c7a233; --brass-dim:#8a6f22; --stamp:#c9622a;
+  /* 키 색 = 게임 안 Keybind Atlas 의 키 분류 색(config/keybindatlas-client.toml) */
+  --k-base:#2a64c9; --k-base-hi:#3b78e0; --k-off:#2b2e24; --k-off-fg:#77735e;
+  --k-combat:#b63c47; --k-magic:#9145d6; --k-gun:#ec4899; --k-util:#f97316; --k-tech:#06b6d4;
+  --font:'IBM Plex Sans KR','IBM Plex Sans','Noto Sans Egyptian Hieroglyphs','Segoe UI Historic',sans-serif;
+}
+html,body{background:var(--ink)}
+html body *{font-family:var(--font)}
+body{color:var(--paper);font-size:14px;line-height:1.6;font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:0 auto;padding-block:32px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:22px}
+.brand{border-bottom:1px solid var(--line);padding-bottom:14px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+.brand h1{margin:0;font-size:26px;font-weight:700;line-height:1.2}
+.brand .sub{color:var(--paper-faint);font-size:12px;margin-top:6px}
+.brand a{color:var(--paper-dim)}
+.hub-link{display:inline-block;margin-top:10px;font-size:.82em;color:var(--brass);border:1px solid var(--brass-dim);padding:4px 10px;text-decoration:none;white-space:nowrap}.hub-link:hover{border-color:var(--brass);color:var(--paper)}
+.brand a.hub-link{color:var(--brass)}.brand a.hub-link:hover{color:var(--paper)}
+.search{display:flex;gap:8px;align-items:center;flex:1 1 260px;max-width:380px}
+.search input{flex:1;min-width:0;background:var(--panel);border:1px solid var(--line);color:var(--paper);padding:8px 10px;font-size:14px}
+.search input:focus{outline:2px solid var(--stamp);outline-offset:0}
+h2{margin:0;font-size:13px;font-weight:600;color:var(--brass);display:flex;gap:10px;align-items:center}
+h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--paper-dim)}
+.legend span{display:inline-flex;gap:6px;align-items:center;white-space:nowrap}
+.legend i{width:12px;height:12px;display:inline-block;border:1px solid rgba(255,255,255,.15)}
+
+/* 키보드 */
+.board-box{overflow-x:auto;border:1px solid var(--line);background:#0f110b;padding:18px}
+.board{--u:68px;display:flex;gap:calc(var(--u)*.3);align-items:flex-start;width:max-content}
+.blk{display:flex;flex-direction:column;gap:5px}
+.row{display:flex;gap:5px}
+.gap{height:calc(var(--u)*.3)}
+.k{--w:1;width:calc(var(--u)*var(--w) + 5px*(var(--w) - 1));height:var(--u);position:relative;flex:none;
+  border:0;padding:0 4px;cursor:pointer;color:#fff;font-weight:700;font-size:15px;letter-spacing:0;
+  background:var(--kc,var(--k-base));box-shadow:inset 0 -4px 0 rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.6);
+  display:flex;align-items:center;justify-content:center;white-space:nowrap;transition:transform .08s,filter .12s}
+.k.sm{font-size:11.5px}
+.k.lab{flex-direction:column;justify-content:flex-start;align-items:stretch;padding:3px 4px 5px;gap:1px;white-space:normal}
+.k.lab .kl{font-size:12px;line-height:1.1;text-align:left;white-space:nowrap}
+.k.lab .kn{font-size:10.5px;font-weight:600;line-height:1.15;text-align:left;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;word-break:keep-all;overflow-wrap:anywhere}
+.k.lab .kn small{font-weight:500;opacity:.8}
+.k.off{--kc:var(--k-off);color:var(--k-off-fg);cursor:default;box-shadow:inset 0 -3px 0 rgba(0,0,0,.3)}
+.k.void{visibility:hidden}
+.k:not(.off):hover{filter:brightness(1.18)}
+.k:focus-visible{outline:2px solid var(--paper);outline-offset:2px;z-index:2}
+.k.sel{outline:3px solid var(--paper);outline-offset:1px;z-index:2}
+.k.dim{opacity:.22}
+.k.basek{--kc:#3a4a66;color:#c9d3e6}
+.k.bundle{--kc:#84cc16;color:#13200a}
+.nav-fabs{display:none}
+@media (max-width:1100px){   /* 다른 위키 #hubFab 기준(1100px)과 같게, 11-15 */
+  .nav-fabs{display:flex;gap:6px;position:fixed;z-index:40;top:calc(10px + env(safe-area-inset-top,0px));left:max(16px,env(safe-area-inset-left,0px))}
+  .wrap{padding-top:calc(60px + env(safe-area-inset-top,0px))}
+}
+.fab{width:38px;height:38px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:var(--panel-2);border:1px solid var(--brass-dim);color:var(--paper);cursor:pointer;text-decoration:none;box-sizing:border-box}
+.fab svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.fab:hover{border-color:var(--stamp);color:var(--stamp)}
+.fab:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+#wheelPop{position:fixed;z-index:30;pointer-events:none;background:rgba(10,12,8,.92);border:1px solid var(--line);padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+#wheelPop .wt{font-size:12px;color:var(--paper-dim);text-align:center;margin-top:2px}
+.wheel{display:block;max-width:100%;height:auto}
+.wheel .seg{fill:rgba(77,77,77,.6)}
+.wheel g.e:hover .seg,.wheel g.e.on .seg{fill:rgba(179,102,115,.7)}
+.wheel text{font-size:10px;fill:rgba(255,255,255,.8);paint-order:stroke;stroke:rgba(0,0,0,.55);stroke-width:2px;font-weight:600}
+.wheel-wrap{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin-top:6px}
+.wheel-wrap .wheel{width:300px}
+.sits{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.sit{background:var(--panel);border:1px solid var(--line);color:var(--paper-dim);padding:5px 12px;cursor:pointer;font-size:13px;white-space:nowrap}
+.sit b{font-weight:600;color:var(--paper-faint);margin-left:6px;font-size:12px}
+.sit:hover{border-color:var(--brass-dim);color:var(--paper)}
+.sit[aria-pressed="true"]{background:var(--brass);border-color:var(--brass);color:var(--ink);font-weight:700}
+.sit[aria-pressed="true"] b{color:var(--ink)}
+.sit:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+.sitbar{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:12px;color:var(--paper-faint)}
+.sitbar label{display:inline-flex;gap:6px;align-items:center;cursor:pointer;color:var(--paper-dim);white-space:nowrap}
+.chip.sitc{border-color:var(--line);color:var(--paper-dim)}
+.k .n{position:absolute;right:3px;top:1px;font-size:9.5px;font-weight:600;opacity:.85}
+.k .mo{position:absolute;left:3px;bottom:5px;width:5px;height:5px;background:var(--brass);border-radius:50%}
+.k.combat{--kc:var(--k-combat)} .k.magic{--kc:var(--k-magic)} .k.gun{--kc:var(--k-gun)} .k.util{--kc:var(--k-util)} .k.tech{--kc:var(--k-tech)}
+.mouse{display:flex;flex-direction:column;gap:5px;align-items:center}
+.mouse-box{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;border:1px solid var(--line);background:#0f110b;padding:16px}
+.mouse-svg{width:170px;flex:none;max-width:100%;height:auto}
+.mb{cursor:pointer}
+.mb .bt{fill:var(--kc,var(--k-base));stroke:rgba(0,0,0,.6);stroke-width:1.5}
+.mb.off{cursor:default}.mb.off .bt{fill:var(--k-off)}
+.mb.basek .bt{fill:#3a4a66}.mb.bundle .bt{fill:#84cc16}
+.mb text{fill:#fff;font-size:13px;font-weight:700;pointer-events:none}
+.mb.off text{fill:var(--k-off-fg)}.mb.bundle text{fill:#13200a}
+.mb:not(.off):hover .bt{filter:brightness(1.18)}
+.mb.sel .bt{stroke:var(--paper);stroke-width:3}
+.mb:focus-visible{outline:none}.mb:focus-visible .bt{stroke:var(--paper);stroke-width:3}
+.mouse-body{fill:#2b2e24;stroke:rgba(0,0,0,.6);stroke-width:1.5}
+.mcalls{flex:1 1 280px;min-width:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+.mcall{border:1px solid var(--line);background:var(--panel);padding:8px 10px;cursor:pointer;min-width:0}
+.mcall:hover{border-color:var(--brass-dim)}
+.mcall.off{cursor:default;opacity:.6}
+.mcall h3{margin:0 0 4px;font-size:13px;font-weight:700;display:flex;gap:8px;align-items:center}
+.mcall h3 i{display:inline-block;width:12px;height:12px;background:var(--kc,var(--k-base));border:1px solid rgba(255,255,255,.15)}
+.mcall ul{list-style:none;margin:0;padding:0;font-size:12.5px;display:flex;flex-direction:column;gap:1px}
+.mcall li{display:flex;gap:8px;justify-content:space-between}
+.mcall li span:first-child{min-width:0;overflow-wrap:anywhere}
+.mcall li>span:last-child{color:var(--paper-faint);font-size:11px;white-space:nowrap}
+.mcall .none{font-size:12px;color:var(--paper-faint)}
+.mouse .body{display:grid;grid-template-columns:repeat(3,auto);gap:5px}
+.mouse .k.tall{height:calc(var(--u)*1.7)}
+.cap{font-size:11px;color:var(--paper-faint);text-align:center;font-weight:500}
+
+/* 상세 */
+.detail{border:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column}
+.detail .hd{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;padding:12px 16px;border-bottom:1px solid var(--line-soft)}
+.detail .hd b{font-size:20px}
+.detail .hd small{color:var(--paper-faint);font-size:12px}
+.acts{display:flex;flex-direction:column}
+.act{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 14px;padding:10px 16px;border-bottom:1px solid var(--line-soft);align-items:start}
+.act:last-child{border-bottom:0}
+.act .t{font-weight:600;font-size:15px;min-width:0;overflow-wrap:anywhere}
+.act .m{color:var(--paper-dim);font-size:12px;white-space:nowrap;text-align:right}
+.act .x{grid-column:1/-1;font-size:12px;color:var(--paper-faint);overflow-wrap:anywhere}
+.chip{display:inline-block;font-size:11px;font-weight:600;padding:0 6px;margin-right:6px;border:1px solid var(--brass-dim);color:var(--brass);vertical-align:2px}
+.chip.raw{border-color:var(--line);color:var(--paper-faint)}
+.chip.ed{border-color:var(--stamp);color:var(--stamp)}
+.bl{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:4px 12px;margin-top:4px}
+.bl div{font-size:13px;color:var(--paper);border-left:2px solid var(--line);padding-left:8px;min-width:0}
+.bl div small{display:block;color:var(--paper-faint);font-size:11px}
+.empty{padding:16px;color:var(--paper-faint)}
+
+/* 전체 목록 */
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px}
+.grp{border:1px solid var(--line);background:var(--panel);min-width:0}
+.grp .gh{display:flex;gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--line-soft);cursor:pointer}
+.grp .gh:hover{background:var(--panel-2)}
+.grp .gh .kb{min-width:34px;padding:0 6px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;background:var(--kc,var(--k-base));white-space:nowrap}
+.grp .gh small{color:var(--paper-faint);font-size:12px;margin-left:auto}
+.grp ul{list-style:none;margin:0;padding:6px 12px 8px;display:flex;flex-direction:column;gap:2px}
+.grp li{display:flex;gap:10px;justify-content:space-between;font-size:13px}
+.grp li span:first-child{min-width:0;overflow-wrap:anywhere}
+.grp li>span:last-child{color:var(--paper-faint);font-size:11.5px;white-space:nowrap}
+details.unb{border:1px solid var(--line);background:var(--panel)}
+details.unb summary{padding:10px 14px;cursor:pointer;color:var(--paper-dim)}
+details.unb .ul{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:2px 16px;padding:4px 14px 14px;font-size:13px}
+details.unb .ul div{min-width:0;overflow-wrap:anywhere}
+details.unb .ul small{color:var(--paper-faint)}
+.note{font-size:12px;color:var(--paper-faint);line-height:1.7}
+mark{background:rgba(199,162,51,.35);color:inherit}
+
+/* 수치 수정(수정자 모드에서만) */
+.edit-box{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;margin-top:6px;padding:8px;border:1px dashed var(--stamp)}
+.ed-row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+.ed-row label{display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--paper-dim)}
+.ed-row input{background:var(--ink);border:1px solid var(--line);color:var(--paper);padding:5px 7px;font-size:13px;width:150px}
+.ed-row label.ed-note{flex:1 1 220px}.ed-row label.ed-note input{width:100%}
+.ed-btn{background:var(--panel-2);border:1px solid var(--line);color:var(--paper);padding:5px 12px;cursor:pointer;font-size:13px}
+.ed-btn.pri{border-color:var(--stamp);color:#fff;background:var(--stamp)}
+.ed-msg{font-size:12px;color:var(--brass)}
+.ed-msg.ed-fail{color:#e5736b;font-weight:600}
+.ed-local{font-size:11.5px;color:var(--brass);border:1px dashed var(--brass-dim);padding:6px 8px}
+.ed-copy{width:100%;background:var(--ink);color:var(--paper);border:1px solid var(--line);font-size:11px}
+.ed-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:var(--stamp)}
+#modeToast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--panel-2);border:1px solid var(--stamp);color:var(--paper);padding:8px 16px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+#modeToast.show{opacity:1}
+@media (prefers-reduced-motion: reduce){.k,#modeToast{transition:none}}
+/* 모바일 글자·누르는 영역 (11-16, 1100px 이하 = #hubFab 기준과 같음) */
+@media (max-width:1100px){
+  .sit{min-height:44px;font-size:16px;padding:8px 14px;display:inline-flex;align-items:center}
+  .sit b{font-size:14px}
+  .sitbar{font-size:14px}.sitbar label{min-height:44px;font-size:15px}
+  .sitbar input[type=checkbox]{width:20px;height:20px}
+  .grp .gh{min-height:44px;font-size:16px;padding:8px 12px}
+  .grp .gh .kb{height:30px;min-width:42px;font-size:14px}
+  .grp .gh small{font-size:13px}
+  .grp ul{gap:0;padding:4px 12px 6px}
+  .grp li{min-height:44px;align-items:center;font-size:15px}
+  .grp li>span:last-child{font-size:13px}
+  .grp .chip{font-size:13px}
+  details.unb summary{min-height:44px;font-size:16px;padding:10px 14px;display:flex;align-items:center;gap:8px;list-style:none}
+  details.unb summary::-webkit-details-marker{display:none}
+  details.unb summary::before{content:'▸';font-size:20px;line-height:1;width:18px;flex:none}
+  details.unb[open] summary::before{content:'▾'}
+  details.unb .ul{font-size:15px;gap:0 16px}
+  details.unb .ul div{min-height:44px;display:block;padding:11px 0;line-height:1.45;box-sizing:border-box}   /* 리뷰: flex 면 검색 강조(mark) 조각 사이가 벌어짐 */
+  details.unb .ul small{font-size:13px}
+  .mcall h3{font-size:16px;min-height:32px}
+  .mcall li{min-height:44px;align-items:center;font-size:15px}
+  .mcall li>span:last-child{font-size:13px}
+  .mcall .none{font-size:13px}
+  .act .t{font-size:16px}.act .m,.act .x,.act .chip{font-size:13px}
+  .bl div{font-size:15px}.bl div small{font-size:13px}
+  .note,.legend{font-size:13px}
+  .detail .hd small{font-size:13px}
+}
+@media (max-width:640px){.board{--u:62px}}
+</style>
+
+<div class="nav-fabs"><button class="fab" id="homeFab" type="button" aria-label="처음 화면" title="처음 화면"><svg viewBox="0 0 24 24"><path d="M4 11.5 L12 4.5 L20 11.5"/><path d="M6.5 10 V19.5 H17.5 V10"/></svg></button><a class="fab hub-fab" id="hubFab" href="https://claude.ai/artifact/Ms7AaGc4EpWaVbBbcyqHPK" target="_blank" rel="noopener" aria-label="위키 모음으로 가기" title="위키 모음으로 가기"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5"/><rect x="13.5" y="4" width="6.5" height="6.5"/><rect x="4" y="13.5" width="6.5" height="6.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5"/></svg></a></div>
+<div class="wrap">
+  <div class="brand">
+    <div>
+      <h1>SharpSharp 키 배치도</h1>
+      <div class="sub">SharpSharp RPG 기본 키 바인딩 · 기준 프로필 「샵샵 rpg 최적화 키 바인딩」 · <span id="built"></span></div>
+      <a class="hub-link" href="https://claude.ai/artifact/Ms7AaGc4EpWaVbBbcyqHPK" target="_blank" rel="noopener">위키 모음으로 가기 ↗</a>
+    </div>
+    <div class="search"><input id="q" type="search" placeholder="기능·모드 이름 검색 (예: 재장전, 주문)" autocomplete="off" aria-label="기능 검색"></div>
+  </div>
+
+  <div class="legend" id="legend"></div>
+  <section>
+    <h2>상황</h2>
+    <div class="sits" id="sits" role="group" aria-label="상황별 보기"></div>
+    <div class="sitbar"><span id="sitDesc"></span><label id="withBaseL"><input type="checkbox" id="withBase"> 기본 조작도 흐리게 함께 보기</label></div>
+  </section>
+  <div class="ed-bar" id="edBar" hidden></div>
+
+  <section>
+    <h2>키보드</h2>
+    <div class="board-box"><div class="board" id="board"></div></div>
+    <div class="note">키를 누르면 그 키에 묶인 기능이 아래에 나옵니다. 오른쪽 위 숫자 = 기능 수, 왼쪽 아래 점 = Shift·Ctrl·Alt 조합이 있는 키. 같은 키의 여러 기능은 상황(총을 들었을 때, 탈것에 탔을 때, 창이 열렸을 때 등)에 따라 그중 하나가 동작합니다.</div>
+  </section>
+
+  <section>
+    <h2>마우스</h2>
+    <div class="mouse-box" id="mouse"></div>
+    <div class="note">버튼을 누르면 아래 「고른 키」에 자세히 나옵니다. 마우스 4·5 는 옆면의 뒤로·앞으로 버튼입니다. 색과 목록은 위에서 고른 상황을 따릅니다.</div>
+  </section>
+
+  <section>
+    <h2>고른 키</h2>
+    <div class="detail" id="detail"><div class="empty">키보드에서 키를 고르세요.</div></div>
+  </section>
+
+  <section>
+    <h2 id="listH">전체 목록</h2>
+    <div class="list" id="list"></div>
+    <details class="unb" id="unb"><summary id="unbS"></summary><div class="ul" id="unbL"></div></details>
+    <div class="note">게임 안에서는 K 키(Keybind Atlas)로 같은 배치도를, 옵션 → 조작에서 키를 바꿀 수 있습니다. 「번역 없음」 표시가 붙은 기능은 게임 조작 화면에 내부 이름이 그대로 보이며, 여기 이름은 위키에서 붙인 것입니다.</div>
+  </section>
+</div>
+
+<script>
+const DATA = {"rows":[{"id":"key.keybindbundles.open_radial_menu","key":"key.keyboard.left.alt","mod":"","m":"KeyBind Bundles","n":"묶음 원형 메뉴 열기","s":"base"},{"id":"key.keybindbundles.open_screen","key":"key.keyboard.unknown","mod":"","m":"KeyBind Bundles","n":"키 설정 화면 열기","s":"settings"},{"id":"key.keybindbundles.bundle_12bd35c9-b044-4612-9f56-fed8c3bebf04","key":"key.keyboard.0","mod":"","m":"KeyBind Bundles","n":"키 묶음 원형 메뉴","raw":true,"bundle":[{"k":"key.socialInteractions","t":"사회적 상호 작용 화면","m":"Minecraft","s":"base","i":"minecraft:player_head"},{"k":"key.playerlist","t":"플레이어 목록 보기","m":"Minecraft","s":"base","i":"minecraft:painting"},{"k":"key.corpse.death_history","t":"플레이어 사망 기록 보기","m":"Corpse","s":"base","i":"minecraft:skeleton_skull"},{"k":"key.voice_chat_adjust_volumes","t":"플레이어 볼륨 조절","m":"Simple Voice Chat","s":"settings","i":"simpleradio:transceiver"},{"k":"key.pvpflag.switch_pvp","t":"PvP On/Off","m":"PvP Flag","s":"base","i":"simplyswords:iron_rapier"}]},{"id":"key.keybindbundles.bundle_09bb7727-dd6e-47a4-9e77-32e43b03a174","key":"key.keyboard.equal","mod":"","m":"KeyBind Bundles","n":"키 묶음 원형 메뉴","raw":true,"bundle":[{"k":"key.keybindbundles.open_screen","t":"키바인딩 옵션 열기","m":"KeyBind Bundles","s":"settings","i":"minecraft:oak_button"},{"k":"key.tacz.open_config.desc","t":"TAC 설정 열기","m":"Timeless & Classics Guns: Zero","s":"settings","i":"tacz:gun_smith_table"},{"k":"key.voice_chat","t":"음성 채팅 GUI","m":"Simple Voice Chat","s":"settings","i":"simpleradio:microphone"},{"k":"keybind.invmove.toggleMove","t":"창을 연 상태에서 움직임 ON/OFF","m":"InvMove","s":"settings","i":"minecraft:elytra"},{"k":"key.immersiveoverlays.settings","t":"추가 오버레이 설정 열기","m":"Immersive Overlays","s":"settings","i":"immersive_paintings:painting"},{"k":"key.pingwheel.open_settings","t":"핑 기능 설정 열기","m":"Ping Wheel","s":"settings","i":"create:brass_hand"},{"k":"key.luxium.toggle_master","t":"럭시움 쉐이더 on/off","m":"Luxium: Let there be light","s":"settings","i":"flashlightmod:flashlight"}]},{"id":"key.keybindbundles.bundle_f92c1563-b6d6-4b3d-a05f-e7758ca7f595","key":"key.keyboard.unknown","mod":"","m":"KeyBind Bundles","n":"키 묶음 원형 메뉴","raw":true,"bundle":[{"k":"key.ghasts_update.open_ghast_inventory","t":"해피 가스트 인벤토리","m":"Ghasts Update","s":"ride","i":"ghasts_update:dried_ghast"},{"k":"key.pvpflag.switch_pvp","t":"PVP 전환","m":"PvP Flag","s":"base","i":"minecraft:diamond_sword"},{"k":"key.exposure.camera_controls","t":"카메라 조정(카메라 아이템을 들고 사용)","m":"Exposure","s":"gear","i":"exposure:camera"},{"k":"key.aether.invisibility_toggle.desc","t":"천국 투명 망토 온/오프","m":"The Aether","s":"gear","i":"alshanex_familiars:invisibility_curio"}]},{"id":"key.keybindbundles.bundle_b8b6822b-e726-4970-ba89-b72ce342e6ff","key":"key.keyboard.unknown","mod":"","m":"KeyBind Bundles","n":"키 묶음 원형 메뉴","raw":true,"bundle":[{"k":"Give","t":"플레이어에게 아이템 건내주기","m":"Give","s":"base","i":"create:brass_hand"},{"k":"key.drop","t":"선택한 아이템 떨어뜨리기","m":"Minecraft","s":"base","i":"alexscaves:sack_of_sating"}]},{"id":"key.keybindbundles.bundle_0e09af41-e6ea-465b-ab48-c7ab0141d9bd","key":"key.keyboard.minus","mod":"","m":"KeyBind Bundles","n":"키 묶음 원형 메뉴","raw":true,"bundle":[{"k":"quark.keybind.autorun","t":"자동으로 걷기","m":"Quark","s":"base","i":"minecraft:leather_boots"},{"k":"key.familiarslib.summoning_key","t":"사역마 소환/해제","m":"FamiliarsLib","s":"magic","i":"alshanex_familiars:familiar_spellbook"},{"k":"key.familiarslib.screen_key","t":"사역마 선택 화면 열기","m":"FamiliarsLib","s":"magic","i":"immersive_paintings:glow_painting"},{"k":"key.third_life_plus.toggle_visibility_keybind","t":"남은 목숨 표시 on/off","m":"3rd life +","s":"settings","i":"legendarysurvivaloverhaul:heart_fragment"},{"k":"key.third_life_plus.set_lives_side","t":"남은 목숨 표시 위치 전환","m":"3rd life +","s":"settings","i":"legendarysurvivaloverhaul:heart_container"},{"k":"key.jei_structures.open_current_structure","t":"현 위치 구조물 조사","m":"JEI Structures","s":"base","i":"iceandfire:pixie_house_mushroom_red"}]},{"id":"key.keybindbundles.bundle_42954e31-3d87-4527-b28f-b03c325cff44","key":"key.keyboard.n","mod":"","m":"KeyBind Bundles","n":"키 묶음 원형 메뉴","raw":true,"bundle":[{"k":"key.puffish_skills.open","t":"경험 스킬 트리","m":"Pufferfish's Skills","s":"base","i":"kubejs:weapon_exp_crystal"},{"k":"key.epicskills.open_skill_tree","t":"전투 기술 트리 열기","m":"Epic Fight: Skill Tree","s":"base","i":"simplyswords:iron_longsword"},{"k":"key.mcaugment.open_augments","t":"증강 화면 열기","m":"MC Augment Reborn","s":"base","i":"apotheosis:mythic_material"}]},{"id":"key.keybindbundles.bundle_8f746718-ee24-4f62-95c5-734f2832ea8a","key":"key.keyboard.grave.accent","mod":"","m":"KeyBind Bundles","n":"키 묶음 원형 메뉴","raw":true,"bundle":[{"k":"cos.key.opencosarmorinventory","t":"표시 갑옷 인벤토리 열기","m":"Cosmetic Armor Reworked","s":"base","i":"minecraft:armor_stand"},{"k":"key.ghasts_update.open_ghast_inventory","t":"가스트 인벤토리 열기","m":"Ghasts Update","s":"ride","i":"ghasts_update:dried_ghast"},{"k":"key.curios.open.desc","t":"장신구 인벤토리 열기/닫기","m":"Curios API","s":"base","i":"endrem:evil_eye"},{"k":"supplementaries.keybind.quiver","t":"화살통 열기","m":"Supplementaries","s":"base","i":"supplementaries:quiver"},{"k":"key.apotheosis.toggle_radial_mining","t":"방사형 채굴 모드 변경","m":"Apotheosis","s":"build","i":"minecraft:diamond_pickaxe"},{"k":"key.protection_pixel.armortabletrigger","t":"방어구 적재 플랫폼","m":"Protection Pixel","s":"gear","i":"protection_pixel:armorloadplatform"}]},{"id":"key.attack","key":"key.mouse.left","mod":"","m":"Minecraft","n":"공격/파괴","s":"base"},{"id":"key.use","key":"key.mouse.right","mod":"","m":"Minecraft","n":"아이템 사용/블록 놓기","s":"base"},{"id":"key.forward","key":"key.keyboard.w","mod":"","m":"Minecraft","n":"앞으로 걷기","s":"base"},{"id":"key.left","key":"key.keyboard.a","mod":"","m":"Minecraft","n":"왼쪽으로 걷기","s":"base"},{"id":"key.back","key":"key.keyboard.s","mod":"","m":"Minecraft","n":"뒤로 걷기","s":"base"},{"id":"key.right","key":"key.keyboard.d","mod":"","m":"Minecraft","n":"오른쪽으로 걷기","s":"base"},{"id":"key.jump","key":"key.keyboard.space","mod":"","m":"Minecraft","n":"점프","s":"base"},{"id":"key.sneak","key":"key.keyboard.c","mod":"","m":"Minecraft","n":"웅크리기","s":"base"},{"id":"key.sprint","key":"key.keyboard.left.shift","mod":"","m":"Minecraft","n":"달리기","s":"base"},{"id":"key.drop","key":"key.keyboard.g","mod":"","m":"Minecraft","n":"선택한 아이템 떨어뜨리기","s":"base"},{"id":"key.inventory","key":"key.keyboard.tab","mod":"","m":"Minecraft","n":"보관함 열기/닫기","s":"base"},{"id":"key.chat","key":"key.keyboard.enter","mod":"","m":"Minecraft","n":"대화 열기","s":"base"},{"id":"key.playerlist","key":"key.keyboard.caps.lock","mod":"","m":"Minecraft","n":"플레이어 목록 보기","s":"base"},{"id":"key.pickItem","key":"key.mouse.middle","mod":"","m":"Minecraft","n":"블록 선택","s":"base"},{"id":"key.command","key":"key.keyboard.unknown","mod":"","m":"Minecraft","n":"명령어 열기","s":"base"},{"id":"key.socialInteractions","key":"key.keyboard.unknown","mod":"","m":"Minecraft","n":"사회적 상호 작용 화면","s":"base"},{"id":"key.screenshot","key":"key.keyboard.f2","mod":"","m":"Minecraft","n":"스크린샷 찍기","s":"settings"},{"id":"key.togglePerspective","key":"key.keyboard.f5","mod":"","m":"Minecraft","n":"시점 전환","s":"base"},{"id":"key.smoothCamera","key":"key.keyboard.f12","mod":"","m":"Minecraft","n":"시네마틱 카메라 전환","s":"settings"},{"id":"key.fullscreen","key":"key.keyboard.f11","mod":"","m":"Minecraft","n":"전체 화면 전환","s":"settings"},{"id":"key.spectatorOutlines","key":"key.keyboard.unknown","mod":"","m":"Minecraft","n":"플레이어 강조 (관전)","s":"base"},{"id":"key.swapOffhand","key":"key.keyboard.f","mod":"","m":"Minecraft","n":"다른 손과 아이템 맞바꾸기","s":"base"},{"id":"key.saveToolbarActivator","key":"key.keyboard.unknown","mod":"","m":"Minecraft","n":"단축 바 저장","s":"base"},{"id":"key.loadToolbarActivator","key":"key.keyboard.unknown","mod":"","m":"Minecraft","n":"단축 바 불러오기","s":"base"},{"id":"key.advancements","key":"key.keyboard.unknown","mod":"","m":"Minecraft","n":"발전 과제","s":"base"},{"id":"keybind.name.ESSENTIAL_FRIENDS","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Essential Friends","s":"settings"},{"id":"keybind.name.COSMETIC_STUDIO","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Cosmetic Studio","s":"settings"},{"id":"keybind.name.SCREENSHOT_MANAGER","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Screenshot Manager","s":"settings"},{"id":"keybind.name.COSMETICS_VISIBILITY_TOGGLE","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Cosmetics Visibility Toggle","s":"settings"},{"id":"keybind.name.CHAT_PEEK","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Chat Peek","s":"settings"},{"id":"keybind.name.INVITE_FRIENDS","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Invite Friends","s":"settings"},{"id":"keybind.name.MENU_ACCESS","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Menu Access","s":"settings"},{"id":"keybind.name.EMOTE_WHEEL","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Emote Wheel","s":"settings"},{"id":"keybind.name.EMOTE_SLOT_1","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Emote Slot 1","s":"settings"},{"id":"keybind.name.EMOTE_SLOT_2","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Emote Slot 2","s":"settings"},{"id":"keybind.name.EMOTE_SLOT_3","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Emote Slot 3","s":"settings"},{"id":"keybind.name.EMOTE_SLOT_4","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Emote Slot 4","s":"settings"},{"id":"keybind.name.EMOTE_SLOT_5","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Emote Slot 5","s":"settings"},{"id":"keybind.name.EMOTE_SLOT_6","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Emote Slot 6","s":"settings"},{"id":"keybind.name.EMOTE_SLOT_7","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Emote Slot 7","s":"settings"},{"id":"keybind.name.EMOTE_SLOT_8","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Emote Slot 8","s":"settings"},{"id":"keybind.name.ZOOM","key":"key.keyboard.unknown","mod":"","m":"Essential","n":"Zoom","s":"settings"},{"id":"key.fancytoasts.config_menu","key":"key.keyboard.k","mod":"","m":"FancyToasts","n":"Fancy Toasts 메뉴","s":"settings"},{"id":"key.puffish_skills.open","key":"key.keyboard.unknown","mod":"","m":"Pufferfish's Skills","n":"스킬트리 열기","s":"base"},{"id":"key.entityculling.toggle","key":"key.keyboard.unknown","mod":"","m":"EntityCulling","n":"컬링 디버그 전환","s":"settings"},{"id":"key.dragon_fireAttack","key":"key.keyboard.r","mod":"","m":"Ice and Fire","n":"드래곤 브래스","s":"ride"},{"id":"key.dragon_strike","key":"key.keyboard.g","mod":"","m":"Ice and Fire","n":"드래곤 스트라이크","s":"ride"},{"id":"key.dragon_down","key":"key.keyboard.x","mod":"","m":"Ice and Fire","n":"드래곤 다운/아기 드래곤 오프","s":"ride"},{"id":"key.dragon_change_view","key":"key.keyboard.f7","mod":"","m":"Ice and Fire","n":"올라타면 3인칭 카메라로 변경","s":"ride"},{"id":"key.gunsmithlib.ballistic_computer.desc","key":"key.keyboard.unknown","mod":"","m":"GunsmithLib","n":"탄도 컴퓨터","s":"gun"},{"id":"key.gunsmithlib.switch_part_or_ammo_type.desc","key":"key.keyboard.unknown","mod":"","m":"GunsmithLib","n":"무기 부품, 변형, 또는 탄약 종류 전환","s":"gun"},{"id":"key.modernfix.config","key":"key.keyboard.unknown","mod":"","m":"ModernFix","n":"설정 화면 열기","s":"settings"},{"id":"key.apotheosis.toggle_radial_mining","key":"key.keyboard.unknown","mod":"","m":"Apotheosis","n":"방사형 채굴 모드 변경","s":"build"},{"id":"key.apotheosis.world_tiers_arent_real","key":"key.keyboard.unknown","mod":"","m":"Apotheosis","n":"월드 티어 오류 알림","s":"build"},{"id":"key.exposure.camera_controls","key":"key.keyboard.unknown","mod":"","m":"Exposure","n":"카메라 설정 열기","s":"gear"},{"id":"info.structure_gel.building_tool.undo","key":"key.keyboard.z","mod":"","m":"Structure Gel API","n":"실행 취소","s":"build"},{"id":"info.structure_gel.building_tool.redo","key":"key.keyboard.y","mod":"","m":"Structure Gel API","n":"다시 실행","s":"build"},{"id":"key.structure_gel.open_building_tool_gui","key":"key.keyboard.unknown","mod":"","m":"Structure Gel API","n":"빌딩 도구 GUI 열기","s":"build"},{"id":"key.corpse.death_history","key":"key.keyboard.unknown","mod":"","m":"Corpse","n":"플레이어 사망 기록 보기","s":"base"},{"id":"key.block_factorys_bosses.dodge_roll","key":"key.keyboard.unknown","mod":"","m":"Bosses'Rise","n":"회피 구르기","s":"melee"},{"id":"Options Gui","key":"key.keyboard.unknown","mod":"","m":"설정 화면","n":"Options Gui","raw":true,"s":"settings"},{"id":"key.chunk_pregen.map.toggleSurface","key":"key.keyboard.unknown","mod":"","m":"Chunk Pregenerator","n":"HUD 지표면 유형 전환","s":"settings"},{"id":"key.chunk_pregen.map.toggleCave","key":"key.keyboard.unknown","mod":"","m":"Chunk Pregenerator","n":"HUD 동굴 유형 전환","s":"settings"},{"id":"key.chunk_pregen.map.toggleMap","key":"key.keyboard.unknown","mod":"","m":"Chunk Pregenerator","n":"미니맵 전환","s":"settings"},{"id":"key.chunk_pregen.map.zoom_in","key":"key.keyboard.unknown","mod":"","m":"Chunk Pregenerator","n":"HUD 맵 확대","s":"settings"},{"id":"key.chunk_pregen.map.zoom_out","key":"key.keyboard.unknown","mod":"","m":"Chunk Pregenerator","n":"HUD 맵 축소","s":"settings"},{"id":"key.chunk_pregen.map.manager","key":"key.keyboard.unknown","mod":"","m":"Chunk Pregenerator","n":"웨이포인트 관리자 열기","s":"settings"},{"id":"key.chunk_pregen.map.create","key":"key.keyboard.unknown","mod":"","m":"Chunk Pregenerator","n":"웨이포인트 생성 열기","s":"settings"},{"id":"key.chunk_pregen.map.key","key":"key.keyboard.unknown","mod":"","m":"Chunk Pregenerator","n":"관리자 맵 열기","s":"settings"},{"id":"key.dynamic_fps.toggle_forced","key":"key.keyboard.unknown","mod":"","m":"Dynamic FPS","n":"강제로 FPS 감소","s":"settings"},{"id":"key.dynamic_fps.toggle_disabled","key":"key.keyboard.unknown","mod":"","m":"Dynamic FPS","n":"Dynamic FPS 비활성화","s":"settings"},{"id":"key.toms_storage.open_terminal","key":"key.keyboard.tab","mod":"SHIFT","m":"Tom's Simple Storage Mod","n":"[Tom's Simple Storage] 터미널 열기","s":"base"},{"id":"key.fieldguide.open","key":"key.keyboard.unknown","mod":"","m":"Field Guide","n":"필드 가이드 열기","s":"base"},{"id":"key.fieldguide.scan","key":"key.keyboard.unknown","mod":"","m":"Field Guide","n":"스캔 시작","s":"base"},{"id":"key.luxium.toggle_master","key":"key.keyboard.keypad.multiply","mod":"","m":"Luxium: Let there be light","n":"Luxium 켜기/끄기","s":"settings"},{"id":"key.cinematic.sit","key":"key.keyboard.h","mod":"","m":"Cinematic Interactions","n":"모닥불 곁에 앉기","s":"base"},{"id":"key.cinematic.look","key":"key.keyboard.left.alt","mod":"","m":"Cinematic Interactions","n":"둘러보기 (작업 중)","s":"base"},{"id":"key.ghasts_update.up_ghast","key":"key.keyboard.space","mod":"","m":"Ghasts Update","n":"가스트가 위로 이동","s":"ride"},{"id":"key.ghasts_update.down_ghast","key":"key.keyboard.left.control","mod":"","m":"Ghasts Update","n":"가스트가 아래로 이동","s":"ride"},{"id":"key.ghasts_update.open_ghast_inventory","key":"key.keyboard.tab","mod":"","m":"Ghasts Update","n":"가스트 인벤토리 열기","s":"ride"},{"id":"key.third_life_plus.toggle_visibility_keybind","key":"key.keyboard.unknown","mod":"","m":"3rd life +","n":"생명 표시 전환","s":"settings"},{"id":"key.third_life_plus.set_lives_side","key":"key.keyboard.unknown","mod":"","m":"3rd life +","n":"생명 표시 위치 전환","s":"settings"},{"id":"key.push_to_talk","key":"key.keyboard.t","mod":"","m":"Simple Voice Chat","n":"눌러서 말하기","s":"base"},{"id":"key.whisper","key":"key.keyboard.unknown","mod":"","m":"Simple Voice Chat","n":"귓속말","s":"base"},{"id":"key.mute_microphone","key":"key.keyboard.grave.accent","mod":"ALT","m":"Simple Voice Chat","n":"마이크 음소거","s":"base"},{"id":"key.disable_voice_chat","key":"key.keyboard.unknown","mod":"","m":"Simple Voice Chat","n":"음성 채팅 사용안함","s":"base"},{"id":"key.hide_icons","key":"key.keyboard.unknown","mod":"","m":"Simple Voice Chat","n":"음성 채팅 아이콘 숨김","s":"base"},{"id":"key.voice_chat","key":"key.keyboard.unknown","mod":"","m":"Simple Voice Chat","n":"음성 채팅 GUI","s":"settings"},{"id":"key.voice_chat_settings","key":"key.keyboard.unknown","mod":"","m":"Simple Voice Chat","n":"음성 채팅 설정","s":"base"},{"id":"key.voice_chat_group","key":"key.keyboard.unknown","mod":"","m":"Simple Voice Chat","n":"음성 채팅 그룹","s":"base"},{"id":"key.voice_chat_toggle_recording","key":"key.keyboard.unknown","mod":"","m":"Simple Voice Chat","n":"녹음 토글","s":"base"},{"id":"key.voice_chat_adjust_volumes","key":"key.keyboard.unknown","mod":"","m":"Simple Voice Chat","n":"플레이어 볼륨 조절","s":"settings"},{"id":"key.punchy.open_main_menu","key":"key.keyboard.f8","mod":"","m":"Punchy","n":"Punchy 메뉴 열기","s":"settings"},{"id":"key.punchy.inspect","key":"key.keyboard.j","mod":"","m":"Punchy","n":"살펴보기","s":"melee"},{"id":"key.immersiveoverlays.toggle","key":"key.keyboard.unknown","mod":"","m":"Immersive Overlays","n":"오버레이 전환","s":"settings"},{"id":"key.immersiveoverlays.settings","key":"key.keyboard.unknown","mod":"","m":"Immersive Overlays","n":"설정 열기","s":"settings"},{"id":"key.smartkeyprompts.control","key":"key.keyboard.k","mod":"","m":"SmartKeyPrompts","n":"컨트롤","s":"settings"},{"id":"key.shouldersurfing.adjust_camera_left","key":"key.keyboard.left","mod":"","m":"Shoulder Surfing Reloaded","n":"카메라 왼쪽으로 조정","s":"base"},{"id":"key.shouldersurfing.adjust_camera_right","key":"key.keyboard.right","mod":"","m":"Shoulder Surfing Reloaded","n":"카메라 오른쪽으로 조정","s":"base"},{"id":"key.shouldersurfing.adjust_camera_in","key":"key.keyboard.up","mod":"","m":"Shoulder Surfing Reloaded","n":"카메라 안으로 조정","s":"base"},{"id":"key.shouldersurfing.adjust_camera_out","key":"key.keyboard.down","mod":"","m":"Shoulder Surfing Reloaded","n":"카메라 밖으로 조정","s":"base"},{"id":"key.shouldersurfing.adjust_camera_up","key":"key.keyboard.page.up","mod":"","m":"Shoulder Surfing Reloaded","n":"카메라 위로 조정","s":"base"},{"id":"key.shouldersurfing.adjust_camera_down","key":"key.keyboard.page.down","mod":"","m":"Shoulder Surfing Reloaded","n":"카메라 아래로 조정","s":"base"},{"id":"key.shouldersurfing.swap_shoulder","key":"key.keyboard.backspace","mod":"","m":"Shoulder Surfing Reloaded","n":"어깨 전환","s":"base"},{"id":"key.shouldersurfing.toggle_first_person","key":"key.keyboard.unknown","mod":"","m":"Shoulder Surfing Reloaded","n":"1인칭 전환","s":"base"},{"id":"key.shouldersurfing.toggle_third_person_front","key":"key.keyboard.unknown","mod":"","m":"Shoulder Surfing Reloaded","n":"3인칭(전면) 전환","s":"base"},{"id":"key.shouldersurfing.toggle_third_person_back","key":"key.keyboard.unknown","mod":"","m":"Shoulder Surfing Reloaded","n":"3인칭(후면) 전환","s":"base"},{"id":"key.shouldersurfing.free_look","key":"key.keyboard.left.alt","mod":"","m":"Shoulder Surfing Reloaded","n":"자유 시점","s":"base"},{"id":"key.shouldersurfing.toggle_camera_coupling","key":"key.keyboard.unknown","mod":"","m":"Shoulder Surfing Reloaded","n":"카메라 결합 전환","s":"base"},{"id":"key.shouldersurfing.toggle_x_offset_presets","key":"key.keyboard.unknown","mod":"","m":"Shoulder Surfing Reloaded","n":"X 오프셋 사전 설정 전환","s":"base"},{"id":"key.shouldersurfing.toggle_y_offset_presets","key":"key.keyboard.unknown","mod":"","m":"Shoulder Surfing Reloaded","n":"Y 오프셋 사전 설정 전환","s":"base"},{"id":"key.shouldersurfing.toggle_z_offset_presets","key":"key.keyboard.unknown","mod":"","m":"Shoulder Surfing Reloaded","n":"Z 오프셋 사전 설정 전환","s":"base"},{"id":"key.shouldersurfing.enter_first_person","key":"key.keyboard.v","mod":"CONTROL","m":"Shoulder Surfing Reloaded","n":"강제 1인칭","s":"base"},{"id":"key.shouldersurfing.enter_third_person_front","key":"key.keyboard.unknown","mod":"","m":"Shoulder Surfing Reloaded","n":"3인칭(전면) 진입","s":"base"},{"id":"key.shouldersurfing.enter_third_person_back","key":"key.keyboard.unknown","mod":"","m":"Shoulder Surfing Reloaded","n":"3인칭(후면) 진입","s":"base"},{"id":"key.shouldersurfing.enter_shoulder_surfing","key":"key.keyboard.unknown","mod":"","m":"Shoulder Surfing Reloaded","n":"숄더 서핑 진입","s":"base"},{"id":"fdlib.key.end_cutscene","key":"key.keyboard.space","mod":"","m":"FDLib","n":"허용된 경우 현재 재생 중인 컷신을 종료합니다.","s":"base"},{"id":"key.traveloptics.ability1","key":"key.keyboard.q","mod":"","m":"T.O Magic 'n Extras","n":"능력 1","s":"magic"},{"id":"key.traveloptics.ability2","key":"key.keyboard.e","mod":"","m":"T.O Magic 'n Extras","n":"능력 2","s":"magic"},{"id":"key.traveloptics.ability3","key":"key.mouse.5","mod":"","m":"T.O Magic 'n Extras","n":"능력 3","s":"magic"},{"id":"key.traveloptics.ability4","key":"key.mouse.4","mod":"","m":"T.O Magic 'n Extras","n":"능력 4","s":"magic"},{"id":"key.traveloptics.lore_item_previous","key":"key.keyboard.left","mod":"","m":"T.O Magic 'n Extras","n":"이야기 아이템 이전 페이지","s":"magic"},{"id":"key.traveloptics.lore_item_next","key":"key.keyboard.right","mod":"","m":"T.O Magic 'n Extras","n":"이야기 아이템 다음 페이지","s":"magic"},{"id":"key.diorama.open_map","key":"key.keyboard.m","mod":"","m":"Diorama","n":"지도 열기","s":"base"},{"id":"key.diorama.new_waypoint","key":"key.keyboard.unknown","mod":"","m":"Diorama","n":"여기에 웨이포인트 추가","s":"base"},{"id":"key.diorama.waypoints","key":"key.keyboard.unknown","mod":"","m":"Diorama","n":"웨이포인트 목록","s":"base"},{"id":"key.diorama.zoom_in","key":"key.keyboard.unknown","mod":"","m":"Diorama","n":"미니맵 확대","s":"base"},{"id":"key.diorama.zoom_out","key":"key.keyboard.unknown","mod":"","m":"Diorama","n":"미니맵 축소","s":"base"},{"id":"key.diorama.settings","key":"key.keyboard.unknown","mod":"","m":"Diorama","n":"지도 설정","s":"base"},{"id":"key.diorama.toggle_minimap","key":"key.keyboard.unknown","mod":"","m":"Diorama","n":"미니맵 보이기/숨기기","s":"base"},{"id":"key.diorama.enlarge_minimap","key":"key.keyboard.unknown","mod":"","m":"Diorama","n":"미니맵 크게 보기","s":"base"},{"id":"key.diorama.toggle_dimension","key":"key.keyboard.unknown","mod":"","m":"Diorama","n":"지도 차원 전환","s":"base"},{"id":"key.open_muffler_gui","key":"key.keyboard.unknown","mod":"","m":"Extreme Sound Muffler","n":"소리 뮤플러 화면 열기","s":"settings"},{"id":"cos.key.opencosarmorinventory","key":"key.keyboard.unknown","mod":"","m":"Cosmetic Armor Reworked","n":"코스메틱 아머 인벤토리 열기","s":"base"},{"id":"key.familiarslib.summoning_key","key":"key.keyboard.unknown","mod":"","m":"FamiliarsLib","n":"사역마 소환/해제","s":"magic"},{"id":"key.familiarslib.screen_key","key":"key.keyboard.unknown","mod":"","m":"FamiliarsLib","n":"사역마 선택 화면 열기","s":"magic"},{"id":"key.inventoryessentials.single_transfer","key":"key.keyboard.unknown","mod":"","m":"Inventory Essentials","n":"하나 이동","s":"screen"},{"id":"key.inventoryessentials.screen_bulk_drop","key":"key.keyboard.unknown","mod":"","m":"Inventory Essentials","n":"화면 밖으로 일괄 버리기","s":"screen"},{"id":"key.inventoryessentials.sort_inventory","key":"key.keyboard.unknown","mod":"","m":"Inventory Essentials","n":"인벤토리 정렬","s":"screen"},{"id":"key.invincible.key1","key":"key.mouse.left","mod":"","m":"Epic Fight - Invincible","n":"주요 행동 [KEY1 / A]","s":"melee"},{"id":"key.invincible.key2","key":"key.mouse.right","mod":"","m":"Epic Fight - Invincible","n":"보조 행동 [KEY2 / B]","s":"melee"},{"id":"key.invincible.key3","key":"key.mouse.4","mod":"","m":"Epic Fight - Invincible","n":"특수 능력 1 [KEY3 / C]","s":"melee"},{"id":"key.invincible.key4","key":"key.mouse.5","mod":"","m":"Epic Fight - Invincible","n":"특수 능력 2 [KEY4 / D]","s":"melee"},{"id":"key.sophisticatedcore.sort","key":"key.keyboard.unknown","mod":"","m":"Sophisticated Core","n":"보관함/배낭 정렬","s":"screen"},{"id":"key.sophisticatedcore.transfer_to_storage","key":"key.keyboard.left.bracket","mod":"","m":"Sophisticated Core","n":"보관함으로 옮기기","s":"screen"},{"id":"key.sophisticatedcore.transfer_to_inventory","key":"key.keyboard.right.bracket","mod":"","m":"Sophisticated Core","n":"인벤토리로 옮기기","s":"screen"},{"id":"placebo.toggleTrails","key":"key.keyboard.unknown","mod":"","m":"Placebo","n":"패트론 잔상 장착","s":"settings"},{"id":"placebo.toggleWings","key":"key.keyboard.unknown","mod":"","m":"Placebo","n":"패트론 날개 장착","s":"settings"},{"id":"key.sophisticatedbackpacks.open_backpack","key":"key.keyboard.b","mod":"","m":"Sophisticated Backpacks","n":"배낭 열기","s":"base"},{"id":"key.sophisticatedbackpacks.inventory_interaction","key":"key.keyboard.c","mod":"","m":"Sophisticated Backpacks","n":"저장소 상호작용 기능 사용","s":"base"},{"id":"key.sophisticatedbackpacks.tool_swap","key":"key.keyboard.unknown","mod":"","m":"Sophisticated Backpacks","n":"현재 블록/개체에 맞는 도구로 전환","s":"base"},{"id":"key.sophisticatedbackpacks.toggle_upgrade_5","key":"key.keyboard.unknown","mod":"","m":"Sophisticated Backpacks","n":"5번째 기능 슬롯 켜기/끄기","s":"base"},{"id":"key.sophisticatedbackpacks.toggle_upgrade_4","key":"key.keyboard.unknown","mod":"","m":"Sophisticated Backpacks","n":"4번째 기능 슬롯 켜기/끄기","s":"base"},{"id":"key.sophisticatedbackpacks.toggle_upgrade_3","key":"key.keyboard.unknown","mod":"","m":"Sophisticated Backpacks","n":"3번째 기능 슬롯 켜기/끄기","s":"base"},{"id":"key.sophisticatedbackpacks.toggle_upgrade_2","key":"key.keyboard.unknown","mod":"","m":"Sophisticated Backpacks","n":"2번째 기능 슬롯 켜기/끄기","s":"base"},{"id":"key.sophisticatedbackpacks.toggle_upgrade_1","key":"key.keyboard.unknown","mod":"","m":"Sophisticated Backpacks","n":"1번째 기능 슬롯 켜기/끄기","s":"base"},{"id":"key.carry.desc","key":"key.keyboard.left.shift","mod":"","m":"Carry On","n":"들고 나르기","s":"base"},{"id":"key.item_scrapper.place_item","key":"key.keyboard.p","mod":"","m":"Item Scrapper","n":"스크랩 테이블에 아이템 올리기","s":"build"},{"id":"equipmentcompare.key.showTooltips","key":"key.keyboard.left.shift","mod":"","m":"Equipment Compare","n":"비교 툴팁 표시","s":"screen"},{"id":"key.travelertoolbelt.open_toolbelt","key":"key.keyboard.e","mod":"","m":"Traveler Tool Belt","n":"도구 벨트 열기","s":"base"},{"id":"key.cataclysm.ability","key":"key.keyboard.q","mod":"","m":"L_Ender's Cataclysm","n":"대격변 능력","s":"gear"},{"id":"key.cataclysm.helmet_ability","key":"key.keyboard.c","mod":"","m":"L_Ender's Cataclysm","n":"대격변 투구 기술","s":"gear"},{"id":"key.cataclysm.chestplate_ability","key":"key.keyboard.c","mod":"","m":"L_Ender's Cataclysm","n":"대격변 흉갑 기술","s":"gear"},{"id":"key.cataclysm.boots_ability","key":"key.keyboard.left.alt","mod":"","m":"L_Ender's Cataclysm","n":"대격변 부츠 기술","s":"gear"},{"id":"key.hypertube.tube_escape","key":"key.keyboard.left.shift","mod":"","m":"Create Hypertube","n":"하이퍼튜브 탈출 버튼","s":"ride"},{"id":"key.moreoverlays.lightoverlay.desc","key":"key.keyboard.f7","mod":"","m":"More Overlays Updated","n":"조명 오버레이 전환","s":"settings"},{"id":"key.moreoverlays.chunkbounds.desc","key":"key.keyboard.f9","mod":"","m":"More Overlays Updated","n":"청크 경계 전환","s":"settings"},{"id":"key.pvpflag.switch_pvp","key":"key.keyboard.unknown","mod":"","m":"PvP Flag","n":"PvP 플래그 켜기/끄기","s":"base"},{"id":"keyinfo.copycats.fill_copycat","key":"key.keyboard.left.alt","mod":"","m":"Create: Copycats+","n":"모방블럭을 재료로 채우세요","s":"build"},{"id":"key.beyond_deepest_dark.ancientsculkjellyfishride","key":"key.keyboard.space","mod":"","m":"Beyond deepest dark","n":"고대 스컬크 해파리 탑승","s":"ride"},{"id":"key.beyond_deepest_dark.ancientsculkjellyfishfall","key":"key.keyboard.left.control","mod":"","m":"Beyond deepest dark","n":"고대 스컬크 해파리 낙하","s":"ride"},{"id":"key.mcaugment.open_augments","key":"key.keyboard.unknown","mod":"","m":"MC Augment Reborn","n":"증강 화면 열기","s":"base"},{"id":"key.sharpsharp.hudedit","key":"key.keyboard.unknown","mod":"","m":"SharpSharp","n":"HUD 편집기","s":"settings"},{"id":"key.simpleradio.use_handheld","key":"key.keyboard.t","mod":"","m":"Simple Radio","n":"휴대용 무전기 사용","s":"base"},{"id":"keyset.key.open_screen","key":"key.keyboard.unknown","mod":"","m":"Keyset","n":"Keyset 열기","s":"settings"},{"id":"key.tagtooltips.show_tag_tooltip","key":"key.keyboard.semicolon","mod":"","m":"Tag Tooltips","n":"아이템 태그 툴팁 표시","s":"screen"},{"id":"key.irons_spellbooks.spell_wheel","key":"key.keyboard.r","mod":"","m":"Iron's Spells 'n Spellbooks","n":"주문 휠 열기","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_wheel_toggle","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"주문 휠 전환","s":["magic","melee"]},{"id":"key.irons_spellbooks.spellbook_cast","key":"key.mouse.4","mod":"","m":"Iron's Spells 'n Spellbooks","n":"선택된 주문 시전","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_bar_modifier","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"주문 바 스크롤 수정","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_quick_cast_1","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"빠른 시전 슬롯 01","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_quick_cast_2","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"빠른 시전 슬롯 02","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_quick_cast_3","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"빠른 시전 슬롯 03","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_quick_cast_4","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"빠른 시전 슬롯 04","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_quick_cast_5","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"빠른 시전 슬롯 05","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_quick_cast_6","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"빠른 시전 슬롯 06","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_quick_cast_7","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"빠른 시전 슬롯 07","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_quick_cast_8","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"빠른 시전 슬롯 08","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_quick_cast_9","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"빠른 시전 슬롯 09","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_quick_cast_10","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"빠른 시전 슬롯 10","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_quick_cast_11","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"빠른 시전 슬롯 11","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_quick_cast_12","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"빠른 시전 슬롯 12","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_quick_cast_13","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"빠른 시전 슬롯 13","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_quick_cast_14","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"빠른 시전 슬롯 14","s":["magic","melee"]},{"id":"key.irons_spellbooks.spell_quick_cast_15","key":"key.keyboard.unknown","mod":"","m":"Iron's Spells 'n Spellbooks","n":"빠른 시전 슬롯 15","s":["magic","melee"]},{"id":"key.ponder.ponder","key":"key.keyboard.t","mod":"","m":"Ponder","n":"팁 확인","s":"screen"},{"id":"key.leaningornot.lean_left","key":"key.keyboard.q","mod":"","m":"LeaningOrNot","n":"왼쪽으로 기울이기","s":"gun"},{"id":"key.leaningornot.lean_right","key":"key.keyboard.e","mod":"","m":"LeaningOrNot","n":"오른쪽으로 기울이기","s":"gun"},{"id":"key.leaningornot.left_alt","key":"key.keyboard.unknown","mod":"","m":"LeaningOrNot","n":"점진적 기울이기","s":"gun"},{"id":"key.leaningornot.increment_left","key":"key.keyboard.unknown","mod":"","m":"LeaningOrNot","n":"왼쪽으로 점증","s":"gun"},{"id":"key.leaningornot.increment_right","key":"key.keyboard.unknown","mod":"","m":"LeaningOrNot","n":"오른쪽으로 점증","s":"gun"},{"id":"key.musicplayer.open","key":"key.keyboard.unknown","mod":"","m":"Music Player","n":"음악 플레이어 열기","s":"settings"},{"id":"key.musicplayer.pause","key":"key.keyboard.unknown","mod":"","m":"Music Player","n":"음악 플레이어 일시 중지","s":"settings"},{"id":"key.musicplayer.skip.forward","key":"key.keyboard.unknown","mod":"","m":"Music Player","n":"앞으로 건너뛰기","s":"settings"},{"id":"key.musicplayer.skip.back","key":"key.keyboard.unknown","mod":"","m":"Music Player","n":"뒤로 건너뛰기","s":"settings"},{"id":"key.epicskills.open_skill_tree","key":"key.keyboard.unknown","mod":"","m":"Epic Fight: Skill Tree","n":"전투 기술 트리 열기","s":"base"},{"id":"key.keybindatlas.open_keyboard","key":"key.keyboard.k","mod":"","m":"Keybind Atlas","n":"Keybind Atlas 열기","s":"base"},{"id":"key.keybindatlas.cycle_sets","key":"key.keyboard.k","mod":"ALT","m":"Keybind Atlas","n":"키 바인딩 세트 순환","s":"base"},{"id":"key.jei.shareToChat","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"채팅에 아이템 공유","s":"screen"},{"id":"key.jei.toggleHideIngredient","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"아이템 숨기기","s":"screen"},{"id":"key.jei.showUses2","key":"key.mouse.right","mod":"","m":"Just Enough Items","n":"아이템 사용법 보기","s":"screen"},{"id":"key.jei.cheatItemStack","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"아이템 1세트 지급","s":"screen"},{"id":"key.jei.toggleCheatModeConfigButton","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"아이템 치트 모드 켜기/끄기","s":"screen"},{"id":"key.jei.quickMove","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"고스트 아이템 빠른 이동","s":"screen"},{"id":"key.jei.previousSearch","key":"key.keyboard.up","mod":"","m":"Just Enough Items","n":"이전 검색 결과 표시","s":"screen"},{"id":"key.jei.copy.recipe.id","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"제작법 ID를 클립보드에 복사하기","s":"screen"},{"id":"key.jei.recipeBack","key":"key.keyboard.backspace","mod":"","m":"Just Enough Items","n":"이전 아이템 제작법 보기","s":"screen"},{"id":"key.jei.maxTransferRecipeBookmark","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"북마크된 제작법 만들기 (최대량)","s":"screen"},{"id":"key.jei.cheatOneItem","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"아이템 1개 지급","s":"screen"},{"id":"key.jei.nextSearch","key":"key.keyboard.down","mod":"","m":"Just Enough Items","n":"다음 검색 결과 표시","s":"screen"},{"id":"key.jei.focusSearch","key":"key.keyboard.f","mod":"CONTROL","m":"Just Enough Items","n":"검색 창 선택","s":"screen"},{"id":"key.jei.closeRecipeGui","key":"key.keyboard.escape","mod":"","m":"Just Enough Items","n":"제작법 GUI 닫기","s":"screen"},{"id":"key.jei.clearSearchBar","key":"key.mouse.right","mod":"","m":"Just Enough Items","n":"검색 필터 초기화","s":"screen"},{"id":"key.jei.showRecipe","key":"key.keyboard.r","mod":"","m":"Just Enough Items","n":"아이템 제작법 보기","s":"screen"},{"id":"key.jei.toggleOverlay","key":"key.keyboard.o","mod":"CONTROL","m":"Just Enough Items","n":"아이템 목록 겹침 켜기/끄기","s":"screen"},{"id":"key.jei.previousRecipePage","key":"key.keyboard.page.up","mod":"","m":"Just Enough Items","n":"이전 제작법 페이지 표시","s":"screen"},{"id":"key.jei.cheatItemStack2","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"아이템 1세트 지급","s":"screen"},{"id":"key.jei.pauseRecipeCycling","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"제작법 아이템 순환 일시정지","s":"screen"},{"id":"key.jei.nextCategory","key":"key.keyboard.page.down","mod":"SHIFT","m":"Just Enough Items","n":"다음 제작법 범주 표시","s":"screen"},{"id":"key.jei.toggleEditMode","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"모드 숨기기/편집 전환","s":"screen"},{"id":"key.jei.showUses","key":"key.keyboard.u","mod":"","m":"Just Enough Items","n":"아이템 사용법 보기","s":"screen"},{"id":"key.jei.previousCategory","key":"key.keyboard.page.up","mod":"SHIFT","m":"Just Enough Items","n":"이전 제작법 범주 표시","s":"screen"},{"id":"key.jei.nextRecipePage","key":"key.keyboard.page.down","mod":"","m":"Just Enough Items","n":"다음 제작법 페이지 표시","s":"screen"},{"id":"key.jei.nextPage","key":"key.keyboard.right","mod":"","m":"Just Enough Items","n":"다음 페이지 표시","s":"screen"},{"id":"key.jei.showRecipe2","key":"key.mouse.left","mod":"","m":"Just Enough Items","n":"아이템 제작법 보기","s":"screen"},{"id":"key.jei.recipeForward","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"다음 아이템 제작법 보기","s":"screen"},{"id":"key.jei.showBookmarkTooltipFeatures","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"북마크 세부정보 표시","s":"screen"},{"id":"key.jei.bookmark","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"북마크 아이템 추가/제거","s":"screen"},{"id":"key.jei.previousPage","key":"key.keyboard.left","mod":"","m":"Just Enough Items","n":"이전 페이지 표시","s":"screen"},{"id":"key.jei.toggleBookmarkOverlay","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"북마크된 아이템 표시/숨기기","s":"screen"},{"id":"key.jei.cheatOneItem2","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"아이템 1개 지급","s":"screen"},{"id":"key.jei.toggleCheatMode","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"아이템 치트 모드 켜기/끄기","s":"screen"},{"id":"key.jei.transferRecipeBookmark","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"북마크된 제작법 만들기 (한 번)","s":"screen"},{"id":"key.jei.toggleWildcardHideIngredient","key":"key.keyboard.unknown","mod":"","m":"Just Enough Items","n":"아이템 숨기기 (와일드카드)","s":"screen"},{"id":"key.koreanpatch.toggle_langtype","key":"key.keyboard.right.alt","mod":"","m":"Korean Patch","n":"언어 타입 전환 (영문/한글)","s":"base"},{"id":"key.koreanpatch.toggle_ime","key":"key.keyboard.unknown","mod":"","m":"Korean Patch","n":"IME(바닐라 입력) 전환 (왼쪽 Ctrl +)","s":"base"},{"id":"slm_codex.core.key.render_details_screen","key":"key.keyboard.h","mod":"","m":"SLM: Codex","n":"아이템 상세정보","s":"screen"},{"id":"key.carbon_config.key","key":"key.keyboard.unknown","mod":"","m":"Carbon Config","n":"모드 목록 열기","s":"settings"},{"id":"key.carbon_config.dep","key":"key.keyboard.keypad.add","mod":"","m":"Carbon Config","n":"의존성 뷰어 열기","s":"settings"},{"id":"treechop.key.toggle_chopping","key":"key.keyboard.unknown","mod":"","m":"HT's TreeChop","n":"나무 찍기 켜기/끄기","s":"build"},{"id":"treechop.key.toggle_felling","key":"key.keyboard.unknown","mod":"","m":"HT's TreeChop","n":"나무 쓰러뜨리기 켜기/끄기","s":"build"},{"id":"treechop.key.cycle_sneak_behavior","key":"key.keyboard.unknown","mod":"","m":"HT's TreeChop","n":"웅크리기 동작 바꾸기","s":"build"},{"id":"treechop.key.open_settings_overlay","key":"key.keyboard.unknown","mod":"","m":"HT's TreeChop","n":"설정 창 열기","s":"build"},{"id":"key.aether.open_accessories.desc","key":"key.keyboard.unknown","mod":"","m":"The Aether","n":"장신구 인벤토리 열기/닫기","s":"gear"},{"id":"key.aether.gravitite_jump_ability.desc","key":"key.keyboard.space","mod":"","m":"The Aether","n":"중력석 점프 활성화","s":"gear"},{"id":"key.aether.invisibility_toggle.desc","key":"key.keyboard.f3","mod":"","m":"The Aether","n":"투명화 전환","s":"gear"},{"id":"key.deep_aether.stratus_dash_ability.desc","key":"key.keyboard.left.alt","mod":"","m":"Deep Aether","n":"스트라투스 대시 활성화","s":"gear"},{"id":"key.deep_aether.slider_eye_ability","key":"key.keyboard.left.alt","mod":"","m":"Deep Aether","n":"슬라이더 강타 활성화","s":"gear"},{"id":"key.aether_redux.shoot_fireball.desc","key":"key.mouse.right","mod":"","m":"The Aether: Redux","n":"화염구 발사","s":"gear"},{"id":"key.immersive_aircraft.fallback_control_left","key":"key.keyboard.a","mod":"","m":"Immersive Aircraft","n":"왼쪽","s":"ride"},{"id":"key.immersive_aircraft.fallback_control_right","key":"key.keyboard.d","mod":"","m":"Immersive Aircraft","n":"오른쪽","s":"ride"},{"id":"key.immersive_aircraft.fallback_control_forward","key":"key.keyboard.w","mod":"","m":"Immersive Aircraft","n":"앞으로","s":"ride"},{"id":"key.immersive_aircraft.fallback_control_backward","key":"key.keyboard.s","mod":"","m":"Immersive Aircraft","n":"뒤로","s":"ride"},{"id":"key.immersive_aircraft.fallback_control_up","key":"key.keyboard.space","mod":"","m":"Immersive Aircraft","n":"Up","s":"ride"},{"id":"key.immersive_aircraft.fallback_control_down","key":"key.keyboard.c","mod":"","m":"Immersive Aircraft","n":"아래로","s":"ride"},{"id":"key.immersive_aircraft.fallback_control_pull","key":"key.keyboard.s","mod":"","m":"Immersive Aircraft","n":"풀 컨트롤러","s":"ride"},{"id":"key.immersive_aircraft.fallback_control_push","key":"key.keyboard.w","mod":"","m":"Immersive Aircraft","n":"푸시 컨트롤러","s":"ride"},{"id":"key.immersive_aircraft.fallback_use","key":"key.mouse.left","mod":"","m":"Immersive Aircraft","n":"무기/탈것 사용","s":"ride"},{"id":"key.immersive_aircraft.dismount","key":"key.keyboard.z","mod":"","m":"Immersive Aircraft","n":"분리","s":"ride"},{"id":"key.immersive_aircraft.boost","key":"key.keyboard.b","mod":"","m":"Immersive Aircraft","n":"로켓 부스트","s":"ride"},{"id":"railways.keyinfo.bogey_menu","key":"key.keyboard.left.alt","mod":"","m":"Create: Steam 'n' Rails","n":"대차 메뉴 열기","s":"build"},{"id":"railways.keyinfo.cycle_menu","key":"key.keyboard.left.alt","mod":"","m":"Create: Steam 'n' Rails","n":"사이클 메뉴 열기","s":"build"},{"id":"key.hadean_breathe.use_skill","key":"key.keyboard.r","mod":"","m":"Hadean Breathe","n":"기술 사용","s":"gear"},{"id":"key.gtbcs_spell_lib.lore_item_previous","key":"key.keyboard.left","mod":"","m":"GTBC's SpellLib","n":"설화 아이템 이전 페이지","s":"magic"},{"id":"key.gtbcs_spell_lib.lore_item_next","key":"key.keyboard.right","mod":"","m":"GTBC's SpellLib","n":"설화 아이템 다음 페이지","s":"magic"},{"id":"key.protection_pixel.armortabletrigger","key":"key.keyboard.unknown","mod":"","m":"Protection Pixel","n":"방어구 적재 플랫폼","s":"gear"},{"id":"key.protection_pixel.wingfly","key":"key.keyboard.space","mod":"","m":"Protection Pixel","n":"활성화","s":"ride"},{"id":"key.protection_pixel.flyfoward","key":"key.keyboard.w","mod":"","m":"Protection Pixel","n":"전방 비행","s":"ride"},{"id":"key.legendarysurvivaloverhaul.added_desc","key":"key.keyboard.left.shift","mod":"","m":"Legendary Survival Overhaul","n":"설명 표시","s":"screen"},{"id":"key.legendarysurvivaloverhaul.body_health","key":"key.keyboard.unknown","mod":"","m":"Legendary Survival Overhaul","n":"신체 체력 표시","s":"screen"},{"id":"key.curios.open.desc","key":"key.keyboard.unknown","mod":"","m":"Curios API","n":"장신구 인벤토리 열기/닫기","s":"base"},{"id":"key.ftbteams.open_gui","key":"key.keyboard.unknown","mod":"","m":"FTB Teams","n":"팀 GUI 열기","s":"base"},{"id":"dsurround.text.keybind.modConfigurationMenu","key":"key.keyboard.unknown","mod":"","m":"Dynamic Surroundings","n":"모드 설정 메뉴","s":"settings"},{"id":"dsurround.text.keybind.individualSoundConfig","key":"key.keyboard.unknown","mod":"","m":"Dynamic Surroundings","n":"개별 소리 설정","s":"settings"},{"id":"dsurround.text.keybind.diagnosticHud","key":"key.keyboard.unknown","mod":"","m":"Dynamic Surroundings","n":"진단 오버레이","s":"settings"},{"id":"key.ftbquests.quests","key":"key.keyboard.unknown","mod":"","m":"FTB Quests","n":"퀘스트 열기","s":"base"},{"id":"key.simplyswords.mainhand_ability","key":"key.mouse.4","mod":"","m":"Simply Swords","n":"주손 무기 능력 사용","s":"melee"},{"id":"key.simplyswords.offhand_ability","key":"key.mouse.5","mod":"","m":"Simply Swords","n":"보조손 무기 능력 사용","s":"melee"},{"id":"key.simplytooltips.cycle_tab","key":"key.keyboard.left.shift","mod":"","m":"Simply Tooltips","n":"툴팁 탭 순환","s":"screen"},{"id":"key.simplytooltips.capture_gif","key":"key.keyboard.unknown","mod":"","m":"Simply Tooltips","n":"툴팁 GIF 캡처","s":"screen"},{"id":"key.cinematic_respawn.skip_cinematic","key":"key.keyboard.space","mod":"","m":"Cinematic Respawn","n":"시네마틱 건너뛰기","s":"base"},{"id":"key.tacz.unload.desc","key":"key.keyboard.u","mod":"","m":"Timeless & Classics Guns: Zero","n":"탄약 분리","s":"gun"},{"id":"key.tacz.aim.desc","key":"key.mouse.right","mod":"","m":"Timeless & Classics Guns: Zero","n":"조준","s":"gun"},{"id":"key.tacz.crawl.desc","key":"key.keyboard.z","mod":"","m":"Timeless & Classics Guns: Zero","n":"기어가기","s":"gun"},{"id":"key.tacz.reload.desc","key":"key.keyboard.r","mod":"","m":"Timeless & Classics Guns: Zero","n":"재장전","s":"gun"},{"id":"key.tacz.inspect.desc","key":"key.keyboard.j","mod":"","m":"Timeless & Classics Guns: Zero","n":"총 둘러보기","s":"gun"},{"id":"key.tacz.fire_select.desc","key":"key.keyboard.left.alt","mod":"","m":"Timeless & Classics Guns: Zero","n":"조정간","s":"gun"},{"id":"key.tacz.melee.desc","key":"key.mouse.4","mod":"","m":"Timeless & Classics Guns: Zero","n":"근접 공격","s":"gun"},{"id":"key.tacz.zoom.desc","key":"key.mouse.5","mod":"","m":"Timeless & Classics Guns: Zero","n":"배율 변경","s":"gun"},{"id":"key.tacz.interact.desc","key":"key.mouse.5","mod":"","m":"Timeless & Classics Guns: Zero","n":"총 든 채로 상호작용","s":"gun"},{"id":"key.tacz.refit.desc","key":"key.keyboard.y","mod":"","m":"Timeless & Classics Guns: Zero","n":"개조","s":"gun"},{"id":"key.tacz.open_config.desc","key":"key.keyboard.unknown","mod":"","m":"Timeless & Classics Guns: Zero","n":"TAC 설정 열기","s":"settings"},{"id":"key.tacz.shoot.desc","key":"key.mouse.left","mod":"","m":"Timeless & Classics Guns: Zero","n":"사격","s":"gun"},{"id":"key.doxbreath.hold_breath","key":"key.keyboard.left.shift","mod":"","m":"DoxBreath","n":"숨참기 (조준 중)","s":"gun"},{"id":"tacztweaks.key.reduceSensitivity","key":"key.keyboard.unknown","mod":"","m":"TaCZ Tweaks","n":"감도 감소","s":"gun"},{"id":"tacztweaks.key.tiltGun","key":"key.keyboard.x","mod":"","m":"TaCZ Tweaks","n":"총기 기울이기","s":"gun"},{"id":"key.melon_tacz_additions.legacy_refit","key":"key.keyboard.i","mod":"","m":"Melon's TACZ Additions","n":"구형 부착물 화면","s":"gun"},{"id":"key.taczexpands.switch_ammo.desc","key":"key.keyboard.t","mod":"","m":"TaCZ Expands","n":"탄약 전환","s":"gun"},{"id":"key.taczexpands.switch_under_barrel.desc","key":"key.keyboard.left.control","mod":"","m":"TaCZ Expands","n":"하부 부착물 전환","s":"gun"},{"id":"key.taczexpands.action_1.desc","key":"key.keyboard.unknown","mod":"","m":"TaCZ Expands","n":"동작 1","s":"gun"},{"id":"key.taczexpands.action_2.desc","key":"key.keyboard.unknown","mod":"","m":"TaCZ Expands","n":"동작 2","s":"gun"},{"id":"key.taczexpands.action_3.desc","key":"key.keyboard.unknown","mod":"","m":"TaCZ Expands","n":"동작 3","s":"gun"},{"id":"key.taczexpands.action_4.desc","key":"key.keyboard.unknown","mod":"","m":"TaCZ Expands","n":"동작 4","s":"gun"},{"id":"key.taczexpands.toggle_laser.desc","key":"key.keyboard.unknown","mod":"","m":"TaCZ Expands","n":"레이저 켜기/끄기","s":"gun"},{"id":"key.taczexpands.toggle_flashlight.desc","key":"key.mouse.5","mod":"","m":"TaCZ Expands","n":"손전등 켜기/끄기","s":"gun"},{"id":"key.taczaddon.switch_gun.desc","key":"key.keyboard.unknown","mod":"","m":"TACZ-addon","n":"빠르게 총기 전환","s":"gun"},{"id":"key.taczadditions.toggle_laser","key":"key.keyboard.unknown","mod":"","m":"TaCZ: Additions","n":"레이저 전환","s":"gun"},{"id":"key.taczadditions.hold_breath","key":"key.keyboard.unknown","mod":"","m":"TaCZ: Additions","n":"Hold Breath","s":"gun"},{"id":"key.sharpsharp_unload_overhaul.eject_chamber","key":"key.keyboard.g","mod":"","m":"SharpSharp Unload Overhaul","n":"약실 비우기","s":"gun"},{"id":"key.pingwheel.ping_location","key":"key.mouse.middle","mod":"","m":"Ping Wheel","n":"위치 핑 보내기","s":"base"},{"id":"key.pingwheel.open_settings","key":"key.keyboard.unknown","mod":"","m":"Ping Wheel","n":"설정 열기","s":"settings"},{"id":"create.keyinfo.toolmenu","key":"key.keyboard.left.alt","mod":"","m":"Create","n":"메뉴 세부정보 보기","s":"build"},{"id":"create.keyinfo.toolbelt","key":"key.keyboard.left.alt","mod":"","m":"Create","n":"근처 공구상자 열기","s":"build"},{"id":"create.keyinfo.rotate_menu","key":"key.keyboard.unknown","mod":"","m":"Create","n":"블럭 회전 메뉴 열기","s":"build"},{"id":"key.createbigcannons.pitch_mode","key":"key.keyboard.c","mod":"","m":"Create Big Cannons","n":"포차 모드 변경","s":"ride"},{"id":"key.createbigcannons.fire_controlled_cannon","key":"key.mouse.left","mod":"","m":"Create Big Cannons","n":"조종 중인 대포 발사","s":"ride"},{"id":"simulated.keyinfo.rotate_mode","key":"key.keyboard.tab","mod":"","m":"Create Simulated","n":"물리 지팡이 회전 모드","s":"ride"},{"id":"simulated.keyinfo.scroll_up","key":"key.keyboard.unknown","mod":"","m":"Create Simulated","n":"위로 스크롤","s":"ride"},{"id":"simulated.keyinfo.scroll_down","key":"key.keyboard.unknown","mod":"","m":"Create Simulated","n":"아래로 스크롤","s":"ride"},{"id":"key.configured.open_mod_list","key":"key.keyboard.unknown","mod":"","m":"Configured","n":"모드 목록 열기","s":"settings"},{"id":"key.flashlightmod.toggle","key":"key.mouse.right","mod":"","m":"Flashier Flashlights","n":"손전등 전환","s":"gear"},{"id":"key.special_ability","key":"key.mouse.5","mod":"","m":"Alex's Caves","n":"알렉스의 동굴들 특수 능력","s":"gear"},{"id":"key.jade.config","key":"key.keyboard.keypad.0","mod":"","m":"Jade","n":"설정 열기","s":"settings"},{"id":"key.jade.show_overlay","key":"key.keyboard.unknown","mod":"","m":"Jade","n":"오버레이 표시","s":"screen"},{"id":"key.jade.toggle_liquid","key":"key.keyboard.unknown","mod":"","m":"Jade","n":"액체 전환","s":"screen"},{"id":"key.jade.show_recipes","key":"key.keyboard.unknown","mod":"","m":"Jade","n":"제작법 표시","s":"screen"},{"id":"key.jade.show_uses","key":"key.keyboard.unknown","mod":"","m":"Jade","n":"용도 표시","s":"screen"},{"id":"key.jade.narrate","key":"key.keyboard.unknown","mod":"","m":"Jade","n":"읽어주기","s":"screen"},{"id":"key.jade.show_details","key":"key.keyboard.left.shift","mod":"","m":"Jade","n":"세부 정보 표시","s":"base"},{"id":"quark.keybind.autorun","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"자동으로 걷기","s":"base"},{"id":"quark.keybind.back","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"뒤로가기","s":"base"},{"id":"quark.keybind.camera_mode","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"카메라 모드","s":"base"},{"id":"quark.keybind.transfer_insert","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"아이템 넣기","s":"base"},{"id":"quark.keybind.transfer_extract","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"아이템 가져오기","s":"base"},{"id":"quark.keybind.shift_lock","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"Shift 고정","s":"base"},{"id":"quark.emote.no","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"아니","s":"base"},{"id":"quark.emote.yes","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"응","s":"base"},{"id":"quark.emote.wave","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"인사","s":"base"},{"id":"quark.emote.salute","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"경례","s":"base"},{"id":"quark.emote.cheer","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"응원","s":"base"},{"id":"quark.emote.clap","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"박수","s":"base"},{"id":"quark.emote.think","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"갸우뚱","s":"base"},{"id":"quark.emote.point","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"가리킴","s":"base"},{"id":"quark.emote.shrug","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"으쓱","s":"base"},{"id":"quark.emote.headbang","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"헤드뱅잉","s":"base"},{"id":"quark.emote.weep","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"울기","s":"base"},{"id":"quark.emote.facepalm","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"얼굴 가리기","s":"base"},{"id":"quark.keybind.patreon_emote.dance","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"댄스 (패트리온 전용)","s":"base"},{"id":"quark.keybind.patreon_emote.tpose","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"T-포즈 (패트리온 전용)","s":"base"},{"id":"quark.keybind.patreon_emote.dab","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"댑 (패트리온 전용)","s":"base"},{"id":"quark.keybind.patreon_emote.jet","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"제트 (패트리온 전용)","s":"base"},{"id":"quark.keybind.patreon_emote.exorcist","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"엑소시스트 (패트리온 전용)","s":"base"},{"id":"quark.keybind.patreon_emote.zombie","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"좀비 (패트리온 전용)","s":"base"},{"id":"quark.keybind.change_hotbar","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"핫바 교체하기","s":"base"},{"id":"quark.keybind.sort_player","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"플레이어 보관함 정렬","s":"base"},{"id":"quark.keybind.sort_container","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"용기 내 보관공간 정렬","s":"base"},{"id":"quark.keybind.lock_rotation","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"설치 방향 고정","s":"base"},{"id":"quark.keybind.narrator_readout","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"내레이터 읽기","s":"base"},{"id":"quark.keybind.narrator_full_readout","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"내레이터 모두 읽기","s":"base"},{"id":"quark.keybind.variant_selector","key":"key.keyboard.unknown","mod":"","m":"Quark","n":"변형 선택기","s":"base"},{"id":"supplementaries.keybind.quiver","key":"key.keyboard.h","mod":"","m":"Supplementaries","n":"화살통","s":"base"},{"id":"key.legendary_monsters.fiery_boots_ability","key":"key.keyboard.left.alt","mod":"","m":"LegendaryMonsters","n":"전설적인 괴물들 장화 능력","s":"gear"},{"id":"key.legendary_monsters.mossy_chestplate_ability","key":"key.keyboard.r","mod":"","m":"LegendaryMonsters","n":"전설적인 괴물들 흉갑 능력","s":"gear"},{"id":"key.legendary_monsters.roar_ability","key":"key.keyboard.r","mod":"","m":"LegendaryMonsters","n":"전설적인 괴물들 포효 능력","raw":true,"s":"gear"},{"id":"key.legendary_monsters.helmet_ability","key":"key.keyboard.c","mod":"","m":"LegendaryMonsters","n":"전설적인 괴물들 투구 능력","raw":true,"s":"gear"},{"id":"key.jei_structures.open_current_structure","key":"key.keyboard.unknown","mod":"","m":"JEI Structures","n":"현재 구조물 JEI 페이지 열기","s":"base"},{"id":"key.shoulderflashlight.toggle","key":"key.keyboard.t","mod":"","m":"Flashlight Slot","n":"손전등 전환","s":"gun"},{"id":"key.epicfight.show_tooltip","key":"key.keyboard.caps.lock","mod":"","m":"Epic Fight","n":"무기 고유스킬 툴팁 보기","s":"melee"},{"id":"key.epicfight.switch_mode","key":"key.keyboard.v","mod":"","m":"Epic Fight","n":"전투/채광 모드 변경","s":"melee"},{"id":"key.epicfight.dodge","key":"key.keyboard.left.alt","mod":"","m":"Epic Fight","n":"회피기","s":"melee"},{"id":"key.epicfight.guard","key":"key.mouse.right","mod":"","m":"Epic Fight","n":"가드","s":"melee"},{"id":"key.epicfight.attack","key":"key.mouse.left","mod":"","m":"Epic Fight","n":"공격","s":"melee"},{"id":"key.epicfight.weapon_innate_skill","key":"key.mouse.5","mod":"","m":"Epic Fight","n":"무기 고유 스킬","s":"melee"},{"id":"key.epicfight.mover_skill","key":"key.keyboard.left.alt","mod":"","m":"Epic Fight","n":"이동기","s":"melee"},{"id":"key.epicfight.skill_gui","key":"key.keyboard.unknown","mod":"","m":"Epic Fight","n":"스킬 편집기 열기","s":"melee"},{"id":"key.epicfight.lock_on","key":"key.keyboard.unknown","mod":"","m":"Epic Fight","n":"락온","s":"melee"},{"id":"key.epicfight.lock_on_shift_left","key":"key.keyboard.unknown","mod":"","m":"Epic Fight","n":"락온 왼쪽 전환","s":"melee"},{"id":"key.epicfight.lock_on_shift_right","key":"key.keyboard.unknown","mod":"","m":"Epic Fight","n":"락온 오른쪽 전환","s":"melee"},{"id":"key.epicfight.lock_on_shift_freely","key":"key.keyboard.unknown","mod":"","m":"Epic Fight","n":"락온 자유 전환","s":"melee"},{"id":"key.epicfight.config","key":"key.keyboard.unknown","mod":"","m":"Epic Fight","n":"설정 화면 열기","s":"melee"},{"id":"key.epicfight.switch_vanilla_model_debug","key":"key.keyboard.unknown","mod":"","m":"Epic Fight","n":"바닐라 모델 디버깅 전환","s":"melee"},{"id":"WingStance Mode","key":"key.keyboard.y","mod":"","m":"Epic Fight: Dragon Dimension","n":"윙 스탠스 모드","raw":true,"s":"melee"},{"id":"key.epicfight_curios_compat.open_editor","key":"key.keyboard.unknown","mod":"","m":"EpicFight x Curios Compat","n":"큐리오 위치 편집기 열기","s":"settings"},{"id":"key.gunlight_bridge.grip_toggle","key":"key.keyboard.unknown","mod":"","m":"Sharpsharp Gunplay Overhaul","n":"전술 조명(손잡이) 켜기/끄기","s":"gun"},{"id":"key.gunlight_bridge.laser_mode","key":"key.keyboard.f","mod":"","m":"Sharpsharp Gunplay Overhaul","n":"부착물 관리","s":"gun"},{"id":"key.gunlight_bridge.kneel","key":"key.keyboard.c","mod":"","m":"Sharpsharp Gunplay Overhaul","n":"무릎 앉아 쏴","s":"gun"},{"id":"key.ssrcamerafixes.shoulder_cycle","key":"key.keyboard.caps.lock","mod":"","m":"Shoulder Surfing Reloaded: Camera Fixes & Additions","n":"어깨 시점 순환 (오른쪽, 왼쪽, 위)","s":"base"},{"id":"epicfight_edp.key.charged_attack","key":"key.mouse.left","mod":"","m":"Epic Fight - Extended Datapacks","n":"충전 공격","s":"melee"},{"id":"key.efn.doppelganger","key":"key.mouse.4","mod":"","m":"EpicFight Nightfall","n":"마영 분신","s":"melee"},{"id":"key.efn.doppelganger_delay","key":"key.keyboard.z","mod":"","m":"EpicFight Nightfall","n":"분신 지연 전환","s":"melee"},{"id":"key.efn.summoned_sword","key":"key.mouse.left","mod":"","m":"EpicFight Nightfall","n":"환영검","s":"melee"},{"id":"key.efn.zansetsu_input_switch","key":"key.keyboard.left.control","mod":"","m":"EpicFight Nightfall","n":"참탈(Zansetsu) 입력 전환","s":"melee"},{"id":"key.efn.arts","key":"key.mouse.5","mod":"","m":"EpicFight Nightfall","n":"나이트폴 무술","s":"melee"},{"id":"key.efn.angel","key":"key.keyboard.left.control","mod":"","m":"EpicFight Nightfall","n":"천사 스타일","s":"melee"},{"id":"key.efn.demon","key":"key.mouse.right","mod":"","m":"EpicFight Nightfall","n":"악마 스타일","s":"melee"},{"id":"key.p1nero_ec.skill_1","key":"key.mouse.5","mod":"","m":"P1nero's Epic Cataclysm","n":"스킬 1","s":"melee"},{"id":"key.p1nero_ec.skill_2","key":"key.keyboard.q","mod":"","m":"P1nero's Epic Cataclysm","n":"스킬 2","s":"melee"},{"id":"key.p1nero_ec.skill_3","key":"key.keyboard.e","mod":"","m":"P1nero's Epic Cataclysm","n":"스킬 3","s":"melee"},{"id":"key.presencefootsteps.settings","key":"key.keyboard.f10","mod":"","m":"Presence Footsteps (Forge)","n":"프레전스 풋스텝","s":"settings"},{"id":"keybind.invmove.toggleMove","key":"key.keyboard.backslash","mod":"","m":"InvMove","n":"UI 이동 전환","s":"settings"},{"id":"key.punchy.triggerable.punchy_sword_inspect_old","key":"key.keyboard.unknown","mod":"","m":"Punchy","n":"key.punchy.triggerable.punchy_sword_inspect_old","raw":true,"s":"melee"},{"id":"key.punchy.triggerable.punchy_sword_inspect_rework","key":"key.keyboard.j","mod":"","m":"Punchy","n":"Punchy 검 살펴보기 동작","raw":true,"s":"melee"},{"id":"sharpsharp.fixed.wheel_scope","key":"key.mouse.wheel","mod":"","m":"고정 조작 (키 설정 없음)","n":"스코프 동적 조작 (조준 중)","s":"gun","fixed":true},{"id":"sharpsharp.fixed.ctrl_wheel_reticle","key":"key.mouse.wheel","mod":"CONTROL","m":"고정 조작 (키 설정 없음)","n":"레티클 밝기 조절","s":"gun","fixed":true}],"sits":[["base","기본 조작","걷기·시점·인벤토리·대화·음성·지도 등 언제나 쓰는 키"],["melee","근접 무기 전투","Epic Fight 무기·근접 무기를 들었을 때"],["magic","마법 전투","주문서·지팡이·마법 장비를 쓸 때"],["gun","총기 전투","TACZ 총을 들었을 때"],["ride","탑승물 탑승","항공기·물리 구조물(Create 시뮬레이티드)·생물(드래곤·가스트·해파리)·하이퍼튜브, 날개 비행"],["gear","장비 능력","갑옷·장신구·특수 아이템 기술"],["screen","창 열림","인벤토리·상자·JEI 같은 창을 열었을 때, 아이템 툴팁"],["build","건축·기계","Create 계열·건축 도구·나무 베기·채굴 방식"],["settings","설정·표시","모드 설정 화면, 화면 표시 켜기/끄기"]],"icons":{"create:brass_hand":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABT0lEQVR4nGNgGOmAkVYGd8Y7/8cmXr5wL4qdTAwDDFho5fOyWS0o4rEaUVjVMzEMlxDoxOHzt+f24NXHxDDUQqATR+pGBzCfF0TNA9NL7t9nHNoh0EkgjufOOECSz4dOCHSSmLphPte1U4II3L/PMLRD4PKhe1jFYXH++PkHFPEJy5LQlf7HVgcM/hCIi4sDu/zf4cNY4zw5wwFvSJw5DQk5fWM5MB1zSPE/tlzBxDDYQiAO6vOw8HAwfwU0BGA+MjGFpm4cAKYOBrZsuYRXPRPDYM8FL9W1wfSSfkhcMxRiVycrKYDVxx9uvxvcdQEjuoCOkRU4DRjpqDAgp4WJk6eDafGbV1FLOgLlxtCrC66cOwZzMbTeXwkm7W0swPRBmMJDkJDABQj5fNCEACMhBehpAh2cu3IHPeRIAkwMAwwYiVUICwl0QK7PB00IjAIAZ6qIgp2nadUAAAAASUVORK5CYII=","legendarysurvivaloverhaul:heart_container":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAD6ElEQVR4nM2XbUhUWRjH77nzkmVp0djbNmNmthC9WLmUkCkZoQu7EUu1SyzuBu2CEUV9KCwoot12C/oQ0TJTZEUvJAQhldk4aUm1bG1Z1EovVpqazqBm9uKdl3sX/v97xJmvffA+X37nzD3n3Pt/znOe84wwDEMZbNlbasAUTxoeCCHQt9vtoK7roGEYeCDnq6qKhs1mQz8ajSqD53e/eIPGvf1L5HhSGWKzy4ZUIoRAI1CaiX6VGAF6DzeA7ow0sKntA8ZpmoZ+lnsUGGzvAWcXZ4OxdK5fVRaUHqJLTFOVITa71/8SDe/Vl/jCm7vnxSl/3Pg2bu+7gu/AKROSQZuNDHX0guFwDOzpIl06Y6L4d+79nM1+vOfXZRnCEh4QMzdewRf9s3cBfvA7UsD/GqnoeqAJ3FOaA543Jz703o+L9lm/zAd/cFDTjr/+BTMXMhZco+mJ8FTOryq7pljCA3Z5vhOV19cyNn5bT+XRFd+AK973g8LvBzWNe70uby74eIwL3HMlAO7yPeCbcmaS95Q4z6nKEJuYtakaMTBl2nj8EIlE4pSnFhWCzugw0H1hK9hXchCMxegB7Ukn6HB8Ah9oHnBkYyW4+wjziM1Gzc1NIWt4wC5zd2oaY0BaBYUp2xQnONpUbrR1x+3hmG4qfv3uI+jyjAX1T8wbXqYRJdXF9YXpgdjTDot4QDVvpUiEXywMsqONyh62JIFZK8vAJCejPDX0Hgz18lTIdXSN8wxjONgeoitH9odBm9NprdtQyFtQ5uj5c6ah/6GVyoatYjT/WLgSTOnuAj3juEDKqqNgshYE6yp5Osqrz4IfzzKfjPLwbml4xP6dP/KFteoBaX1J3PP0pV+ALeeegadreQv8tOx78HWQ5/6rEX3g5X3bwYpntWDPpXZwRtGXYPP9lrj3yNOnKlaJAWnTfS/ww9rVLGWGd/L53+fpiaTVGeDyrCIwpjPKLzbxbuj1vwHzCiaDwk2lJ3fWgWk3WRFV38q3iAd0s9KR1Wvut81gz3Id0jesoWKlleOuX+OeJy/l3RAO83xH6zksdzGjXU2ntsOnud70U51i8PjL9Ys4TrHaKbhdyb33RRV88YETrBXLS0xPLGH1eyPATKiaRW5eAZXnZHLPfz7+Cswob8WAkto89GuqWy2aCROton/gHxC480wLGsdMTzQ087kW5SlYM9UB5vqeg/lfu6G8eJLM/fTUdxw2YKpiVQ9IK73UBhYUTgR3nHyFCbfXsrxtNOeX+Fg9Z51ph9R1dYvRD1zl/EPFE+P23noe0BPygbRED0kF2Vtq8ED27/5ZwNstQWGiyRpyYL3PlvCZ9j8XVnX0dnmDqgAAAABJRU5ErkJggg==","minecraft:armor_stand":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABLElEQVR4nGNgIBPEe2r8B2EGCgETwwADFlI1wHztbKkJ5t97/g3MP3zhEePICAEYEOLjZKAGYGIYYMBISAGulG6gJwumL1x6jFXfwu03GId2GohHS+3ocf/u03cwHepuBKZvP38NplUlRUnKHUwMAwwYCSmwNZBDSQNB7upget3Om1j5MEBsucDEMNjLgcNQn8DShDA3D4o8Op/UEpGJYaiVhELQXKAkyYXCJxcwMQy1EHgHzf+4+MO3LjCAlv3oqR+WBmAlIaw8GD7lwEJErfYfuezvXHAETJcn2JDl86ETAugAFtfDJhewkKoBlvpHTkkYj9YmRPcxepqAqR8ybUJGXBIwn3jGN6CIf/36FUxzc3ODaQ4ODjD948cPFH5vQx7D8GwTEguGTF0AADgLb/Tdskf9AAAAAElFTkSuQmCC","minecraft:skeleton_skull":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAD50lEQVR4nO1WzVLiTBS9+YUkgHzKjLDQcty4HZ9gqPIBeAKLJYspn8FYPIVL3+Sbva7cuJAqqyycEcofQoAE8vPVudD5gEFhxpmdp6ornU6nzzn33u6E6B3veAPq9bqN9pY1pN8lJqLjdDpNnufxWD6fPzk6OrL/qoD6FHE+nydcAYgQfSI6OTw8tP+ogPqEGH0Qo00jDEMaekNSVIXvfc+nOI5Pvh59td8koF6v297AY+L19XX6uPmRyQBFUUjTNOr3+9TpdCiTySRRGPpD0lP6ShGRVnFsGiaFQUh6WuerN/C4D1FCgGmatLa2logajUbzyy4UIs8PVKtV+655dwwSAK7gxrAMdo1+Lp8j13UTouFwSM1mk25vb/mdefKnpyc6Pz8/XiRAXRSBwWDAC24UNtjlVIFxeEEsYKQN8vSx2K2tLY4AIoE5rVaLGo0GPT4+LqJ5WYAAQnt5eckLbm9vUy6X4/FCoUD5f8aFCKLsWpaiTsTz4R7Rubq6ovv7e56jKgoFk9pZKiCKIpJlmaSp8hBCstksFdYLfEUqRCRAioYUwK1wrOs6py0KQ4onhbuSgDiOSZIkUmJlZhy5bLfatFncpFiKk4jA8c3NDd017yhtpPldFCWAtRRVJVXTuL9UgAAmwxWucAIBgKqpM6nBISQcgxRREeQAxLwG9bWHII/CMTHSMn0FIKTX6/GYNnHp+R7Jyk+b60XI8wNwhG0lUhGEQUI8TT6ziCSRJMscKbT5eUgdDrAgCJYLiKKIG0QIIYugyPK44UScFBuIIQBbURBfXFxwi7GmN1yhCIOIw67p2owQVVUTZ6lUiisbY+GUQEQP5OI9EAOlYok6HYd4KywTsAgQ5PQcFpDJZtglj89FB46xM4LRiEMO4mKxyM9wPwpGy1Mg4DpOkjNsLXxs2Jn/fxhFROZD/fz8zGcCyLFFr6+vye25yb/DqxFwXYf0VIq3oOR5JKUN7kMAHGChD/QhmQ9nDw8PLAJH8XWjweO+7zNx1+3y/afdT2RZ1nIBwND3KZPN8eJwje2GHYF7OMJhhMVMy2TH+B7sf97nSIHUcRwWAOzs7FCpVKKXIC0aPDg4KGesDL5cX3CPCkfuUVgIb2GjwAUI4BwAIKzVbrFYYHd3lxui5/v+N0VR7LOzs39XEiBQqVTKFBMLMQyDz3984VJ6iqsdX0mcfN9/fKd2uz1DDMRx/I2I7NPT05+If+mXrFKplC3Lsk3T/ALnbtelbnec24E34PyjRvb29lYm/iUBArVarYyFJUni1EBIf9BPiss0zZWJ3/RbXpsSghqA45dy/FdRq9XK1WoVYt5Bv4v/AL1sW1n1cG7DAAAAAElFTkSuQmCC","apotheosis:mythic_material":"data:image/gif;base64,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","ghasts_update:dried_ghast":"data:image/png;base64,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","kubejs:weapon_exp_crystal":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABtUlEQVR4nGNgGAUjHTCSq/HJzP//kfl70maBzUpgTCfJHCaGoRICT9B83LN4A4p8SWwAAzkhwsQwWEPgCQEf15RAfPzjJYS/bN1EFPmooHyiQoSJYbCFwBOozwn5GBdoP/AUTMu/WwOmn32VR0kjMumMjIMqBFhwSUhxPwTT2Q2QuHx/Cb+P0QEsDaCnDXTAxDBYQwAGYD6XNn7NgAxKat+DaQ4ovzBADUUeloZYv51kGNohAAOFBUcZkEH/BGsw/e23KJhuyI4C06Ki5lAVkNRPCDAxDPYQaIemcg5eLTD99/M1MP30LMTnE2ei+xwCmKHqGb4NtRBoh/qY6zUk9XIweWL3GRSg+xxW8jHzQvjX395EMXfwhwAM/OYKA9OsLxvA9Df1bjBd6SDNgA0gfA4JoZvXIsG0imwtxDysuhgGYW244wkkVW8u7UJpD3DdLEVRBwsR1senwfSdx80o8vJWm1D4ts0FYLsiVCC15OBNAx4yy8D0jieoobO5tBtriMBSObqPjUrKwPqlxWEibFgdwMQwVFrFO6BpAwbQ04heTiHYLHl5VqwhigswEeuAUcBAIwAAHjmJYUd8+YUAAAAASUVORK5CYII=","minecraft:leather_boots":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAA+klEQVR4nGNgGAWjYKQDRkIKjBVE/2MTP/vgNSM56tABE8MAAxZcEjAf+RrKoYgvPHILr4Ho6t99/QE25/7rz4xDKwQoBe+//iRKHRPDUAmB90T6iFh1QycE3pPoI1IBE8NQSQPvaBQSTAyDLQSMFSEloI2qOIq4CA8HfpOg5RwTI4Tx7z+karBRk4CpwFoiMjEMlhAwhvo8wUYVRcG9V5/B9OO3X4gyEKZOVpgHTJspiaKE4IZzD1BCgolhsKWBe1Afo/vo7MM3eA169+UHCg0LAUIhyMQwwIARPQ3AfIAOcNXnuICiKC/WFhK6eUykGDoKRsEoYKABAABlE1sdkmn7sAAAAABJRU5ErkJggg==","tacz:gun_smith_table":"data:image/png;base64,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","exposure:camera":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACZElEQVR4nO2UPWgTYRjH/+/H5S6hrZdezKU1tkUo1rNBHdwcnBULDoqIQhdnRxEXwcUizi6dRQfRoUjtYoUubk7Br5p+nMXkkiZNcsl9n+SKc4NGXe43Pcv75/c+7/O8QExMTExMTMx/hvzOoauXL856vn3Hdf08J8LCy9cry/9E4PqVC6cTXLztuN68ru8glUxiVJFBKV2TuLCw+PTF0l8ROKtpuezR7CORs2tGrc4VRUFWUVDfraO0uQ3CKCbyR6Bk0qt7jd3Hz1+tLA1U4OTxyfOMJ95m0mnkcln4XoBPX9ZBKQPlLArxPQ+EEIyPHQYJwzXbtm++efd+46Bs2p8nx8iIDD8k2NjU4QchzpwqQFFkuI4Dx3GgZhUUZmfAGIfteOcATPWX3AfSkARRTEASJax/q6BruxgeToJThvy4Cs4ZGGVoNPZgGDV0bacnMgNgdSAdsNoWarsNtFptBCGiejStIAgJ9J0KOp0OypUaSqUttM1uFFut1Z+oqjo1EAEPQLPZwo9yGYEf4NjUBELfx/T0NAgJohuXtr8jAEXL7MLsdJBKJSFJB2fTvgS8nkKIIAiiuvjxM8xOF416HZwLSIopeJ6PWr2BE5qGuUtzkGW593iDEsAHCiwyxq3ekBFKUDaqsG1nX47sLxNjDEG0DRSMC7Asa7AfkaZpORr6DwjFjVbblDqmhUxGxqGhYaxvbEUCY6qKEEClUn7m+OEtwzDaAxP4RaFQyCNw73VNc54nBEkURDSararruhIIlikT7uq6/hV9QPAHaJOTOU+g9zkXqqD8YbFY7PW8NzAxMeiXn2aZ+gZsWc/EAAAAAElFTkSuQmCC","simpleradio:transceiver":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAFZklEQVR4nNWXS2xUVRjH/+ee+5iZezud6RQ6bQdKYUooSMQEY4hNusFI3ABBE4wsNDHRsCNq4s6FK3e4INGNujAxIZBgIrELNRlEQUIEUzA1bWH6ojMd2k7ncd/3HHPuSIMJtHbGYPwnM+fmPH/nO9/33XOB/7teHe7uPDG8I9vseNIqwP5sx41km7YvoStjjPGPz/8888kTA9i/PfkUl8ioeNYUCpni6qVbpQMbmUNqBYATqZN5zBfPMiUghFzc6BykFYAdQFYlGFdiKqJxdSS+2fgpoWuzhKNcVLd9k8vlQri1JLcCEADHXQ6QuotlisJiofphKu4hoatQ62OF4cHUp1D907nfVsr/CsDZd19KLy+62YrpyURC4cxXuWOsATLrR2ganKNierBcBlniaYWSDyhTngfwQssAxw/s+nF0amlo+LkMJALkpxubouKPYAScnBAHKtOGW7k+AyFU9M2tNa/8TxY/ujebqVvu0J1SGeavLio1C1bNRXZwMyqlOhxVOuL5QYRKknDEcAxjDApVAEovtAwQSOx1Uba1KahbHr6/OgVFpkh36Nj1TC+MqNI5W6xiulRHEDBwziELGJD8lbHirZYBojH5sOczUWJqfqUxkEpYrjpYrpagqRQJXcGe/iQYSLj7mEbzvsveuzJ+v7UwfHN4b8anbKY9qSKRUvHDlTzuFavQo9pqH8f1wcHx8ouD2LM9hR1dSdRWPCzet+zCvHnOd9iZd87mrjZlAZ+yQ6I04gpkRUKl5sLQNciUwvOCRp8gQG9XHJbt4+J3eZi1cYAGsDwvslS1TtRtzxCu1BQAwA8TSYLepiA/Ww7PWI9pUBUKpsmomw44gK6UDvFg1j3Yno/5xTJimgJf+ARwvqlUfHJ4twGQg4YhQzj3zFwlLIUDhoMlAolK0KMK+vsScN0AQcBRc2wof4Wj5wc2cSMXmgKwqHQEQMRoFzsB7rtJKLHEaqiFC3gBujoNJBMRqIoMXVfgBD76ehJ4eudmDGxJXn/l5G67KQBO+DEikfD8F1Y4OI1A0rtgqz2wYcD1SRhy27a0h/2rKx4oJVBVCssLUDZdtMejQzPXCvs2DNAHRG5cv3vI85zQ1PcWRdJtKOCAjShMuRNSLIVMdxxW3YfvMVQsOwR4INdntz779o/rGwaQgIOVFTNCFQ7GgYmZarhbIcYa3i/Uuak9zAPVitewQggggwr/IAQM/GusIflxDQQ4LJbb2t+BeyUbi8sVyLKJaCyGh1Nub0peNX/AWDgwYWhhxjRt72JUV79sCoACh1LdbYjFFPwyVl2ttyyz0S5RaJqGzCZ51fw124UeU8Pd10wXpum8fW1iaXYtAOlRlTuBIRnIZAd7QCJR3JkzGzt+KG+6rgvCLMRjEhYXzFXzG1EFAeNwXO/yeos/1gIy8Jow//a9vSiuBKjWHVBKISJCkqTQF8RvIBML+9+8NA7f5aCGEoah7QaQqfLY5LOuBTgwlEq3I96hY3Kq8d4PggCO7cB1XAQiKQDY1aejsmyhVrbhmA4UTQ4zn+sFAvRc0wAm8OzAvswpDoyN313+W5sA8TwPibiMZErH3ORSWC9OJ5KIiksRfJ9dzo3OrWt+oUcewRRgfz5y+zRGbp9Op9PiZfQWAJEVV5XdlgTVdczPVBoTKRQBJajXbdiut2borWuBh1UoFEaKxcJRxoIBzvGFePmJ+v6t7TArNhaml8JrmWyoqJsuapYLkwVr3oKa+i4olUoTCwuFNwA+oGnyRz3denny5kzYFuY9o3E/CAI+8ftkZeJfB3igYrGYn56efb/Gqt350blTwkiUSjYicj5g/BbAzuBJarjFb4v/XH8CHL1f7xd1qlsAAAAASUVORK5CYII=","simplyswords:iron_longsword":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB50lEQVR4nMWXMUvDQBTH30UUHAriIEkXxyxdnFxDSRbHfqB+iZaufoPi5lBI3QQXFVJM3ZTSTkJRpy4n/zMXryHWtJc7HxxJj7v+/u//Hnct45yT7Yii6OcD59zqCMMwf3ddl/4FHsexfQFhCVyU3zY8TdMcbkXAJjiGY6Pb8Ww2mxQEAS0Wi7U1TNhgBp5/cZIkDM8iXIQh27kM13Uxfl3rmMh8NBrReDyutoEbyDyO4zz7v/aQCXiappXgtQnYFV6LAB24tgBdeGUBOM3UW0zCAdWBYzgVDxTu+756svF+v0/z+Vw94cRhs204VRYBPp1OeafTqRUuoqrdg8FA2Ay78a5je6USROrPpiy63S71ej1qt9v6mWfhFCdwjCLUmuPSGg6HNJlMUAoBb7VazPM8XT6t3YYSCBF4R80B3n9/5KfuIV3drQAWa5IkESLwLL3ldhXgfzdcPgd4cHZMl9czWq4asFxsgBDA8R21CUCUZX7z8CbgKsjzPLFRtw9YmQCZ5ez5VswBLjPWyXbrJlyuGtJ2WXNkXqsAVnTg4vyE7l/38km10VR4XU44qvWAo+GODj5Qb2TO1Mzrth+ROwC4bLinl8+1RTJzIwLCMKRCwxkBbSyBnzUcMrcJRzDxBzEL23AwvwBH0IbgidazogAAAABJRU5ErkJggg==","endrem:evil_eye":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACIklEQVR4nGNkIBN8/rPyP4j+/ucUmP/l2HYwreR0jZEUc5gYBhiwkKsR5nMxjl6wj+/t0wKHCKmAiWGAASO5cf/6UCOKOP+p92D63duXYFq1+x/j8AqBVz+K/yOndjOnHqzqbnYkkxQSTAyDPQQ+Q+M8zE4WzHdyk0OR72y4BKalJFXB9Mvnn8A0O/cHML03yxVvSDAxDNYQeAWN83inYBSfF9ZIoKj78RtCH/0JoVekvgLTm1YfQ1F3qyMXTAtXPGccWiWhrIsUmNaqEcQqP/fDWzA9+Q2EPjFXDSpjBSY3rt6N13wmhsGWBu5By3RYPg+q0wLT/nWiKOpOLNwLpmeXzgHTb97dANMKlzeA6WXsihB9apDyAAYu/piMUocwMQz2NLCu6RqYzqp0BtNzPrwB02vQfP6PAZL6CQFYSQoDTAyDLQT4obUaDMBLuJ/MYHrHm494fS7BxwemlQRZsVr4dztE3+AvCd92SIJzg1bFFjDfK1QSTHfPFQPTFg9vYfX5BkFISVmaDAmZW5cgIbfATxJrncDEMFhzwe/vqLXaptX3UUq4Za2QfA4DsDiH+XzH6l9gurhJAEwz22hAFHZDctXQaQ/cLmUCpwWL7lVg/n+Gr2CancEeq3oldU4wHRjNDqbjyppRSj50wMQwVNqEb6G5AgZ0Ko5jVXelwxJMfzQTJKqnxMQw1PoF6GlDSFicARmgt3gIASZSFI8CBhoAAAyEtMOWKUg9AAAAAElFTkSuQmCC","alshanex_familiars:invisibility_curio":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABY0lEQVR4nGNkIBFkWIv/xyc/4+hLRlLMY2IYYMBCqs8boy1RxJ+9fg+hnz6BCf0nJSSYGAZ7CGRAfd7dWoci/u3abjAtJSqIIu7LQFpIMDEM1hDIgPrcV5sHxcewOIeB4hVXseovtuUnKiSYGAZ7Gth89QuUdRlFvPfwR7z6rr34AaZvvfuLVx0Tw2ANgRnQOHPSFPmPHBLKwsQVHXff/iFKHRPDUCkJlaE+15LgQPEhehyrCTGjiO+7/maIlgPoPoL5HD1ECKVyQoCJYYABE6kapKRlwBgXAIUMsTmFLAdQG7AQqxCfr7EBT1V2KAtSjuDKDUwMg702THfTwCq//fZPvAbDcg0hdUwMAwxYSNWA1PbDCmA+Ri83hk4IZKDFPazNB2sJEWoH4CpJ9w2ZEIABmM+5tFzBdHFmPQMtABPDYA0BLqjPS6ubiKrXYQDWghoyIYATgHIDoZ4wPkCs/gEPAQC1z3XIvsDx8QAAAABJRU5ErkJggg==","minecraft:painting":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABMUlEQVR4nGNgGAUUgqSkpP8gTK5+JoYBBozkaoT5+tKlSyjiZ86cYRzeIWBiYvIfm4/V1NTA4nx8fCjiQy8E1s9NB/vk0ZVHKOLPLh0D01J6VljFiQWvf7CB6XlHXzMOihBgQReA+ZxZXA9Mc/AIgWlVZQesBuASRwc/vrwD0683z0MRZ2IYbCEAAzCfw4CohAiEFpdjIAa8fgkJydcv3mA1b/CGwDNoqobFLak+hwF09bCQGPwhgA5I9Tku/UM3BKgN9M1MIIyj24dICLyG5mdy0wJMP666g4lh0IfAC9TUS25JCAPw2nTvYE8DP6C1F6wMh/kEV34mBGDmoQMmhsEWAq+hLRb0eluU4xcKH1fLCF0cBuR0IGnnxO5jg7xNqCbDSXYvhxRw68n3wdEmHAUASaBreKA1vosAAAAASUVORK5CYII=","immersive_paintings:painting":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABbmlDQ1BJQ0MgUHJvZmlsZQAAeJyVkDtLw2AYhZ+0iqKVgjp4GzJUcaggCuKodegSpNQKbXVpY9IWeglJihRXwcWh4CC6WHXwH+gquCoIgiKIOPkDvC1SIl9TaBEcfJf34bycw/cd8Ch5tWB1TEOhaJvRcEiOJ5Jy1yudjNLPMP6UahmLkYjCn/N1jyT23ZTI4n/Tu6FZKkjdwJxqmDZIC4CyaRuCd4FBNZvaAKkGBM14IgnStdDTLr8Izrj8IdiMRZfAIzLlTBun21jNmgXwTAKBQr6sNt8jfuLTiqsrwAgwhkWUMCFk0pTJkcdmihxF+MM33fAtU0JGpYRBBZMcGbLYBJEpY6Eho2OioZGnInr/3aelz8646b4QdD47zvs4dO1Bveo438eOUz8B7xNcFlv+Ug3mP8FbbWmBI/Bvw/lVS0vvw8UODD0aKTPVkLyAR9fh7Qz6EjBwCz1rblfNO6cPENsC5QYODmFCB//6D9B9Z/QZqmLjAAACRklEQVR4nO2Xz2sTURDH375s0mxDdtOkxEJ+gKAhB1OqGEE8ePIgiHgSPO+leNG/wYt/hXjqyZNQ1EMPhSaGEFFJD0qRxraJUrdpEnTbsNl0xe9khY170HjwVToQPmEyL/vmm3lvJoyd2F+aruvOj9ek6zn7xyZNutDNul6ve/y1Wk36vxUoFouOX8a5XA5+TdM8/uOnwNPHi8hke33b42/Vy2Bq/oqv/3fN6IfARyVDEkIBedzhZn7r9isKsIagdJ326vAKBQ4IRxfpK6xGAuw1ztIHya8AP5wGl6o6+fldz/M4E00B1+QDm97YR4CSDIIR1X/PTqZLcSaV1er6HXCPkYJvU3Q60p+Z4Aq0RlUtXR1lHqeQaZP2alZT4L41B8YWmmA0sQtORTug3T4DvshGQUM1j4kCrn3YS4MXlDbYqRbA5y8XwUo+Auq9J2AmbIDv1m6Cq/Ek+P485Wh3SYFx40xUBe7ZD8DLm5/AuY+U0Y58mgLMb8Ba6wbYtGfBN1kV3DhHp2EQV0AnRDfgwqUirS89E1yBzVgebATot5evUWioZ4GB/hS4HKQb0IpQLkMtDEoK0WnvgylT9e0dnImqQLBJ59maoUwGKmUwzGhjWx81VInIueSpkVM7ND4USszbTVdEr4H7ZeqGWxGq/t1wDBwE6PzLoy7XDVEOnRm682VO1T77JQAmtqin2P0D3+dwJpoCxmhiMfoPPf58mKrftV8mo9djExMJ9pPZQhasLJUFnwlzaWXifzl/YhvNQzFmwhP7DqhLsPHfjGk+AAAAAElFTkSuQmCC","flashlightmod:flashlight":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADOklEQVR4nO1UP0wTURj/veOV/rmWSrkYoNCGBllkcNAEBlNGBwcXEwc2NZiw6ODu4KBxNoFEo4OjIwmYuDQRg4mhg5KQUCPYaoTSlBavvX+9Z74HRyIGixJw6S+5XO971/f7833vgBZaaKGFFv4z2HFuPjo6OmxZ1g0hxOvFxcWZExGQTCYDhmFcU1V1Ih6Pj3DO4bouhBAvGWN3M5nM6rEISCaTpzjnty3LmgSgKYoCx3HQ29sLTdNgGAZ0XTds236YzWbv/bWAdDrNM5mMs7+eSqXOM8auM8bGw+FwOBQKSWJd12FZFra3txEMBtHV1QXbtmU9l8uxQwlIp9MBXdevuK47wRgbdl33TjabfUExW5Y1rp3tmezwh875ChXovB0K52g0GlKAaZqSrF6vy+dIJCIvWl9eXm4uYGho6JKqqs8URen2+/2gSKmXABYKhcKg4zqaGu+Av82PzmgEkUIZXwVD3bKkUyL1hAgh0NnZiWg0KlNZWlra4+UHCajX6yOmaXarqgoSEAgE4PP5aNORRCKBzc1NVAtVOB1BGNUavlRNgDFJSi7b2tpA7aD/UBIHgaMJarWadEDuaaIpCXomYSSqVCrhh2FI4vb2dnlRnUTTe1QneL8pkUMJ4HxnKaZpiMZiWF1ZkTUiJlCUtBk5pciJmCImkFiq0Z1IiXx3NgpCiKeHEqAoiiQMhkK4MDaGMAx8WvuGcrksSRnbaaN39xx7aREhiaAhdF13xjTN6YGBgbn9J4k3a8FWqYT52VloIYGzg3G8+/BZ1smxF68Hb/B2XW+RW875VLFYzFUqFayvr/+eNA4AbeK5K5dK0EIx1ExbJkMJkAC6ez0lp7vJrAohpgOBwNTa2tpWM4P8oAWvfzTFdH5tFkRHLAyfryhrJIRi3j2aFPcMY+xxsVica0Z6KAEADOonpSAnn3Gc7kkA2Y97L5AAAK+EELcqlcov3/gjC8jn8w/6+/u/12q1R0IIjZy+nZ/3SCVoyIQQC/9KTlD+tJjP558LIc7Ytv1kY2NDnnnvQ+Mds6NCafYCDVIul7sJ4KLjOO+9eqPReMMYu9rX13cfJ4lEInE5lUoNnyhpCzhG/ATw9NnrXsnniwAAAABJRU5ErkJggg==","legendarysurvivaloverhaul:heart_fragment":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAChUlEQVR4nO2Wz2sTQRTHJ2vIkphkJTVSLyraIkjsTWqCQaimBPUgQsFjL1rowaalqT/WtiqNMf1B0IOC/4IKiikUewyRoj1pUZBYrLbG2lBJmkTzo1nJ922qWay9NRvoO8yHN7OTmfedN2+ikSSJVdO4qq7OtjbAmHY9adLpNNj14xdYX18HCok46OQNSJ64wVCeoik1z2LLcIxGI3gtlwCtVmuNKJDL5UD79Qh4e6wVFAor9IGJR+QdV2i8bL5RF/otFguU0KBl7JT/HRi5ZQd1Op3KFdDJOzx6cAd4OPUBXOR2I8ILA1PwvcGroJGjsxbl+W4fKSFJlBMtg8fR379K4wHFehyrsmnWq4Q/V76D07weH/T0v4LfNXwZPDvlAb+1DoGRpB682zcGum60rK1Rapw8OWe4WlEgVGQYEHsn4XcHveC5lz2gicoDkx5Pg5noV/Dpi0/gSLcfdPtca2uVmgAJpeJbEFJE7gn2gu3v6axZPEN4+Bw0vV0E56JR0L73EOh/MALSXWHM0dlMUjeY5QqhVgXC2Uq/TktvQGJmFsw/eQ0KaQroy8IC9efz4PwcKZHaRvM2Mo6pTQEnL99bubaXK5x4fpDGd5FEGfkVLJr3gbyeFEjF6Hr4Lg2Ajs5m6l9K09k3mFWuQNnCWVKiqc0GJe5bhtG/fegmqI19BgUDKfIxQzkx6r0DOi4eAY81nsDvCKuUO0rjmNoqYaj47w/DWaoPEyLVB/Ee5UShWAADHh/Y1GYD3zyaQeSNJw/Ad9l2gh17aiUHlDYhTmr+fu8p3j+mjLxs7e797H/GMbXnwPhSEjxtrTy78dlkxcSNsl35P0C9Cmy2cZu+4tYGWKX9BtB40B7/Ejj5AAAAAElFTkSuQmCC","alexscaves:sack_of_sating":"data:image/gif;base64,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","minecraft:elytra":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABT0lEQVR4nO2VzU6EMBSFr8WJCdPGccNCE3YTeQDegvi0hhdwSzcujWuHpBvHDLIxZEw6PZlpRQqJxibybS6Uey+cQ3+IZv47Z76Eoij2feNKKes+SZLe+rIsB9/B6I859ynOskxHztc6Snk/qDjP73RsmmcM7YccYRSKA4VR7iperW56/31VVZYS1CMfEX1cR+AEo9DmADdfLESjY9c96RhFt5Mao04IjBz6KvVg5TEKzQFhlIPdjpurl1ENt1vkcauf2zdcB+q6tuYCeHt9H9UQeZdXS8vBk1UQuAP867o1XE9q7NYfHQ19FSj1qGMcxzp2H9OUA9RFi411hrgwCsWB0uzN2NPTNNXjFwuylHwHzogs21gOtG07eIYwCm8OKDp1AECJD+TBOR+MQnOgOv4jPRfy/HAjpXSf/0gdo9AccPEp8Dnhg41JmpmhX+QTKA+KKuoRb2wAAAAASUVORK5CYII=","supplementaries:quiver":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABVklEQVR4nGNgGAU0Bjdu3PgPwrjkmRgGGDDSymCYr9+9ewfmCwkJgWkNDQ3GQRUCLMQqrPMUQYnHpu1vGLHJv4B4GMPnMD4sZGAhwcQw2NNAHdRnF+7+QRE3UIYEHkw81ZUPRX7zmW9gOqF/E0pIpKeng+mDBw8yDq00sOnWB7TQEviPHBKzd39CCQlfEy4w3ZHgBaY/Suqj+BwGmBgGawjU4Yh7PzWIzwP1uVE1KDOghAQsZD5+/AWmD95C9fmgCQFGQj6HxT1On6OB449+gumbDyC54ODLb3hzGhPDYE0Dm4j0+f0vEB/DSkBifT74Q8AP6nNYaqa2zwdvCFyApn6YzxV52LFqpNTngy8E/KBxLiGI3eewOIeFELyEI9Pngy8EPkJ9BAsBWIkmAanG4YBaPh98IYAOXryHxPWL97Tx+aAJAUZ0AXtxLqy9GGr7fNCEwCgAALMipmgv5W6cAAAAAElFTkSuQmCC","minecraft:oak_button":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABcElEQVR4nO3TO0vDUBgG4DdNamrbiFTR4gWLg3ZwLg5KHR0E7dhBHHVxU4qjg+CgOKrgJoKTIDoI+gNc3F1EwUttaUqatE17ci6iv8AUIgjn2c7hu7zLB0iSJEn/3dnOQvp0NzfSab/SaeP+enba6IkUXI8tVcw67UvEjgcT8b381uVLoAEu9vIzlIvCW9FceHotIdnfi4nUAIQiQIigpaqzvHlwe/7beZqf5Zsrs2vP79XDmuMg1q1jLjMJwhiKlo12i6PpUo1ykfYzU/NTXLHsZLFiIdlvYHQoDtNpoGy2UKraiEV0hBQVjDMEFoBQCiEUlEwHjSZBPBoBwME4B6EMYRWoN5sBBiAUggnokS54nkC95UJTFbDvfzWMp/cybLvx6WdmyE8xJd4jp4yCiZ93l6aCtCkYpbBq9jXnbPbu4eMo0CtYzI6lVKgbbouvGoauRXXlRgth++Tq8R5/aT4zPJLLjk/96VJJkiQJAfgC406e10nDNFEAAAAASUVORK5CYII=","alshanex_familiars:familiar_spellbook":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB2UlEQVR4nGNgGOmAkVyNRjZx/5H5544sIsssJoYBBizk+nxFgh2KeAQDA1khwsQwVELACOrzoJgmMP/8nRko8jBxJEBUiDAxDDBgJNXnzEd78Kq/J+UDpuUVNVDE1y2pY8AWIkwMgzUEjKA+N7aOAvOVnm0B019vPkZR9+D2XTCt7eOAIq4kzQOm9/yHiJeqPgHTkio/wbR9zUmGwRkCuOIc5nNudVkwfXXLATDdPwvCn9jNhiKPHhJeHrIoPv/w7uUgCwEjNJ+rPkDN5/eefkEJCQt7ZjB9+YUUijqYvK6TJpg2VFEB0xELDoHpcJtfYHrmpveDJASMcJTt5+/cwaoBPSTQASwNwMqDs0eXofj84H19MH3j8oFBEgJKWu7gEBAQEsdbtuNKE+ip/bZCBkrJh8vn967tZBxctSHMpdfZpLCW3ehphIEBNY0g8jlEn56TCETVTzcwfeNyP4rPYYCJYbCEwEFoHMGAnhOqQlg+hqtvMUfhw0o470JbMP3iFCRE9m7G7vPBEwL3EC5DacEwMKDWbt6FkJINBuxrDqPwM5akg+nT0z8T5fPBEwIMUIDFpXhDBOZjGCDV54MvBNABoRA5Pd0QRRJW5hPr80ETAozkahw2fUMAvEPDozDYS3YAAAAASUVORK5CYII=","minecraft:diamond_pickaxe":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABBklEQVR4nGNgGAUjHTCSqoHPzvQ/Meo+HTpNlNlMDEMlBPigPldZNQXM/3H3IZj++/odijpmUSEw/aSyG0xbfX8ApuUlOMH0zM2PGIdmCKCHxK/nrxmwAfnuChR+wrZ+ML1gxxMwffPR1yEeAoSAh6koOIQeTZiKkkYelnaA6R+3HwzTEPCA+hyW2g9cfAuRmNSLkjvuJZShhAQTwwADFmr53N5QCGtq5yjt+I8td8AAE8NQDQEPtDjHlc8JASaGoRYCHgTiHBeA5YKhGwIeFMY5h7L84AwBRlrFOTrgUFX4P7TqAg8cZTupPicEmBgGGDDSKs6Hbgioy3GjtPtp5fNBEwKjAACJ1XBKVcA3qwAAAABJRU5ErkJggg==","simplyswords:iron_rapier":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABr0lEQVR4nMWXv06EQBDGdwmaWFxjcYFGSwporvFaC7a5ysAb8Qz0+gJUFhZE3sGERAobExNaY4yFiVkzc7tIEDDCsPcle8Cy4fftzP47LqVkpiWE+HmQUhotYRg2947jsIPAi6IwbyDsgWP6TcOrqmrgRgyMwRc3oOFwhdKFQ+HoYrmphh/P85y7rsvquv7Vji9hQMPzPGcABk4fHGSZgI+1tw/Vc/IIiAlwMgNT4SQG5sBnG5gLn2WAAj7ZABUcNDoNhRDNKgWrGTW810DrtCI9z8Mb3/e1GU4JBw2lAOFZlmFJkoRFUYT1aZqSwfEj3b1Ah7gsS3zfNhXHMRqigoOsLlyFHcA8CAKs35x9yauLY4SrOrIdzO7CVQ9REPajtwd5uTll13cvjLEVL8uSdPu02w8Ab4d2t13Lc+dEwfdhd113dHf7r/jQeQBGPUTk/vYG271+rrCeKvejs2C3XeNVDzgNh/yrGUAmuw8OYX/62M+Ax+f35p2GDx2vZqVAqAVIh70NbkuboDJgdyv2A7EfTgluDAjVc7XwGJcFP3rNh95R9/AvcfyDqGQaDsxvl6Xx2Ih8PPIAAAAASUVORK5CYII=","minecraft:player_head":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAFQklEQVR4nO1WTWhcVRT+7s+7M5PMZDLtpJmmjaMpREqKtlZBSiEupLhrceHGghVcdCdSRLoQERdFtIg7F4JddCu4dOGihYIKLoo/GFrbZtq0JFqT6WQy895990fOnZkak7RTbO1CPfB4P/fnfN853zn3Af/bf93Y311YrSKbM4NHPWP5WDQ/rNUQPxQA09OQ9dniYc/9CedQsdbBecyDs+OVieXTZ8/C/CMAql3GUopjkrPtkeAwzsN5D+s8CAgY5lQkTg7b4U/O1mrxAwEwPQ25cCl/xHu8xxgqQjBkpIDiHLGxSK2D4CyA4YxBCU7XPGf87WjrzVP9IsLuytgVjirJXmdgj8J7JMYFJwSC7sSejJ6N7Y1x5CQPz95jNjbm48JdIsI2Yjx/Of8aHN4hxlJwDEQCsss4MTY4joQAY4Agp5yhpU1IBUVnQAlYD2hrCQSBmzfev1uZaH66NiJsLYCxYuaIVPyzrOJhc8552JAA0IZx2tmU847jMIcxWO9DFJxH+E7getqgb9o4mNS+em0xObXan1wLwNKVOiSpA4HIREAz8SG3ngGMnDkHZ0l8HQ7e+9upIXFGnOb4MF87ILUeqXEb5lveSQO0YWqIgYUUDDYiJ52xwJzzVRrgARQ58dxDRhK265SmUJS8EPDM9wcgBOBcxwkxIyfGAnFqEAmGQk6CdEGRGJQiRKBtLBgj4dFcj5W4k2ZKC6VCUkQoShsRxVoAhErwsChs4jyMIyYeSWqxUG+j3kwDu0Zs0Ih1yHOsLYzxwCqSVJok1omRzQHIRibXfrAkAuGD+CQ4PFxHTF0QZCREulTEg+pprMOUGHUEOJjNYGe5jC35PKxNsdiKsbVYwOWFi30AACDZLse6W2oEvSMy0hyB6KQH0KmDYH8GkcRWLgziscoIxkvDARhFRymJXWOjYU3fCPSMJocu1y0zck6lyLpgSNL0lqQmABoezGHXI9tQrVTCepPE3XLlUAMUBQcp17vjuINlIxkckpED0gXJgtQfdTtdSKv3IbT7dlQxvrkE7yxsqkNPaKcRMuPPYM+LrwTnVFF9ASiBUMtkq4XTe6RqoM17Y9R689nMbXbemgBC6wQ/3RhByw1hYeZ7tNstxPH6bizXftCWqoDK56+yJUVnhICIWOhqNE4R2TY8hPHyJiilsJJEQUUCGsYYjBSacFfPYPa6hbEW2txDBFLnAsvQyVaJhsSnpMCe8a2YHC2HKNGcyUoZpeEStkztx3e1UbQSjqXlFuZuNjA2tAT4BM12E404RpKm/QFMjY2gUix0WbvbenC+U4ZSCIwO5cPlnIOKFLZPPYXyxOMYLTSxuDSPhcVGEN3MlRouXK1BGx26aSbL+6cgm4nibSpCtVTEXL2BequNqcoIbsUa9XYMQa0SwIBS4U7vS3NX8NulnzFRbuDavAv/CgIMtVsNbC4VQpPKKkERXScCtg4SgANPVF/IcnGCAbspC8SayomenbfgTIQqoJxuymeRy2TpQMDFq9fBLP2wRKivNLGctLCpWECpmD+fU/z46XMXvrwnAD07+OSOQ+A4pqJov3EdAVlvQ0vOSAklJYayCh4eLR1jZvYGBjM5tHUMrVNIIc8N5HInv679/gXu55/wpad3Pq+9/gCM7Y64RCtNwkI6nAYjBS4YVhKNmcvXIMIBhfM+dW/+sJh89UD/ig/unTykOHtLO/MsCZQWlwYy4cRsxhq/1K5/w4R4/8df23dkfF8AenZw747ntHUfWet2V4pZOjrOt4154/NvL53Bw7QDu6qHXt43efihOsW/zf4ADRCcLKLSKbIAAAAASUVORK5CYII=","simpleradio:microphone":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADfUlEQVR4nO1WzWscZRj/zWTmndndmdnvdLfJNqEGssaGJE0t4gcjePEgeLF4EfRSFDyqVBDJQRTEiwcvgoei/gENXipUYamgtApdbINfkI3Jbjct22xm5/OdL3mn9D6RTQXJ7/J+8Mzz/N7n+T3vO8ARjnCE/xjcv/lodVWvBIHxfBRxQhj6KBQK8H0KSt1L7XZ7eBBfwkGMdV2XDcN91/P2L2SzWZkQAp7n4XkuPI8iDCPm74uxE9B1XY4i/m1K/Tc1TakBCkRRgGmaSXDfDwDEjMRzYyewuLg4PRjs/crzfIHjOLiuw04KQibgeSwwQCkFz09AFMmzOAwNNJuP/glwc1EUJWtGIJvNgBABtk2TvSgK4fs+HMd95vbt7R/SEuDTGAVBuM5x9wOzdMdxkm7Ytoc4jpIMsOAMhJCX0gZPTSCKgkuuy0QWgpWBZYLNGSGmAyZEtmblyZdKL46dQKPR+IlIWbdUnQKRcsmeZZnJKAgCLGuEYrmKU6tncex4Y/bcuVdrY+2CTufeGUVTZTVfQaXagOuY6G7/AdM0kC9UUa2VUCgVMNOYgjjBxOm8kLYbhDRGskxkSm3s9v6GSCSIggxVq0BRy8gXimg2T+Kx5hx6/T6Gw33kcurLaQnwaYwSQ55PBGdbIxjGALwgol6fxJNPrWDukRO4erWF769cwa2bt+A49tNra2vCGLsgSIT3oOZyJgNhQoCm5SBLEnKZDDY3N5NOuLPbh2GM5F/aG0+MkQA6YRj9xuasBe+PISSZwLZtDEcmJo/Vk8to+fRpEJH8FUaRO9bHSNd1IasUP9ve7r3ueT6mpuuo16oQCUGpVExKJMkSAup//snHH70x9seo1WoFb71zob+ydApeECQnvzfYQ7fbhaLkUKmUQal/MfTjT9P6PBABhqExRF7VoGoalpaXkZElmMY+RqaFG+1Op9ff/e7yN18mpUoLLq3h/PzKmcbsia+mjleb5XIZUkZOXkRNVSHLGaj5EtbXv8XO1s6NfXNw/veb138eawYopbWtztasTyliSCiWJExO5hBDQLe3h60fN3D3zl1Y1rAZBmHtUP6IFhYer/EC/4EgZl6RJEnOKQo4jofjWAiDyEUcfT0KvPc3rrf6h0LgARbP6tO+ab3nus5roighm8telATlw2vXLu/gYWJmZqE2P780+1CDHuF/h38AD1SEbDSVXusAAAAASUVORK5CYII=","immersive_paintings:glow_painting":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABbWlDQ1BJQ0MgUHJvZmlsZQAAeJyVkL9LAnEYxj93FkUaDkVERNxQ0aAQBdFoNrRIiBmkteh5p4Knx91JSGvQ0hA0RC1ZDf0HtQatBUFQBBFN/QH9WkIuvioogUPv8n54Xp6H7/cBOVJQDbsrBEbRsWJLYWUtkVR63vAh42WMoZRqmwvRaISO8/2AJPZ9UGTxv/FmNFsFqReYU03LASkERDYdU/AuMKjmUhmQqkDAWkskQboRerrBr4KzDf4UbMVjiyCLTCXbxuk2VnOWAfIUMG4UymrzPeInPq24ugKMAKPYxFgijEKaMnkKOATJU4QOvum6b5kSCiolTCpY5MmSwyGAQhkbDQUdCw2NAhXR+98+bX12ppHuC0P3i+t+TEDPPtT2XPfnxHVrp+B5hqtiy1+qwvwXePZa2vgx+Lfh4rqlpQ/gcgeGn8yUlapLHkDWdXg/h/4EDNxB33qjq+ads0eIb0HkFg6PYFIH/8Yv2Chn97Mp8yIAAAJGSURBVHic7ZfNaxNRFMXvvOmkTpoPo63aCoVCP6xttATrogsR4kL8G0Rw7y5u3Lr1H3CpW2mLmy5EIoK0is0iNFRFQ7WpHdEwVhttTJoP8ZwZZEoQjQun0gvhN5y8x8w97747b0T24i8jlUo1f/zana/kH4fW7kQ362w269HT6bT2fzuQTCabrTJOJBLQY7GYR999DjyYvopMrOV1j27lFsC++FRL/XejWDbAG3N5zRcOdOwU3Mynbl4DdekC6xqfXC2wBKpC2lIH83oFXBr5BPZt0tyvQXLm8n3w3J3bnvsp8ZsDbugS5UVYB7ojnaBZ804ZcDhqmGDXMTqQnmB/eG+vUI8+lFahxHc1kGNVO0soPaV9YMMMgc/GuNZbvV/AkdUwGFpvgN1lji8MBkH9+Dxo2N5d5V8H3CgEXoGhyinwafwzmL70Ahw/8hqszJ/huI394Gz/G7DnYIZ6nTVg2c1d5sCj61fAt9UL4MrhE6DRz0yawqrPTFpgLbQMKv0uOFTlmiuDxbQdIE+enuQN5vL8X/zqgDnKZysHH4MD5nNQ19gfKix6CR8gO51dMxQgv7GBilWkY6WIavnuUOJXByybKXY0yFCAmQSC3A2m5lS15n2tVl2WyTVn2JqcBc/HNyhMr/rcgcKTi2B9cAtcirIvSHCbusldUFPvwEiDKWsGc/qo2BdqNfaJ0qaT+Y5Q4jcHis6JZXzxFoVFYthk5m78PBn1/vLEJFKgPnYUzOTu+fxMODF8qO2vnD+J7MsP/jgT7sV34bWzmhoOf2sAAAAASUVORK5CYII=","iceandfire:pixie_house_mushroom_red":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADVUlEQVR4nO2UT2hcRRzHvzPzZt7L5u2fpttNN7V97ZKkmx7adNdSxCBEPdiD2GLBYyOIrVjwTyk9eQiegvQgtBRBTLxKkUJtTy1BEEPwIgbjtmzzr8H8YZPNdrPZ92feG9kteKrZNepB2A/M5c1v3vc73/nNAC1atGjRokWLFv93xgHtn6wnOxVdTMQvco2dp6CaVP715NLqtUFA/qcGRi3LMOytdwhlH+jpdHd4cBClO3fgPV5A4Mu80I3PdxP25eD8vP2vGhi1LEN3qkMapZdAaTeUghIC5okT2JqchGfb4JyDMIbAk3kFdTXB9bFmjNBGBd8kkwOrqUNTDiE3FFAXZ7FdIK6LrYkJwPfBGIMiBB3nL2DPhfe6XeDGw/5jU9+mUgM7TuBcNBo7GY2M7nLd0zOpFPJTUzggBHqe24f9H36MJ/fvoXL/HoQQkFKCUAoHwO9VG6tSYn8mg+SDHEoquLVYsd8eLpU2/q6Bg+FMZjahAnQ9yCFQCjO1XR/tRxfXsO+3aehKgRACSSjWs1ms+T7oxI9IahoI56i+8ioWvrsNeP6hkVJp7lk62l9mI4Rtz80ur3Tu3TtX2UIX5+gNhxEsL2EhHMb4kzIOHjkCk3OsTP+KRLEIa30NyjSxVKmgFAohEomCMbrMCbN31ITnAINFzCEQ+iklJB4aGMCejRK6HuXr84t9fYi0hxCZnKwnUc5kUY7HUb57FwqqoIBPQmZkbHibZiTbGfjTiGUZwnEuso7YZ4TrcGZn0Mk5etpD0BjD4/Imir6E3t0DIiXctcLlNsKubSfc9C2o8fX8vB16642bbS+/tIxEB7RwGCueh5+PHcfsCy/WGg3EMOxA+WPG66eQ/Oj9m82I12j4jGbf7Y1Tx3lax9gXIn04xvvSJ4u3bn9fnXl0xYtGoCcSI21nT1uOi2FF6RDspt8hNDRQ/aFokz7xvG3YcxTUEIaxoSiN6adey+mcoT2+Gz6lOUJpVtP8s/UzNYymDZBGBb1JMx70m+MHktbVo+bxUd8Pavc5RilFbXQm4vCkhOAChACO62K69MuZ/Ebu8E9f5Uca/b9hDzxc2iw4QXB9bXP9TS5EzicyRiigaU/Dk9IHJRRB4Ne/KYVcobCqeet2upkE/gDtNEWP8v+kOwAAAABJRU5ErkJggg==","protection_pixel:armorloadplatform":"data:image/png;base64,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","minecraft:diamond_sword":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABP0lEQVR4nGNkoBPgszP9j02ciWGAASO9fD5lzw4U8TRt48ERAiz08nnH6b1gusLUGUUdE8NwSwN8BHwOi/sftx8wDq8QwOVzDmV5MH3NNhzF5zDAxDDUQ4CPTJ8P3hDgQyuzPx06jdXlMHUqq6aA+T/uPiTJ54MmBFhwSbCrQHzCx8DwHzkkqOXzwRsCn2A+hfpcwMsRLP7r+WsUn79ZsBZMiyQEk+XzQRMCjLgkYHENCwEY+H7rHpiWbSulyOeDPwTQQwKWK37egaT6X89fU+TzwR8CHqaiYJ/LS3CC+QtvQNzKJimKoo7SkGBiGGzlgAfU5/aGQmD+gh1PwPSPR19hPkSpK5BC5P+QLAdY0Gs/ef6XKD6/ifA5Aw4fYu3xDJ0QYIACWD5feBiaqtF8jgsM+XKABZaPYTS9wYCHAAC/V5jVb8RRswAAAABJRU5ErkJggg=="},"built":"2026-11-16"};
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const slug = id => id.replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 120);
+document.getElementById('built').textContent = '정리 ' + DATA.built;
+
+// 키 이름(한국어 키보드 표기)
+const KEYLBL = {'grave.accent':'`','minus':'-','equal':'=','backspace':'BKSP','tab':'TAB','left.bracket':'[','right.bracket':']','backslash':'₩',
+  'caps.lock':'CAPS','semicolon':';','apostrophe':"'",'enter':'ENTER','left.shift':'SHIFT','right.shift':'SHIFT','comma':',','period':'.','slash':'/',
+  'left.control':'CTRL','right.control':'CTRL','left.win':'WIN','right.win':'WIN','left.alt':'ALT','right.alt':'ALT','menu':'MENU','space':'SPACE',
+  'escape':'ESC','insert':'INS','home':'HOME','page.up':'PGUP','delete':'DEL','end':'END','page.down':'PGDN','up':'↑','down':'↓','left':'←','right':'→',
+  'num.lock':'NUM','keypad.divide':'/','keypad.multiply':'*','keypad.subtract':'-','keypad.add':'+','keypad.enter':'ENT','keypad.decimal':'.',
+  'print.screen':'PRT','scroll.lock':'SCR','pause':'PAU'};
+const KEYFULL = {'left.shift':'왼쪽 Shift','right.shift':'오른쪽 Shift','left.control':'왼쪽 Ctrl','right.control':'오른쪽 Ctrl','left.alt':'왼쪽 Alt',
+  'right.alt':'오른쪽 Alt (한/영)','space':'스페이스','caps.lock':'Caps Lock','backspace':'Backspace','backslash':'₩ (역슬래시)','grave.accent':'` (물결표 키)',
+  'escape':'Esc','page.up':'Page Up','page.down':'Page Down','up':'위 화살표','down':'아래 화살표','left':'왼쪽 화살표','right':'오른쪽 화살표','enter':'Enter','tab':'Tab'};
+const MOUSE = {'left':'왼쪽 클릭','right':'오른쪽 클릭','middle':'휠 클릭','wheel':'휠 돌리기','4':'마우스 4 (뒤로)','5':'마우스 5 (앞으로)'};
+function keyName(k){
+  if (!k || k === 'key.keyboard.unknown') return '없음';
+  if (k.startsWith('key.mouse.')) return MOUSE[k.slice(10)] || ('마우스 ' + k.slice(10));
+  const n = k.replace('key.keyboard.', '');
+  if (n.startsWith('keypad.')) return '숫자패드 ' + (KEYLBL[n] || n.slice(7));
+  return KEYFULL[n] || (KEYLBL[n] || n.toUpperCase());
+}
+const MODNAME = {SHIFT:'Shift', CONTROL:'Ctrl', ALT:'Alt'};
+const comboName = r => (r.mod ? MODNAME[r.mod] + ' + ' : '') + keyName(r.key);
+
+// 게임 안 Keybind Atlas 분류(keyCategoryAssignments) 그대로
+const CAT = {'v':'combat','left.alt':'combat','right.alt':'combat','left.control':'combat','right.control':'combat','x':'magic',
+  't':'gun','q':'gun','e':'gun','equal':'util','left.shift':'tech','right.shift':'tech'};
+const CATNAME = [['base','기본'],['combat','전투'],['magic','마법'],['gun','GUN PLAY'],['util','편의'],['tech','기술'],['off','비어 있음']];
+document.getElementById('legend').innerHTML =
+  '<span><i style="background:var(--k-base)"></i>이 상황에서 쓰는 키</span>' +
+  '<span><i style="background:#84cc16"></i>키 묶음(원형 메뉴)</span>' +
+  '<span><i style="background:#3a4a66"></i>기본 조작(겹쳐 보기 켰을 때)</span>' +
+  '<span><i style="background:var(--k-off)"></i>이 상황에서 안 쓰는 키</span>' +
+  '<span style="color:var(--paper-faint)">키 위 글자 = 기능 이름, +숫자 = 같은 키의 다른 기능 수(키를 누르면 전부)</span>';
+
+const BY = {};
+for (const r of DATA.rows) { if (r.key === 'key.keyboard.unknown') continue; (BY[r.key] = BY[r.key] || []).push(r); }
+const unbound = DATA.rows.filter(r => r.key === 'key.keyboard.unknown');
+// 키 묶음 안 기능: 어느 키의 묶음에서 쓰는지 (키가 정해진 묶음만)
+const IN_BUNDLE = {};
+for (const r of DATA.rows) if (r.bundle && r.key !== 'key.keyboard.unknown') for (const b of r.bundle) IN_BUNDLE[b.k] = (IN_BUNDLE[b.k] ? IN_BUNDLE[b.k] + ', ' : '') + keyName(r.key);
+// 고유 기능 수: 기능 id 로 셈(단독 키 + 키 묶음, 묶음 여러 곳에 같은 기능이 있어도 한 번)
+const FIDS = new Set(), SITFIDS = {};
+for (const k in BY) for (const r of BY[k]) for (const [fid, st0] of (r.bundle ? r.bundle.map(b => [b.k, b.s]) : [[r.id, r.s]])) { FIDS.add(fid); for (const st of (Array.isArray(st0) ? st0 : [st0])) (SITFIDS[st] = SITFIDS[st] || new Set()).add(fid); }
+const TOTAL = FIDS.size;
+// ---- 상황별 보기 (화면만 거름, 실제 키는 그대로) ----
+const SITNAME = {all: '검색 결과'}, SITDESC = {all: '모든 상황에서 찾음'};
+for (const [id, n, dsc] of DATA.sits) { SITNAME[id] = n; SITDESC[id] = dsc; }
+const SITCOUNT = {all: TOTAL};
+for (const st in SITFIDS) SITCOUNT[st] = SITFIDS[st].size;
+let SIT = 'base', WITHBASE = false, QALL = false;   // 전체 탭 없음: 검색할 때만 모든 상황(QALL)
+try { WITHBASE = localStorage.getItem('keywiki.withBase') === '1'; } catch (e) {}
+const effSit = () => QALL ? 'all' : SIT;
+const stHas = (st, id) => Array.isArray(st) ? st.includes(id) : st === id;   // 상황 값 = 문자열 또는 목록(여러 상황)
+const inSit = st => effSit() === 'all' || stHas(st, effSit());
+const inBase = st => WITHBASE && effSit() !== 'all' && effSit() !== 'base' && stHas(st, 'base');
+const sitName = st => (Array.isArray(st) ? st : [st]).map(x => SITNAME[x] || '').join('·');
+function viewOf(r){
+  if (r.bundle) {
+    const ents = r.bundle.filter(b => inSit(b.s) || inBase(b.s));
+    const main = ents.filter(b => inSit(b.s)).length;
+    return {r, ents, main, base: ents.length - main, show: ents.length > 0};
+  }
+  const m = inSit(r.s), b = !m && inBase(r.s);
+  return {r, ents: [], main: m ? 1 : 0, base: b ? 1 : 0, show: m || b};
+}
+// ---- 키 묶음 원형 메뉴 (KeyBind Bundles RadialMenuRenderer 와 같은 기하) ----
+function wheelSvg(r, interactive){
+  const n = r.bundle.length, K = 1.4, IN = 40 * K, OUT = 100 * K, MID = 70 * K, G = 10 * K, C = OUT + G + 4;
+  const P = (a, rad) => [C + Math.cos(a * Math.PI / 180) * rad, C + Math.sin(a * Math.PI / 180) * rad];
+  const seg = (a0, a1, ri, ro) => { const [x0, y0] = P(a0, ro), [x1, y1] = P(a1, ro), [x2, y2] = P(a1, ri), [x3, y3] = P(a0, ri);
+    const big = (a1 - a0) > 180 ? 1 : 0;
+    return `M${x0.toFixed(1)},${y0.toFixed(1)} A${ro},${ro} 0 ${big} 1 ${x1.toFixed(1)},${y1.toFixed(1)} L${x2.toFixed(1)},${y2.toFixed(1)} A${ri},${ri} 0 ${big} 0 ${x3.toFixed(1)},${y3.toFixed(1)}Z`; };
+  let g = '';
+  r.bundle.forEach((b, i) => {
+    const a0 = -90 + 360 * (i - 0.5) / n, a1 = a0 + 360 / n, ac = -90 + 360 * i / n;
+    const [x, y] = P(ac, MID); const icon = b.i && DATA.icons[b.i];
+    const lab = b.t.length > 16 ? b.t.slice(0, 15) + '…' : b.t;
+    g += `<g class="e"><title>${esc(b.t)} · ${esc(b.m)}</title><path class="seg" d="${seg(a0, a1, IN, OUT)}"/>` +
+      (icon ? `<image href="${icon}" x="${(x - 8 * K).toFixed(1)}" y="${(y - 19 * K).toFixed(1)}" width="${16 * K}" height="${16 * K}" style="image-rendering:pixelated"/>` : '') +
+      `<text x="${x.toFixed(1)}" y="${(icon ? y + 6 * K : y).toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${esc(lab)}</text></g>`;
+  });
+  return `<svg class="wheel" viewBox="0 0 ${2 * C} ${2 * C}" width="${2 * C}" height="${2 * C}" role="img" aria-label="${esc(keyName(r.key))} 키 묶음 원형 메뉴">${g}</svg>`;
+}
+const wheelPop = document.createElement('div'); wheelPop.id = 'wheelPop'; wheelPop.hidden = true; document.body.appendChild(wheelPop);
+function showWheel(btn){
+  const r = DATA.rows.find(x => x.id === btn.dataset.bundle); if (!r) return;
+  wheelPop.innerHTML = wheelSvg(r, false) + `<div class="wt">${esc(keyName(r.key))} 키를 누르고 있으면 열리는 원형 메뉴 · 눌러서 자세히</div>`;
+  wheelPop.hidden = false;
+  const b = btn.getBoundingClientRect(), w = wheelPop.offsetWidth, h = wheelPop.offsetHeight;
+  let x = b.left + b.width / 2 - w / 2, y = b.bottom + 8;
+  if (y + h > innerHeight - 8) y = b.top - h - 8;
+  x = Math.max(8, Math.min(innerWidth - w - 8, x)); y = Math.max(8, y);
+  wheelPop.style.left = x + 'px'; wheelPop.style.top = y + 'px';
+}
+document.getElementById('board').addEventListener('mouseover', e => { const b = e.target.closest('.k[data-bundle]'); if (b) showWheel(b); });
+document.getElementById('board').addEventListener('mouseout', e => { const b = e.target.closest('.k[data-bundle]'); if (b && !b.contains(e.relatedTarget)) wheelPop.hidden = true; });
+document.getElementById('board').addEventListener('focusin', e => { const b = e.target.closest('.k[data-bundle]'); if (b) showWheel(b); });
+document.getElementById('board').addEventListener('focusout', () => { wheelPop.hidden = true; });
+addEventListener('scroll', () => { wheelPop.hidden = true; }, {passive: true});
+// ---- 마우스 칸 ----
+const MOUSE_BTNS = [  // id, 그림 위 글자, 모양(path d), 글자 위치
+  ['left', 'L', 'M80,14 H44 Q22,14 22,44 V96 H80 Z', [52, 64]],
+  ['right', 'R', 'M84,14 H120 Q142,14 142,44 V96 H84 Z', [112, 64]],
+  ['middle', '휠', 'M74,30 h16 a4,4 0 0 1 4,4 v34 a4,4 0 0 1 -4,4 h-16 a4,4 0 0 1 -4,-4 v-34 a4,4 0 0 1 4,-4 Z', [82, 55]],
+  ['5', '5', 'M10,112 h12 v34 h-12 a3,3 0 0 1 -3,-3 v-28 a3,3 0 0 1 3,-3 Z', [14, 133]],
+  ['4', '4', 'M10,152 h12 v34 h-12 a3,3 0 0 1 -3,-3 v-28 a3,3 0 0 1 3,-3 Z', [14, 173]],
+  ['wheel', '⇕', 'M82,104 l9,11 h-18 Z M82,130 l9,-11 h-18 Z', [82, 117]],   // 휠 돌리기(고정 조작): 휠 아래 위·아래 화살표
+];
+function keyState(id){
+  const vs = (BY[id] || []).map(viewOf).filter(v => v.show);
+  const main = vs.reduce((a, v) => a + v.main, 0), base = vs.reduce((a, v) => a + v.base, 0);
+  const bun = vs.find(v => v.r.bundle && v.main);
+  const cls = !vs.length ? 'off' : !main ? 'basek' : bun ? 'bundle' : '';
+  return {vs, main, base, bun, cls};
+}
+function drawMouse(){
+  const el = document.getElementById('mouse'); if (!el) return;
+  let svg = '<svg class="mouse-svg" viewBox="0 0 164 250" role="group" aria-label="마우스 버튼"><path class="mouse-body" d="M82,8 C40,8 22,26 22,60 V180 C22,222 48,242 82,242 C116,242 142,222 142,180 V60 C142,26 124,8 82,8 Z"/>';
+  let calls = '';
+  for (const [n, lbl, d, [tx, ty]] of MOUSE_BTNS) {
+    const id = 'key.mouse.' + n, st = keyState(id);
+    const tip = st.vs.length ? st.vs.map(v => v.r.bundle ? '키 묶음: ' + v.ents.map(b => b.t).join(', ') : v.r.n).join('\n') : keyName(id) + ' · 이 상황에서 쓰는 기능 없음';
+    svg += `<g class="mb ${st.cls}" data-key="${id}"${st.bun ? ` data-bundle="${esc(st.bun.r.id)}"` : ''} tabindex="${st.vs.length ? 0 : -1}" role="button" aria-label="${esc(keyName(id))} ${st.main || st.base}개"><title>${esc(keyName(id))}\n${esc(tip)}</title><path class="bt" d="${d}"/><text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="middle">${lbl}</text></g>`;
+    const items = [];
+    for (const v of st.vs) {
+      if (v.r.bundle) for (const b of v.ents) items.push([b.t, b.m, !inSit(b.s)]);
+      else items.push([(v.r.mod ? MODNAME[v.r.mod] + ' + ' : '') + v.r.n, v.r.m, !inSit(v.r.s)]);
+    }
+    const col = st.cls === 'off' ? 'var(--k-off)' : st.cls === 'basek' ? '#3a4a66' : st.cls === 'bundle' ? '#84cc16' : 'var(--k-base)';
+    calls += `<div class="mcall${st.vs.length ? '' : ' off'}" data-key="${id}"${st.vs.length ? ' role="button" tabindex="0"' : ''}><h3><i style="--kc:${col}"></i>${esc(keyName(id))}</h3>` +
+      (items.length ? `<ul>${items.map(([t, m, dim]) => `<li${dim ? ' style="opacity:.55"' : ''}><span>${esc(t)}</span><span>${esc(m)}</span></li>`).join('')}</ul>` : '<div class="none">이 상황에서 쓰는 기능 없음</div>') + '</div>';
+  }
+  el.innerHTML = svg + '</svg><div class="mcalls">' + calls + '</div>';
+  try { if (SEL && SEL.startsWith('key.mouse.')) { const b = el.querySelector(`.mb[data-key="${SEL}"]`); if (b) b.classList.add('sel'); } } catch (e) {}   // 첫 그리기 때는 SEL 선언 전
+}
+(() => {
+  const el = document.getElementById('mouse');
+  const pick = e => { const t = e.target.closest('.mb[data-key], .mcall[data-key]'); if (t && !t.classList.contains('off')) showKey(t.dataset.key, true); };
+  el.addEventListener('click', pick);
+  el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { const t = e.target.closest('.mb[data-key], .mcall[data-key]'); if (t) { e.preventDefault(); pick(e); } } });
+  el.addEventListener('mouseover', e => { const b = e.target.closest('.mb[data-bundle]'); if (b) showWheel(b); });
+  el.addEventListener('mouseout', e => { const b = e.target.closest('.mb[data-bundle]'); if (b && !b.contains(e.relatedTarget)) wheelPop.hidden = true; });
+})();
+function drawBoard(){ board.innerHTML = blockHtml(MAIN) + blockHtml(NAV) + blockHtml(PAD); drawMouse(); }
+function renderSits(){
+  const ids = DATA.sits.map(x => x[0]);
+  document.getElementById('sits').innerHTML = ids.map(id =>
+    `<button type="button" class="sit" data-sit="${id}" aria-pressed="${id === SIT}">${esc(SITNAME[id])}<b>${SITCOUNT[id] || 0}</b></button>`).join('');
+  document.getElementById('sitDesc').textContent = SITDESC[SIT] + ' · 키보드에는 이 상황 기능만 색으로 표시 · 탭 숫자 = 키에 묶인 고유 기능 수(키 묶음 안 포함)';
+  document.getElementById('withBaseL').hidden = SIT === 'base';
+}
+function setSit(id, fromHash){
+  if (!SITNAME[id] || id === 'all') id = 'base';
+  SIT = id; renderSits(); drawBoard(); rerender(true);
+  if (SEL) { const b = board.querySelector(`[data-key="${CSS.escape(SEL)}"]`); if (!b || b.classList.contains('off')) { SEL = null; document.getElementById('detail').innerHTML = '<div class="empty">키보드에서 키를 고르세요.</div>'; } }
+  if (!fromHash) { try { history.replaceState(null, '', id === 'base' ? location.pathname + location.search : '#sit-' + id); } catch (e) {} }
+}
+
+// 배치(US QWERTY, 게임 설정 keyboardLayout = US_QWERTY)
+const K = (id, w, lbl) => ({id, w: w || 1, lbl});
+const MAIN = [
+  [K('escape'), {sp:.6}, K('f1'),K('f2'),K('f3'),K('f4'), {sp:.4}, K('f5'),K('f6'),K('f7'),K('f8'), {sp:.4}, K('f9'),K('f10'),K('f11'),K('f12')],
+  'gap',
+  [K('grave.accent'),K('1'),K('2'),K('3'),K('4'),K('5'),K('6'),K('7'),K('8'),K('9'),K('0'),K('minus'),K('equal'),K('backspace',2)],
+  [K('tab',1.5),...'qwertyuiop'.split('').map(c=>K(c)),K('left.bracket'),K('right.bracket'),K('backslash',1.5)],
+  [K('caps.lock',1.75),...'asdfghjkl'.split('').map(c=>K(c)),K('semicolon'),K('apostrophe'),K('enter',2.25)],
+  [K('left.shift',2.25),...'zxcvbnm'.split('').map(c=>K(c)),K('comma'),K('period'),K('slash'),K('right.shift',2.75)],
+  [K('left.control',1.25),K('left.win',1.25),K('left.alt',1.25),K('space',6.25),K('right.alt',1.25),K('right.win',1.25),K('menu',1.25),K('right.control',1.25)]
+];
+const NAV = [
+  [K('print.screen'),K('scroll.lock'),K('pause')], 'gap',
+  [K('insert'),K('home'),K('page.up')],[K('delete'),K('end'),K('page.down')],[{v:1},{v:1},{v:1}],[{v:1},K('up'),{v:1}],[K('left'),K('down'),K('right')]
+];
+const PAD = [
+  [{v:1},{v:1},{v:1},{v:1}], 'gap',
+  [K('num.lock'),K('keypad.divide'),K('keypad.multiply'),K('keypad.subtract')],
+  [K('keypad.7'),K('keypad.8'),K('keypad.9'),K('keypad.add')],
+  [K('keypad.4'),K('keypad.5'),K('keypad.6'),{v:1}],
+  [K('keypad.1'),K('keypad.2'),K('keypad.3'),K('keypad.enter')],
+  [K('keypad.0',2),K('keypad.decimal'),{v:1}]
+];
+function capLabel(n){
+  if (KEYLBL[n]) return KEYLBL[n];
+  if (n.startsWith('keypad.')) return n.slice(7);
+  return n.toUpperCase();
+}
+function keyHtml(k, full){
+  if (k.v) return '<span class="k void" style="--w:1"></span>';
+  if (k.sp) return `<span style="width:calc(var(--u)*${k.sp})"></span>`;
+  const id = full || 'key.keyboard.' + k.id;
+  const vs = (BY[id] || []).map(viewOf).filter(v => v.show);
+  const list = vs.map(v => v.r);
+  const short = k.id || '';
+  const lbl = k.lbl || capLabel(short);
+  const cls = ['k'];
+  const main = vs.reduce((a, v) => a + v.main, 0), base = vs.reduce((a, v) => a + v.base, 0);
+  const bun = vs.find(v => v.r.bundle && v.main);
+  if (!vs.length) cls.push('off'); else if (!main) cls.push('basek'); else if (bun) cls.push('bundle');
+  if (lbl.length > 3) cls.push('sm');
+  // 키 위 기능 이름: 이 상황 기능 먼저, 조합키는 표시, 묶음은 '키 묶음', 나머지는 +N
+  const names = [];
+  for (const v of vs.slice().sort((a, b) => (b.main ? 1 : 0) - (a.main ? 1 : 0))) {
+    if (v.r.bundle) names.push('키 묶음'); else names.push((v.r.mod ? MODNAME[v.r.mod] + '+ ' : '') + v.r.n);
+  }
+  if (names.length) cls.push('lab');
+  const tip = vs.length ? vs.map(v => v.r.bundle ? comboName(v.r) + ' · 키 묶음: ' + v.ents.map(b => b.t).join(', ') : comboName(v.r) + ' · ' + v.r.n).join('\n') : keyName(id) + ' · ' + (effSit() === 'all' ? '비어 있음' : '이 상황에서 쓰는 기능 없음');
+  const cnt = main || base;
+  return `<button type="button" class="${cls.join(' ')}" style="--w:${k.w || 1}" data-key="${esc(id)}"${bun ? ` data-bundle="${esc(bun.r.id)}"` : ` title="${esc(tip)}"`} ${list.length ? '' : 'tabindex="-1" aria-disabled="true"'}
+    aria-label="${esc(keyName(id))} ${cnt}개">${names.length ? `<span class="kl">${esc(lbl)}</span><span class="kn">${esc(names[0])}${names.length > 1 ? ` <small>+${names.length - 1}</small>` : ''}</span>` : esc(lbl)}${cnt > 1 ? `<span class="n">${cnt}</span>` : ''}${list.some(r => r.mod) ? '<span class="mo"></span>' : ''}</button>`;
+}
+function blockHtml(rows){
+  return '<div class="blk">' + rows.map(r => r === 'gap' ? '<div class="gap"></div>' : '<div class="row">' + r.map(k => keyHtml(k)).join('') + '</div>').join('') + '</div>';
+}
+function mouseHtml(){
+  const m = n => keyHtml({id: '', w: 1, lbl: {left:'L',right:'R',middle:'휠','4':'M4','5':'M5'}[n]}, 'key.mouse.' + n);
+  return `<div class="mouse"><div class="gap"></div><div class="gap"></div>
+    <div class="body">${m('left').replace('class="k', 'class="k tall')}${m('middle').replace('class="k', 'class="k tall')}${m('right').replace('class="k', 'class="k tall')}</div>
+    <div class="row">${m('4')}${m('5')}</div><div class="cap">마우스</div></div>`;
+}
+const board = document.getElementById('board');
+drawBoard();
+// 배치도에 없는 키에 묶인 것이 있으면 알림(빠짐 방지)
+const drawn = new Set([...document.querySelectorAll('.k[data-key], .mb[data-key]')].map(b => b.dataset.key));
+const notDrawn = Object.keys(BY).filter(k => !drawn.has(k));
+if (notDrawn.length) console.warn('배치도에 없는 키', notDrawn);
+
+let SEL = null;
+function actHtml(r){
+  const ed = edOf(r);
+  const chips = (r.mod ? `<span class="chip">${MODNAME[r.mod]} 조합</span>` : '') + (r.raw && !r.bundle ? '<span class="chip raw">번역 없음</span>' : '') +
+                (EDIT_MODE && ed ? `<span class="chip ed">수정됨 → ${esc(ed.key || '키 그대로')}</span>` : '');
+  let extra = '';
+  if (r.bundle) extra = `<div class="x">이 키를 누르고 있으면 아래 원형 메뉴가 열리고, 마우스를 움직여 하나를 고릅니다. (게임 조작 화면에는 ${esc(r.id)} 로 보임)</div>
+    <div class="wheel-wrap">${wheelSvg(r, true)}</div>
+    <div class="bl">${viewOf(r).ents.map(b => { const o = DATA.rows.find(x => x.id === b.k); const own = o && o.key !== 'key.keyboard.unknown' ? ' · 따로 ' + comboName(o) + ' 키에도 있음' : '';
+      return `<div>${esc(b.t)}<small>${esc(b.m)}${esc(own)} · ${esc(sitName(b.s))}</small></div>`; }).join('')}</div>`;
+  else if (r.fixed) extra = `<div class="x">키 설정(옵션 → 조작)에 없는 고정 조작이라 바꿀 수 없습니다.</div>`;
+  else if (r.raw) extra = `<div class="x">게임 조작 화면 표시: ${esc(r.id)}</div>`;
+  return `<div class="act" data-id="${esc(r.id)}"><div class="t">${chips}${r.mod || !SEL ? esc(comboName(r)) + ' · ' : ''}${esc(r.n)}${r.s ? ` <span class="chip sitc">${esc(sitName(r.s))}</span>` : ''}</div><div class="m">${esc(r.m)}</div>${extra}${editBoxHtml(r)}</div>`;
+}
+function showKey(k, scroll){
+  SEL = k; UNB_SEL = null;
+  document.querySelectorAll('.k.sel, .mb.sel').forEach(b => b.classList.remove('sel'));
+  const btn = document.querySelector(`.k[data-key="${CSS.escape(k)}"], .mb[data-key="${CSS.escape(k)}"]`); if (btn) btn.classList.add('sel');
+  const all = (BY[k] || []);
+  const vs = all.map(viewOf).filter(v => v.show).sort((a, b) => (b.main ? 1 : 0) - (a.main ? 1 : 0) || (a.r.mod ? 1 : 0) - (b.r.mod ? 1 : 0));
+  const list = vs.map(v => v.r);
+  const el = document.getElementById('detail');
+  const cnt = vs.reduce((a, v) => a + v.main + v.base, 0);
+  const allCnt = all.reduce((a, r) => a + (r.bundle ? r.bundle.length : 1), 0);
+  const hid = allCnt - cnt;
+  el.innerHTML = `<div class="hd"><b>${esc(keyName(k))}</b><small>${effSit() === 'all' ? '' : esc(SITNAME[effSit()]) + ' · '}기능 ${cnt}개${list.some(r => r.bundle) ? ' (키 묶음 포함)' : ''}${hid ? ` · 다른 상황 기능 ${hid}개 숨김` : ''}</small></div>
+    <div class="acts">${list.length ? list.map(actHtml).join('') : '<div class="empty">이 키에는 묶인 기능이 없습니다.</div>'}</div>`;
+  el.querySelectorAll('.act').forEach(a => { const r = DATA.rows.find(x => x.id === a.dataset.id); if (r) wireEditBox(a, r); });
+  if (scroll) el.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest'});
+}
+board.addEventListener('click', e => { const b = e.target.closest('.k[data-key]'); if (b && !b.classList.contains('off')) showKey(b.dataset.key, true); });
+
+// 전체 목록 + 검색
+const ORDER = [...board.querySelectorAll('[data-key]')].map(b => b.dataset.key);
+const kOrder = k => { const i = ORDER.indexOf(k); return i < 0 ? 9999 : i; };
+const norm = s => String(s).toLowerCase().replace(/\s+/g, '');
+const hit = (r, q) => !q || norm(r.n + r.m + r.id + comboName(r) + (r.bundle ? r.bundle.map(b => b.t + b.m).join('') : '')).includes(q);
+const hl = (s, q) => { if (!q) return esc(s); const i = norm(s).indexOf(q); if (i < 0) return esc(s);
+  // 공백을 뺀 위치를 원문 위치로 되돌림
+  let a = -1, b = -1, c = 0; for (let j = 0; j < s.length; j++) { if (/\s/.test(s[j])) continue; if (c === i) a = j; if (c === i + q.length - 1) { b = j + 1; break; } c++; }
+  return a < 0 || b < 0 ? esc(s) : esc(s.slice(0, a)) + '<mark>' + esc(s.slice(a, b)) + '</mark>' + esc(s.slice(b)); };
+function renderList(){
+  const q = norm(document.getElementById('q').value);
+  const keys = Object.keys(BY).sort((a, b) => kOrder(a) - kOrder(b));
+  let n = 0;
+  const html = keys.map(k => {
+    const items = [];
+    for (const r of BY[k]) {
+      const v = viewOf(r); if (!v.show) continue;
+      if (r.bundle) { for (const b of v.ents) if (!q || norm(b.t + b.m + b.k + comboName(r)).includes(q)) items.push({r, nm: b.t, m: b.m, bundle: true, s: b.s}); }
+      else if (hit(r, q)) items.push({r, nm: r.n, m: r.m, s: r.s});
+    }
+    items.sort((a, b) => (inSit(a.s) ? 0 : 1) - (inSit(b.s) ? 0 : 1));
+    if (!items.length) return ''; n += items.length;
+    const short = k.replace('key.keyboard.', '');
+    const cat = CAT[short];
+    return `<div class="grp"><div class="gh" data-key="${esc(k)}" role="button" tabindex="0"><span class="kb" style="--kc:${BY[k].some(r => r.bundle) ? '#84cc16;color:#13200a' : 'var(--k-base)'}">${esc(k.startsWith('key.mouse.') ? keyName(k) : capLabel(short))}</span>${esc(keyName(k))}<small>${items.length}개</small></div>
+      <ul>${items.map(({r, nm, m, bundle, s: st}) => `<li${!inSit(st) ? ' style="opacity:.55"' : ''}><span>${effSit() === 'all' ? `<span class="chip sitc">${esc(sitName(st))}</span>` : ''}${bundle ? '<span class="chip">묶음</span>' : ''}${r.mod ? `<span class="chip">${MODNAME[r.mod]}</span>` : ''}${hl(nm, q)}${!bundle && EDIT_MODE && edOf(r) ? ' <span class="chip ed">수정됨</span>' : ''}</span><span>${hl(m, q)}</span></li>`).join('')}</ul></div>`;
+  }).join('');
+  document.getElementById('list').innerHTML = html || '<div class="empty">찾는 기능이 키에 묶여 있지 않습니다. 아래 「키가 비어 있는 기능」도 확인해 보세요.</div>';
+  document.getElementById('listH').textContent = q ? `검색 결과 ${n}개` : (false ? '' : `${SITNAME[SIT]} 목록 (기능 ${SITCOUNT[SIT]}개 — 여러 키에 있는 기능은 한 번만 셈${WITHBASE && SIT !== 'base' ? ', 흐린 줄 = 기본 조작' : ''})`);
+  const ub = unbound.filter(r => hit(r, q) && (inSit(r.s) || (r.bundle && r.bundle.some(b => inSit(b.s)))));
+  document.getElementById('unbS').textContent = `키가 비어 있는 기능 ${ub.length}개` + (q ? ' (검색 결과)' : '') + ' — 필요하면 옵션 → 조작에서 직접 정할 수 있습니다';
+  document.getElementById('unbL').innerHTML = ub.map(r => `<div data-id="${esc(r.id)}">${hl(r.n, q)} <small>· ${esc(r.m)}${IN_BUNDLE[r.id] ? ' · <b style="color:var(--brass)">' + esc(IN_BUNDLE[r.id]) + ' 키 묶음에서 사용</b>' : ''}</small>${EDIT_MODE && edOf(r) ? ' <span class="chip ed">수정됨</span>' : ''}</div>`).join('');
+  if (q && ub.length && !n) document.getElementById('unb').open = true;
+  // 키보드에서 검색과 맞는 키만 밝게
+  board.querySelectorAll('.k[data-key]').forEach(b => { const rs = BY[b.dataset.key] || []; b.classList.toggle('dim', !!q && !rs.some(r => hit(r, q))); });
+}
+document.getElementById('list').addEventListener('click', e => { const g = e.target.closest('.gh'); if (g) showKey(g.dataset.key, true); });
+document.getElementById('list').addEventListener('keydown', e => { const g = e.target.closest('.gh'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); showKey(g.dataset.key, true); } });
+document.getElementById('unbL').addEventListener('click', e => { const d = e.target.closest('[data-id]'); if (d && EDIT_MODE) showUnbound(d.dataset.id); });
+let UNB_SEL = null;   // 키 없는 기능 상세(리뷰: 저장 뒤 다시 그리려고 기억)
+function showUnbound(id){
+  const r = DATA.rows.find(x => x.id === id); if (!r) return;
+  SEL = null; UNB_SEL = id; board.querySelectorAll('.k.sel').forEach(b => b.classList.remove('sel'));
+  const el = document.getElementById('detail');
+  el.innerHTML = `<div class="hd"><b>키 없음</b><small>비어 있는 기능</small></div><div class="acts">${actHtml(r)}</div>`;
+  wireEditBox(el.querySelector('.act'), r);
+  el.scrollIntoView({block: 'nearest'});
+}
+
+// ---- 수치 수정 ------------------------------------------------------------------------------
+// 수정자 모드(검색 칸에 비밀 코드 -> 켜기/끄기)일 때만 수정 칸이 보임. 코드는 해시로만 비교(공백 제거·소문자).
+// 저장: 1순위 공유 저장소 db edits/<키 id> (편집 권한자), 2순위 이 브라우저(localStorage) + '수정 내용 복사'.
+const EDIT_CODE_SHA = 'dafe102170e9c727d0274ac92beae8c69dec0b4b926e6985f0d05c8829b55561';
+const MODE_KEY = 'keywiki.editMode', LS_KEY = 'keywiki.localEdits.v1';
+let EDIT_MODE = false;
+try { EDIT_MODE = localStorage.getItem(MODE_KEY) === '1'; } catch (e) {}
+const EDITS = {};   // 공유 저장소 값(LOCAL 이면 브라우저 값). 브라우저 사본은 localStorage 에만 두고 화면은 mergedEd 로 합쳐 보여 줌
+let EDB = null, CAN_EDIT = false, TRY_SHARED = false, NO_DB = false, EDIT_STATE = 'loading', LOCAL = false, EDIT_WHY = '';
+async function sha256hex(t){
+  try { const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t));
+    return Array.from(new Uint8Array(buf)).map(x => x.toString(16).padStart(2, '0')).join(''); } catch (e) { return ''; }
+}
+async function isEditCode(t){ t = t.trim().toLowerCase(); return t.length >= 8 && t.length <= 64 && (await sha256hex(t)) === EDIT_CODE_SHA; }
+function toast(msg, ms){
+  let el = document.getElementById('modeToast');
+  if (!el) { el = document.createElement('div'); el.id = 'modeToast'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
+  el.textContent = msg; el.classList.add('show'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), ms || 1800);
+}
+function setEditMode(on){
+  EDIT_MODE = on; try { localStorage.setItem(MODE_KEY, on ? '1' : '0'); } catch (e) {}
+  toast(on ? '수정자 모드' : '일반 모드'); rerender(true);
+}
+let LS_READ_OK = true;
+function lsRaw(){ try { const v = localStorage.getItem(LS_KEY); LS_READ_OK = true; return v ? JSON.parse(v) : {}; } catch (e) { LS_READ_OK = false; return {}; } }
+const TOMB_KEY = 'keywiki.delTomb.v1';
+const TOMB = (() => { try { return JSON.parse(sessionStorage.getItem(TOMB_KEY) || '{}') || {}; } catch (e) { return {}; } })();   // 세션 묘비 id -> 지운 사본 at
+function tombSave(){ try { sessionStorage.setItem(TOMB_KEY, JSON.stringify(TOMB)); } catch (e) {} }
+const SH_DEL = {};   // 공유 삭제 기록 id -> 기록 문서 {id, deleted:true, at, del_at0, del_shared_at} (마법 위키와 같은 형식)
+// 지운 사본 시각 이력: 삭제 기록·일반 문서의 del_prev·내 삭제를 볼 때마다 모음(기록이 새 저장으로 덮인 뒤에도 판정, 다음 삭제의 del_prev)
+const DEL_HIST = {};
+function addHist(id, r){ if (!r) return; const h = DEL_HIST[id] = DEL_HIST[id] || []; for (const t of [r.del_at0, r.del_shared_at].concat(Array.isArray(r.del_prev) ? r.del_prev : [])) if (typeof t === 'string' && h.indexOf(t) < 0) h.push(t); if (h.length > 40) h.splice(0, h.length - 40); }
+function histFor(id){ addHist(id, SH_DEL[id]); if (EDITS[id]) addHist(id, {del_prev: EDITS[id].del_prev}); return (DEL_HIST[id] || []).slice(-40); }
+function isTomb(id, l){
+  if (!l) return false;
+  if (TOMB[id] !== undefined && TOMB[id] === l.at) return true;   // 이 탭에서 지운 사본
+  if (l.at != null && DEL_HIST[id] && DEL_HIST[id].indexOf(l.at) >= 0) return true;   // 이 항목에서 지운 적 있는 사본 시각(기록이 덮여도 유지)
+  const r = SH_DEL[id]; if (!r) return false;
+  if ('id' in r || 'del_at0' in r || 'del_shared_at' in r || 'del_prev' in r) return l.at != null && (l.at === r.del_at0 || l.at === r.del_shared_at || (Array.isArray(r.del_prev) && r.del_prev.indexOf(l.at) >= 0));   // 지운 그 사본만(시계 차이 무관)
+  return isFinite(atMs(r.at)) && isFinite(atMs(l.at)) && !(atMs(l.at) > atMs(r.at));   // 옛 v65 기록(필드 없음): 삭제 시각 비교
+}
+// lsLoad = 살아 있는 브라우저 사본만(묘비에 진 사본은 뺌). 다음 lsSave 때 그 사본은 저장소에서도 빠짐
+function lsLoad(){ const o = lsRaw(); for (const id of Object.keys(o)) if (isTomb(id, o[id])) delete o[id];
+  if (LS_READ_OK) { let ch = false; for (const id of Object.keys(TOMB)) if (!lsRawHas(id, TOMB[id])) { delete TOMB[id]; ch = true; } if (ch) tombSave(); }   // 리뷰: 읽기 오류면 TOMB 유지
+  return o; }
+function lsRawHas(id, at){ const o = lsRaw(); return !!(o[id] && o[id].at === at); }
+function lsSave(o){ try { localStorage.setItem(LS_KEY, JSON.stringify(o)); return true; } catch (e) { return false; } }
+// 쓰기 거부 오류 코드(db.d.ts): 권한 없음은 따로 없고 invalid_argument 로 옴(실측). 나머지는 이 보기에서 db 를 못 쓰는 경우.
+const REFUSED_CODES = ['invalid_argument', 'not_granted', 'revoked', 'capability_disabled', 'capability_removed', 'transform_error'];
+// 늦게 성공한 공유 쓰기가 그 사이 새로 저장된 브라우저 사본까지 지우지 않게, 쓴 값과 같은 시각(at)의 사본만 지움
+// 반환: true = 지움 또는 지울 것 없음, false = 지우려 했지만 브라우저 저장소가 거부
+function lsDropIf(id, at){ const o = lsRaw(); if (id in o && (o[id] || {}).at === at) { delete o[id]; return lsSave(o); } return true; }
+// 모든 공유 쓰기의 단일 통로. 절대 던지지 않음. 성공 = true, 실패 = false.
+// 실패 사유: 거부 -> SW_ERR = '' / 그 밖의 오류(네트워크·시간 초과 등) -> SW_ERR = 이유. 20초 응답 없으면 시간 초과.
+let SW_ERR = '';
+const SW_CHAIN = {}, SW_PEND = {}, LAST_SH = {};   // LAST_SH: 쓰기 줄에서 마지막으로 공유에 쓴 일반 문서 at(삭제 기록이면 null). SW_PEND: 항목별 진행 중 쓰기 수(실시간 정리 건너뛰기). 항목별 쓰기 줄: 앞선 실제 쓰기가 끝나야(시간 초과 뒤라도) 다음 쓰기를 보냄
+// 시각 판정(11-16 총기 위키 v300 결함): Date.parse 는 '1'·'garbage 5'·숫자 5 도 날짜로 읽음 -> 이 위키가 직접 쓰는 형식(toISOString)만 시각으로 인정
+const ISO_AT = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d{1,3})?Z$/;
+const atMs = v => (typeof v === 'string' && ISO_AT.test(v)) ? Date.parse(v) : NaN;
+const newerLocal = (id, at) => { const l = lsLoad()[id]; if (!l) return false; const tl = atMs(l.at), td = atMs(at); return isFinite(tl) && isFinite(td) && tl > td; };
+const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rj) => setTimeout(() => rj({code: 'timeout', message: '응답 없음(' + Math.round(ms / 1000) + '초)'}), ms))]);
+// 반환: true = 공유 쓰기 성공, false = 거부(권한·데이터), 'timeout' = 실제 쓰기 20초 응답 없음(결과 모름), 'error' = 그 밖의 오류·앞 쓰기 대기 초과(보내지 않음).
+//       사유는 반환값으로만 판단(전역 SW_ERR 은 알림 문구용, await 뒤에 읽지 않음)
+//       'skip' = 차례가 왔을 때 skip() 이 참(더 새로운/다른 브라우저 사본) -> 보내지 않음
+async function sharedWrite(fn, id, verb, at, skip, kept = true){
+  const tail = verb === '삭제' ? ' — 공유 값은 그대로입니다' : kept ? ' — 이 브라우저에 보관됨' : ' — 이 브라우저에도 저장하지 못해 저장 안 됨';
+  const prev = SW_CHAIN[id] || Promise.resolve();
+  let release; const gate = new Promise(r => { release = r; });
+  SW_CHAIN[id] = prev.then(() => gate);
+  SW_PEND[id] = (SW_PEND[id] || 0) + 1; gate.then(() => { if (--SW_PEND[id] <= 0) delete SW_PEND[id]; });   // 줄이 풀릴 때(실제 쓰기 끝) 줄임
+  try { await withTimeout(prev, 20000); }
+  catch (e) {   // 앞 쓰기가 20초 넘게 안 끝남: 보내지 않음(늦게 도착해 덮일 수 있으므로). 줄 순서는 앞 쓰기가 끝날 때 풂
+    prev.then(release, release);
+    SW_ERR = '앞선 저장이 끝나지 않음(20초)';
+    toast('공유 ' + verb + ' 보류(' + SW_ERR + ')' + tail, 6000);
+    return 'error';
+  }
+  SW_ERR = '';
+  if (skip && skip()) { release(); return 'skip'; }
+  let op;
+  try { op = Promise.resolve(fn()); } catch (e) { op = Promise.reject(e); }
+  op.then(release, release);   // 줄은 실제 쓰기가 끝날 때 풂(20초 시간 초과로 먼저 돌아가도 늦은 도착이 다음 쓰기를 덮지 못하게)
+  try { await withTimeout(op, 20000); }
+  catch (e) {
+    if (e && REFUSED_CODES.indexOf(e.code) >= 0) {
+      if (CAN_EDIT) toast('공유 ' + verb + ' 실패(데이터 오류: ' + e.code + ')' + tail, 6000);
+      else {
+        TRY_SHARED = false;
+        toast('공유 저장소에 쓸 권한이 없습니다(위키 소유자 계정만 가능)' + tail, 6000);
+      }
+      return false;
+    }
+    SW_ERR = String((e && (e.code || e.message)) || e || '알 수 없는 오류');
+    const isTO = SW_ERR === 'timeout';
+    toast(isTO ? '공유 ' + verb + ' 응답 없음(20초) — 결과를 모릅니다. 늦게 처리될 수 있으니 잠시 뒤 새로고침해 확인해 주세요' + (verb === '삭제' ? '' : (kept ? '(이 브라우저에 보관됨)' : '')) : '공유 ' + verb + ' 실패(' + SW_ERR + ')' + tail, 6000);
+    return isTO ? 'timeout' : 'error';
+  }
+  if (!CAN_EDIT) { TRY_SHARED = false; CAN_EDIT = true; lsDropIf(id, at); rerender(); }   // 권한을 몰랐는데 써졌음 -> 편집자 확정
+  else lsDropIf(id, at);   // 공유 쓰기 성공 뒤에만, 쓴 값과 같은 시각의 브라우저 사본만 지움
+  return true;
+}
+// 반환: 'shared' = 공유 저장, 'local' = 처음부터 브라우저 저장, 'fallback' = 공유 실패로 브라우저 저장(토스트는 이미 띄움),
+//       'error-local'(del 만) = 공유 삭제가 오류로 실패해 아무것도 바꾸지 않음
+const STORE = {
+  async set(id, d){
+    d = JSON.parse(JSON.stringify(d));   // undefined 필드 제거
+    { const h = histFor(id); if (h.length) d.del_prev = h; }   // 일반 저장 문서에도 삭제 이력(게임 반영 때는 무시)
+    const o = lsLoad(); o[id] = d; const saved = lsSave(o);   // 먼저 이 브라우저에 기록(공유 쓰기가 실패·지연돼도 수정이 사라지지 않게)
+    if (UPLOADING) {   // 올리는 중: 버리지 않고 브라우저에 보관(올리기가 끝난 뒤 다시 '올리기')
+      if (!saved) throw {message: '공유 저장소로 올리는 중이고 이 브라우저에도 저장할 수 없습니다. 끝난 뒤 다시 저장해 주세요'};
+      if (LOCAL) EDITS[id] = d; rerender(); return 'uploading';
+    }
+    const tryShared = !LOCAL && (CAN_EDIT || TRY_SHARED);
+    if (!tryShared && !saved) throw {message: '이 브라우저에 저장할 수 없습니다'};
+    if (LOCAL) EDITS[id] = d;
+    let fb = false;
+    if (tryShared) {
+      let sent = d;   // 보낸 문서(쓰기 줄 안에서 그 순간의 삭제 이력을 실음)
+      const r = await sharedWrite(() => { const h = histFor(id); sent = h.length ? Object.assign({}, d, {del_prev: h}) : d; return EDB.collection('edits').doc(id).set(sent).then(x => { LAST_SH[id] = d.at; return x; }); }, id, '저장', d.at, () => newerLocal(id, d.at), saved);
+      if (r === true) { EDITS[id] = sent; rerender(); return 'shared'; }
+      if (r === 'skip') { rerender(); return 'superseded'; }   // 더 새로운 저장이 뒤에서 공유로 감
+      if (!saved) throw {message: r === 'timeout' ? '공유 저장 응답이 늦어 결과를 모르고, 이 브라우저에도 저장할 수 없습니다' : '공유 저장에 실패했고 이 브라우저에도 저장할 수 없습니다'};
+      fb = r === 'timeout' ? 'timeout' : true;
+    }
+    rerender();
+    return fb === 'timeout' ? 'fallback-timeout' : fb ? 'fallback' : 'local';
+  },
+  async del(id){
+    if (UPLOADING) throw {message: '공유 저장소로 올리는 중입니다. 끝난 뒤 다시 눌러 주세요'};
+    let fb = false;
+    // 같은 항목 저장이 진행 중이면 끝날 때까지(최대 10초) 기다린 뒤 '지울 것' 판단
+    if (SW_PEND[id]) { await Promise.race([SW_CHAIN[id], new Promise(r => setTimeout(r, 10000))]); await new Promise(r => setTimeout(r, 0)); }
+    const at0 = (lsLoad()[id] || {}).at;   // 삭제 시작 때의 브라우저 사본 시각: 그 사이 새로 저장된 사본은 지우지 않음
+    if (!LOCAL && (CAN_EDIT || TRY_SHARED) && (lsLoad()[id] || EDITS[id])) {   // 지울 것이 있을 때만 공유에 기록(리뷰 [2])
+      // 묘비: 지운 그 사본의 at(브라우저·공유)을 남김 -> 다른 탭·기기의 같은 사본은 올리기로 되살아나지 않고, 시계가 다른 기기의 새 수정은 숨기지 않음
+      const tomb = {id: (EDITS[id] || lsLoad()[id] || {}).id || id, deleted: true, at: new Date().toISOString(), del_at0: at0 == null ? null : at0, del_shared_at: null};   // del_at0 = 누른 순간 사본(고정)
+      const r = await sharedWrite(() => {   // 기록은 쓰기 줄 안 set 직전에 완성: 앞선 느린 쓰기(삭제·저장)의 결과까지 담김
+        tomb.del_shared_at = (id in LAST_SH ? LAST_SH[id] : (EDITS[id] && EDITS[id].at)) || null;   // 이 기록이 덮는 공유 값
+        histFor(id); tomb.del_prev = (DEL_HIST[id] || []).filter(t => t !== tomb.del_at0 && t !== tomb.del_shared_at).slice(-40);
+        return EDB.collection('edits').doc(id).set(tomb).then(() => { SH_DEL[id] = tomb; addHist(id, tomb); LAST_SH[id] = null; }); }, id, '삭제', at0);
+      if (r === true) {
+        delete EDITS[id]; SH_DEL[id] = tomb; addHist(id, tomb);
+        const l = lsRaw()[id], left = at0 !== undefined && l && l.at === at0;
+        if (left) { TOMB[id] = at0; tombSave(); }   // 올리기로 되살아나지 않게 숨김
+        rerender(); return left ? 'local-remains' : 'shared';
+      }
+      if (r === 'timeout') return 'error-timeout';   // 실제로 보냈지만 응답 없음: 결과 모름
+      if (r === 'error') return 'error-local';   // 오류로 실패: 공유·브라우저 상태 모두 그대로(시간 초과는 결과 모름)
+      if (CAN_EDIT) return 'error-local';   // 리뷰: 편집자인데 거부(데이터 오류) -> 권한 문제가 아님, 아무것도 바꾸지 않음
+      fb = true;
+    }
+    if (!lsDropIf(id, at0)) throw {message: '이 브라우저 저장소가 거부해 지우지 못했습니다'};   // 리뷰: 그 사이 다시 저장한 사본은 남김
+    if (LOCAL && !(id in lsLoad())) delete EDITS[id]; rerender();
+    if (!LOCAL && EDITS[id] && !EDITS[id].deleted) return at0 === undefined ? 'shared-kept' : 'shared-remains';   // 공유 값은 권한이 없어 남음(지운 브라우저 사본이 없었으면 shared-kept)
+    return fb ? 'fallback' : 'local';
+  }
+};
+// 같은 항목에 브라우저 수정과 공유 수정이 함께 있으면 저장 시각(at)이 더 새로운 쪽. 한쪽뿐이면 그쪽(로컬이 더 새로우면 숨기지 않음).
+function mergedEd(id){
+  const l = lsLoad()[id], sh = EDITS[id];
+  if (!l) return sh || null;
+  if (!sh) return l;
+  const tl = atMs(l.at), ts = atMs(sh.at);
+  return (isFinite(tl) && (!isFinite(ts) || tl > ts)) ? l : sh;
+}
+const localOnly = () => LOCAL || (!CAN_EDIT && !TRY_SHARED);
+const edOf = r => mergedEd(slug(r.id));
+// 이 브라우저에만 저장된 수정을 공유 저장소로 올림(편집자 확정일 때만). 공유 쪽이 더 새로우면 공유 값 유지.
+let UPLOADING = false;
+function uploadBtnHtml(){
+  if (!EDIT_MODE || LOCAL || !CAN_EDIT) return '';
+  const n = Object.keys(lsLoad()).filter(id => mergedEd(id)).length;
+  return n ? `<div class="ed-row"><button type="button" class="ed-btn edUp">이 브라우저에만 저장된 수정 ${n}건을 공유 저장소로 올리기</button><span class="ed-msg edUpMsg" role="status"></span></div>` : '';
+}
+function wireUpload(root){
+  const b = root.querySelector('.edUp'); if (!b) return;
+  const m = root.querySelector('.edUpMsg');
+  b.addEventListener('click', async () => {
+    if (UPLOADING) return;
+    UPLOADING = true; b.disabled = true;
+    const o = lsLoad(), ids = Object.keys(o); let up = 0, skip = 0, changed = 0, gone = 0, fail = '', stopped = false, stopWhy = '';
+    try {
+      for (const id of ids) {
+        m.textContent = '올리는 중… ' + (up + skip + changed + gone + 1) + '/' + ids.length;
+        const ref = EDB.collection('edits').doc(id), snap = await withTimeout(ref.get(), 20000), sh = snap.exists ? snap.data() : null;
+        const tl = atMs((o[id] || {}).at), ts = sh ? atMs(sh.at) : NaN;
+        const canon = v => { const y = Object.assign({}, v || {}); delete y.del_prev; return JSON.stringify(y, Object.keys(y).sort()); };   // 키 순서·del_prev 는 빼고 같은 값인지 비교
+        if (sh && canon(sh) === canon(o[id])) { lsDropIf(id, o[id].at); up++; continue; }
+        if (sh && sh.deleted) { SH_DEL[id] = sh; addHist(id, sh); } else if (sh && Array.isArray(sh.del_prev)) addHist(id, {del_prev: sh.del_prev});   // ① 읽은 최신 문서의 이력을 먼저 넣음
+        if (sh && isTomb(id, o[id])) { lsDropIf(id, o[id].at); gone++; continue; }   // 지운 그 사본은 정리, 별개 사본은 아래 시각 비교(더 새로우면 올림, 아니면 보존)   // 공유에서 지운 뒤의 옛 사본: 되살리지 않고 정리   // 이미 같은 값이 공유에 있음 -> 사본만 정리
+        if (sh && !(isFinite(tl) && isFinite(ts) && tl > ts)) { skip++; continue; }   // 공유가 더 새롭거나 어느 쪽 시각이든 모르면 덮지 않음 -> 공유 값 유지, 사본도 남김(11-16 몬스터 위키 리뷰 결함 2)
+        const r = await sharedWrite(() => { const h = histFor(id); const up = o[id]; return ref.set(h.length ? Object.assign({}, up, {del_prev: h}) : up).then(x => { LAST_SH[id] = up.at; return x; }); }, id, '저장', o[id].at, () => { const l = lsLoad()[id]; return !l || l.at !== o[id].at; });
+        if (r === 'skip') { changed++; continue; }   // 그 사이 지워졌거나 다시 저장됨 -> 보내지 않음(옛 값 되살림 방지)
+        if (r !== true) { stopped = true; stopWhy = r === 'timeout' ? '응답 없음 20초 — 결과 모름' : r === false ? '거부됨' : '오류'; break; }
+        up++;
+      }
+    } catch (err) { fail = ' 실패: ' + ((err && (err.code || err.message)) || err); }
+    UPLOADING = false;
+    toast('공유 저장소로 ' + up + '건 올림' + (skip ? ', 공유 쪽이 더 새롭거나 저장 시각을 알 수 없어 ' + skip + '건은 이 브라우저에 그대로 두었습니다' : '') + (changed ? ', 올리는 사이 다시 저장·삭제된 ' + changed + '건은 보내지 않았습니다' : '') + (gone ? ', 공유에서 이미 지운 ' + gone + '건은 올리지 않고 이 브라우저 사본을 정리했습니다' : '') + (stopped ? (stopWhy.indexOf('응답 없음') === 0 ? ', 공유 저장소 응답이 없어 나머지는 이 브라우저에 그대로 두었습니다' : ', 공유 저장에 실패해 나머지는 이 브라우저에 그대로 두었습니다') + (stopWhy ? '(' + stopWhy + ')' : '') : '') + fail, 5500);
+    if (fail || stopped) b.disabled = false;
+    rerender();
+  });
+}
+function localWhyHtml(){
+  if (LOCAL && NO_DB) return '이 화면에서는 공유 저장소를 쓸 수 없어(claude.ai 에 로그인하지 않았거나 이 보기에서 저장소가 열리지 않음) <b>이 브라우저에만</b> 저장됩니다. 위키 소유자 계정으로 claude.ai 에 로그인해 열면 공유 저장됩니다. 지금 저장한 것은 로그인 뒤 "공유 저장소로 올리기"로 옮기거나 <b>수정 내용 복사</b>로 채팅에 붙여 넣어 주세요.';
+  if (LOCAL) return `공유 저장소에 연결되지 않아(${esc(EDIT_WHY)}) <b>이 브라우저에만</b> 저장됩니다. 다 고친 뒤 <b>수정 내용 복사</b>를 눌러 채팅에 붙여 넣어 주세요.`;
+  return '이 계정에는 이 위키의 편집 권한이 없습니다(위키 소유자의 계정이어야 공유 저장소에 저장됩니다). 그래서 <b>이 브라우저에만</b> 저장됩니다. 다 고친 뒤 <b>수정 내용 복사</b>를 눌러 채팅에 붙여 넣어 주세요.';
+}
+function editsText(){
+  const rows = Object.entries(lsLoad()).filter(([id]) => mergedEd(id)).map(([, e]) => e).map(e => ({id: e.id, name: e.name, orig_key: e.orig_key, key: e.key, note: e.note}));
+  return '키 배치도 위키 수정 내용 ' + rows.length + '건\n' + JSON.stringify(rows);
+}
+async function copyEdits(btn){
+  const txt = editsText();
+  try { await navigator.clipboard.writeText(txt); btn.textContent = '복사됨 — 채팅에 붙여 넣어 주세요'; }
+  catch (e) { const ta = document.createElement('textarea'); ta.value = txt; ta.className = 'ed-copy'; ta.rows = 4; btn.after(ta); ta.select(); btn.textContent = '아래 글을 복사해 채팅에 붙여 넣어 주세요'; }
+}
+function editBoxHtml(r){
+  if (!EDIT_MODE) return '';
+  if (EDIT_STATE === 'loading' || EDIT_STATE === 'slow')
+    return `<div class="edit-box"><span class="ed-msg">${EDIT_STATE === 'slow' ? '저장소 연결이 늦어지고 있습니다. 잠시 뒤 새로고침해 주세요.' : '저장소 연결 중…'}</span></div>`;
+  const e = edOf(r) || {};
+  const nLocal = Object.keys(lsLoad()).filter(id => mergedEd(id)).length;
+  const foot = localOnly()
+    ? `<div class="ed-local">${localWhyHtml()}</div>`
+    : (TRY_SHARED && !CAN_EDIT
+      ? `<div class="note">이 계정의 편집 권한을 아직 모릅니다. 저장하면 먼저 공유 저장소에 써 보고, 거부되면 이 브라우저에 보관합니다.</div>`
+      : `<div class="note">빈칸 = 원래 키 그대로. 저장하면 공유 저장소에 저장되어 다른 기기·다른 브라우저에서도 보이고, Claude 가 이 값으로 기본 키(options.txt·키 프로필)를 고칩니다.</div>`);
+  return `<div class="edit-box"><div class="note">원래 키 · ${esc(comboName(r))}</div>
+    <div class="ed-row">
+      <label>바꿀 키 <input class="edKey" type="text" maxlength="40" value="${esc(e.key || '')}" placeholder="예: Ctrl+G, 없음"></label>
+      <label class="ed-note">메모 <input class="edNote" type="text" maxlength="300" value="${esc(e.note || '')}" placeholder="이유, 겹치는 키 등"></label>
+    </div>
+    <div class="ed-row">
+      <button type="button" class="ed-btn pri edSave">저장</button>
+      ${edOf(r) ? '<button type="button" class="ed-btn edDel">수정 취소(원래 키)</button>' : ''}
+      ${nLocal ? `<button type="button" class="ed-btn edCopy">수정 내용 복사 (${nLocal}건)</button>` : ''}
+      <span class="ed-msg${FAIL[r.id] ? ' ed-fail' : ''}" role="status">${FAIL[r.id] ? esc(FAIL[r.id].msg) : (OKMSG[r.id] && Date.now() - OKMSG[r.id].t < 8000 && OKMSG[r.id].at === (edOf(r) || {}).at) ? esc(OKMSG[r.id].msg) : ''}</span>
+    </div>${uploadBtnHtml()}${foot}</div>`;
+}
+// 항목별 실패 상태: {msg, kT, nT, key, note}. 다시 그려도 안내와 입력(손댄 칸만)을 되살림. 성공하면 지움
+const FAIL = {}, SEQ = {}, OKMSG = {};   // OKMSG: 성공 안내 {msg,t} 8초 동안 다시 그려도 보임
+function wireEditBox(root, r){
+  const save = root.querySelector('.edSave'); if (!save) return;
+  const msg = root.querySelector('.ed-msg');
+  const said = res => res === 'shared' ? '공유 저장소에 저장됨' : res === 'fallback' ? '이 브라우저에 저장됨(공유 저장 실패)' : res === 'fallback-timeout' ? '이 브라우저에 저장됨 — 공유 저장은 응답이 늦어 결과를 모릅니다(늦게 반영될 수 있음)' : res === 'error-local' ? '공유 삭제 실패 — 아무것도 바꾸지 않았습니다' : res === 'error-timeout' ? '공유 저장소 응답이 늦어 결과를 모릅니다 — 늦게 지워졌을 수 있으니 잠시 뒤 새로고침해 확인해 주세요' : res === 'uploading' ? '올리는 중이라 이 브라우저에 보관함 — 끝난 뒤 다시 올려 주세요' : res === 'superseded' ? '저장하지 않았습니다(더 새로운 수정이 있음) — 입력은 칸에 그대로 있습니다' : res === 'shared-remains' ? '이 브라우저 사본만 지움 — 공유 저장소 값은 편집 권한이 없어 남아 있습니다' : res === 'shared-kept' ? '되돌리지 못함 — 공유 저장소 값은 편집 권한이 없어 지울 수 없습니다(이 브라우저에는 지울 사본이 없었습니다)' : res === 'local-remains' ? '공유에서 지움 — 이 브라우저 사본은 저장소가 거부해 지우지 못했지만, 공유에 삭제 기록이 있어 화면·올리기에서는 빠집니다' : '이 브라우저에 저장됨';
+  const kIn = root.querySelector('.edKey'), nIn = root.querySelector('.edNote');
+  const touched = el => el.value !== el.defaultValue;
+  { const f = FAIL[r.id]; if (f) { if (f.kT) kIn.value = f.key; if (f.nT) nIn.value = f.note; } }   // 실패한 입력 되살림(보호 상태 유지)
+  if (FAIL[r.id] && FAIL[r.id].partial && (edOf(r) || {}).at !== FAIL[r.id].at) { delete FAIL[r.id]; msg.textContent = ''; msg.classList.remove('ed-fail'); }
+  const liveMsg = () => root.isConnected ? msg : document.querySelector(`.act[data-id="${CSS.escape(r.id)}"] .ed-msg`);
+  [kIn, nIn].forEach(el => el.addEventListener('input', () => {
+    delete OKMSG[r.id];
+    const f = FAIL[r.id]; if (!f) return;
+    f.kT = touched(kIn); f.nT = touched(nIn); f.key = kIn.value; f.note = nIn.value;
+    if (!f.kT && !f.nT) { delete FAIL[r.id]; const m = liveMsg(); if (m) { m.textContent = ''; m.classList.remove('ed-fail'); } }   // 리뷰: 입력을 원래대로 되돌리면 실패 표시도 지움
+  }));
+  // 결과 안내: 항목 이름을 붙여 저장한 항목의 칸에만. 그 칸이 지금 화면에 없으면(다른 키로 옮김) 알림으로
+  const label = text => r.n + ': ' + text;
+  const report = (text, fail) => {
+    const m = liveMsg();
+    if (!fail && text.slice(-1) !== '…') OKMSG[r.id] = {msg: label(text), t: Date.now(), at: (edOf(r) || {}).at}; else delete OKMSG[r.id];
+    if (m) { m.textContent = label(text); m.classList.toggle('ed-fail', !!fail); }
+    else toast(label(text), fail ? 8000 : 3000);
+  };
+  const failed = (text, partial) => {
+    const f = FAIL[r.id] = {msg: label(text), kT: touched(kIn), nT: touched(nIn), key: kIn.value, note: nIn.value, partial: !!partial, at: (edOf(r) || {}).at};
+    if (!root.isConnected) {   // 저장 중 다시 그려져 같은 항목 칸이 새로 생겼으면, 손대지 않은 그 칸에 입력을 되살림
+      const a = document.querySelector(`.act[data-id="${CSS.escape(r.id)}"]`), k2 = a && a.querySelector('.edKey'), n2 = a && a.querySelector('.edNote');
+      if (k2 && f.kT && k2.value === k2.defaultValue) k2.value = f.key;
+      if (n2 && f.nT && n2.value === n2.defaultValue) n2.value = f.note;
+    }
+    report(text, true);
+  };
+  save.addEventListener('click', async () => {
+    // 손대지 않은 칸은 지금 최신 값(다른 탭에서 바뀌었을 수 있음)을 씀
+    const cur = edOf(r) || {};
+    const kT = touched(kIn), nT = touched(nIn), kV = kIn.value, nV = nIn.value;   // 누른 순간의 값(저장 중 새로 친 글과 구분)
+    if (!kT && !nT) { delete FAIL[r.id]; report('바꾼 내용이 없습니다'); return; }   // 리뷰: 두 칸 다 안 건드림 -> 저장·삭제하지 않음(남은 실패 표시도 지움)
+    const my = SEQ[r.id] = (SEQ[r.id] || 0) + 1;   // 시도 번호: 더 나중 시도가 시작됐으면 이 결과로 실패 표시를 바꾸지 않음
+    const key = kT ? kV.trim() : (cur.key || '');
+    const note = nT ? nV.trim() : (cur.note || '');
+    save.disabled = true; report('저장 중…');
+    SAVING++;
+    let res = null, err = null;
+    const isDel = !key && !note;   // 두 칸 다 비움 = 원래 값으로 되돌림(삭제 경로)
+    try {
+      if (isDel) res = await STORE.del(slug(r.id));
+      else {
+        const d = {kind: 'keybind', id: r.id, name: r.n, mod: r.m, orig_key: comboName(r), orig_raw: r.key + (r.mod ? ':' + r.mod : ''), at: new Date().toISOString()};
+        if (key) d.key = key; if (note) d.note = note;
+        res = await STORE.set(slug(r.id), d);
+      }
+    } catch (e) { err = e; }
+    finally {
+      SAVING--;
+      const latest = SEQ[r.id] === my;
+      const partial = res === 'shared-remains' || res === 'local-remains' || res === 'shared-kept';   // 빈칸 저장(=취소)이 일부만 됨
+      const ok = !err && !partial && res !== 'error-local' && res !== 'error-timeout' && res !== 'superseded';   // 장신구 v31: superseded = 이 값은 버려짐 -> 저장 안 됨
+      if (ok) {   // 성공한 뒤, 저장한 그 값만 '저장한 값'(저장 중 새로 친 글은 계속 보호). 저장 중 새로 생긴 같은 항목 칸에도(리뷰 3)
+        const a = root.isConnected ? null : document.querySelector(`.act[data-id="${CSS.escape(r.id)}"]`);
+        const k2 = a && a.querySelector('.edKey'), n2 = a && a.querySelector('.edNote');
+        if (kT) { kIn.defaultValue = kV; if (k2) k2.defaultValue = kV.trim(); }
+        if (nT) { nIn.defaultValue = nV; if (n2) n2.defaultValue = nV.trim(); }
+        if (latest) delete FAIL[r.id];
+      } else if (latest) {
+        if (partial) { kIn.value = kIn.defaultValue; nIn.value = nIn.defaultValue; }
+        failed(err ? '저장 안 됨: ' + ((err.code || err.message) || err) + ' — 입력은 칸에 그대로 있습니다. 다시 눌러 주세요.' : (isDel && res === 'error-local' ? '저장 안 됨: ' : '') + said(res), partial);
+      } else if (!ok) toast(label('앞선 저장이 반영되지 않았습니다(' + (err ? (err.code || err.message || err) : said(res)) + ') — 더 나중에 누른 저장·취소가 처리됩니다'), 8000);   // [C] 옛 시도 실패도 알림
+      save.disabled = false;
+      flushDeferred(true);   // 사용자 동작: 다른 칸에 저장 안 한 입력이 없으면 바로 반영
+      if (ok && latest) report(isDel ? (res === 'shared' ? '원래 키로 되돌림(공유 저장소에서도)' : '원래 키로 되돌림') : said(res));
+    }
+  });
+  const del = root.querySelector('.edDel');
+  if (del) del.addEventListener('click', async () => {
+    del.disabled = true; report('되돌리는 중…');
+    const kV0 = kIn.value, nV0 = nIn.value;   // 누른 순간 값: 그 뒤 새로 친 칸은 완료 때 되돌리지 않음
+    const my = SEQ[r.id] = (SEQ[r.id] || 0) + 1;
+    SAVING++;
+    let res = null, err = null;
+    try { res = await STORE.del(slug(r.id)); } catch (e) { err = e; }
+    finally {
+      SAVING--;
+      const latest = SEQ[r.id] === my;
+      const partial = res === 'shared-remains' || res === 'local-remains' || res === 'shared-kept';
+      const ok = !err && res !== 'error-local' && res !== 'error-timeout';
+      if (ok && latest) { if (kIn.value === kV0) kIn.value = kIn.defaultValue; if (nIn.value === nV0) nIn.value = nIn.defaultValue; }   // 취소(일부라도) = 이 칸 입력 버림. 그 사이 새 저장이 시작됐으면 그 입력은 건드리지 않음
+      if (latest) {
+        if (ok && !partial) delete FAIL[r.id];
+        else failed(err ? '되돌리지 못함: ' + ((err.code || err.message) || err) + ' — 아무것도 바꾸지 않았습니다' : said(res), partial);   // 일부만 됨도 다시 그려도 남게
+      } else if (!ok || partial) toast(label('앞선 취소가 다 반영되지 않았습니다(' + (err ? (err.code || err.message || err) : said(res)) + ')'), 8000);
+      del.disabled = false;
+      flushDeferred(true);
+      if (ok && !partial && latest) report('원래 키로 되돌림');
+    }
+  });
+  const cp = root.querySelector('.edCopy'); if (cp) cp.addEventListener('click', () => copyEdits(cp));
+  wireUpload(root);
+}
+// 저장 안 한 입력이 있는 수정 칸이 있는지(값 ≠ 처음 값). 11-16: 사용자 동작이 아닌 모든 다시 그리기는 이것이 참이면 미룸
+let SAVING = 0;   // 저장·취소가 끝나기 전에는 다시 그리지 않음
+let PTR = false;   // 수정 칸 안에서 누르는 중
+document.addEventListener('pointerdown', e => { if (e.target.closest && e.target.closest('.edit-box')) PTR = true; }, true);
+let PTR_T = 0;
+const ptrEnd = () => { if (!PTR) return; clearTimeout(PTR_T); setTimeout(() => { PTR = false; flushDeferred(); }, 0); };   // click 뒤에 풂
+document.addEventListener('pointerdown', e => { if (PTR) { clearTimeout(PTR_T); PTR_T = setTimeout(ptrEnd, 3000); } }, true);   // 놓는 이벤트가 안 와도 3초 뒤 풂
+['pointerup', 'pointercancel', 'contextmenu', 'dragend'].forEach(t => document.addEventListener(t, ptrEnd, true));
+window.addEventListener('blur', ptrEnd); document.addEventListener('visibilitychange', ptrEnd);
+const editDirty = () => SAVING > 0 || PTR ||
+  (() => { const a = document.activeElement; return !!(a && a.tagName === 'INPUT' && a.closest && a.closest('.edit-box')); })() ||
+  [...document.querySelectorAll('.edit-box input.edKey, .edit-box input.edNote')].some(i => i.value !== i.defaultValue || (i.validity && i.validity.badInput));
+let RERENDER_DEFERRED = false;
+// force = 사용자가 직접 한 화면 전환(수정자 모드·상황 탭)만. 저장·삭제·올리기 완료, onSnapshot, 다른 탭, 로컬 전환, 대기 타이머는 force 없이 부름
+function rerender(force){
+  const typing = editDirty();
+  const bar = document.getElementById('edBar');
+  const n = new Set([...Object.keys(EDITS), ...Object.keys(lsLoad())].filter(id => mergedEd(id))).size;
+  bar.hidden = !EDIT_MODE;
+  if (EDIT_MODE) bar.textContent = `수정자 모드 · 수정된 키 ${n}건 · 저장 위치: ${EDIT_STATE === 'loading' ? '연결 중' : LOCAL ? '이 브라우저(공유 저장소 없음)' : CAN_EDIT ? '공유 저장소' : TRY_SHARED ? '공유 저장소(권한 확인 전)' : '이 브라우저(편집 권한 없음)'} · 키를 고르면 기능마다 수정 칸이 나옵니다. 키가 비어 있는 기능은 아래 목록에서 눌러 고칩니다.`;
+  renderList();
+  if (!force && typing) { RERENDER_DEFERRED = true; return; }   // 입력 보호: 저장·취소 뒤나 입력을 되돌리면 반영
+  RERENDER_DEFERRED = false;
+  if (SEL) showKey(SEL, false);
+  else if (UNB_SEL && EDIT_MODE) showUnbound(UNB_SEL);
+}
+// 미뤄 둔 다시 그리기: 입력이 처음 값으로 돌아가거나 칸을 떠날 때 저장 안 한 입력이 없으면 반영
+// user = 사용자가 방금 저장·취소함: 미뤄 둔 것이 없어도 그 결과를 바로 그림(다른 칸에 저장 안 한 입력이 있으면 그때는 계속 미룸)
+const flushDeferred = user => { if ((RERENDER_DEFERRED || user) && !editDirty()) rerender(); else if (user) RERENDER_DEFERRED = true; };
+document.addEventListener('input', e => { if (e.target.closest && e.target.closest('.edit-box')) flushDeferred(); });
+document.addEventListener('focusout', e => {
+  const from = e.target && e.target.closest && e.target.closest('.edit-box'), to = e.relatedTarget;
+  if (from && to && from.contains(to)) return;   // 같은 수정 칸 안(저장·취소 버튼 등)으로 옮김: 그 동작이 끝날 때 반영
+  setTimeout(() => flushDeferred(), 0);
+});
+function goLocal(why){
+  LOCAL = true; TRY_SHARED = false; EDIT_STATE = 'local'; EDIT_WHY = why;
+  for (const k of Object.keys(EDITS)) delete EDITS[k]; Object.assign(EDITS, lsLoad());
+  rerender();
+}
+async function initEdits(){
+  try {
+    if (!(window.claude && window.claude.use)) { goLocal('claude.ai 뷰어 밖에서 열림'); return; }
+    const db = await window.claude.use('db');
+    if (!db) { NO_DB = true; goLocal('저장소 기능 없음'); return; }   // null = 로그아웃이거나 이 보기에서 db 가 안 열림
+    EDB = db;
+    const user = await window.claude.use('user');
+    let ce = false, ow = false, dw = null;
+    if (user) { try { ce = !!(await user.canEdit()); } catch (e) {} try { ow = !!(await user.isOwner()); } catch (e) {} try { dw = await user.can('data.write'); } catch (e) {} }
+    CAN_EDIT = ce || ow;   // 확인된 편집자만. can('data.write') 는 루트(interact) 수준이라 edits(admin)와 다름
+    TRY_SHARED = !CAN_EDIT && dw !== false;   // 모름·interact -> 저장 때 한 번 시도, 거부되면 브라우저 보관
+    const timer = setTimeout(() => { if (EDIT_STATE === 'loading') { EDIT_STATE = 'slow'; rerender(); } }, 10000);
+    db.collection('edits').onSnapshot(snap => {
+      clearTimeout(timer);
+      for (const k of Object.keys(EDITS)) delete EDITS[k];
+      for (const k of Object.keys(SH_DEL)) delete SH_DEL[k];
+      for (const k of Object.keys(LAST_SH)) if (!SW_PEND[k]) delete LAST_SH[k];   // 진행 중 쓰기가 없으면 확정 공유 값(EDITS)이 기준
+      snap.docs.forEach(d => { const v = d.data(); if (!v) return; if (v.deleted) { SH_DEL[d.id] = v; addHist(d.id, v); } else { EDITS[d.id] = v; if (Array.isArray(v.del_prev)) addHist(d.id, {del_prev: v.del_prev}); } });   // deleted:true = 공유 삭제 기록(묘비)
+      if (!(snap.metadata && snap.metadata.hasPendingWrites)) { const raw = lsRaw(); if (LS_READ_OK) { const dead = Object.keys(raw).filter(id => !SW_PEND[id] && isTomb(id, raw[id])); if (dead.length) { dead.forEach(id => delete raw[id]); lsSave(raw); } } }   // 지운 그 사본(정확 일치)만 저장소에서 정리
+      EDIT_STATE = 'ready'; rerender();
+    }, e => { clearTimeout(timer); goLocal('저장소 읽기 실패' + (e && e.code ? ': ' + e.code : '')); });
+    rerender();
+  } catch (e) { goLocal('저장소 연결 실패'); }
+}
+
+// 다른 탭에서 이 브라우저 사본이 바뀌면 화면에 반영(11-16 몬스터 위키 리뷰 덧붙임)
+addEventListener('storage', e => { if (e.key === LS_KEY || e.key === null) rerender(); });
+const qi = document.getElementById('q');
+qi.addEventListener('input', async () => {
+  const raw = qi.value;
+  if (raw.trim().length >= 8 && await isEditCode(raw)) { qi.value = ''; if (QALL) { QALL = false; drawBoard(); } setEditMode(!EDIT_MODE); return; }
+  const was = QALL; QALL = !!norm(qi.value);
+  if (was !== QALL) { drawBoard(); if (SEL) { if (editDirty()) { RERENDER_DEFERRED = true; const b = document.querySelector(`.k[data-key="${CSS.escape(SEL)}"], .mb[data-key="${CSS.escape(SEL)}"]`); if (b) b.classList.add('sel'); } else showKey(SEL, false); } }
+  renderList();
+});
+document.getElementById('sits').addEventListener('click', e => { const b = e.target.closest('[data-sit]'); if (b) setSit(b.dataset.sit); });
+const wb = document.getElementById('withBase'); wb.checked = WITHBASE;
+wb.addEventListener('change', () => { WITHBASE = wb.checked; try { localStorage.setItem('keywiki.withBase', WITHBASE ? '1' : '0'); } catch (e) {} setSit(SIT, true); });
+const fromHash = () => { const h = location.hash.slice(1); return h.startsWith('sit-') ? h.slice(4) : 'base'; };
+window.addEventListener('hashchange', () => setSit(fromHash(), true));
+renderSits();
+setSit(fromHash(), true);
+document.getElementById('homeFab').addEventListener('click', () => {
+  const q = document.getElementById('q'); if (q.value) { q.value = ''; q.dispatchEvent(new Event('input')); }
+  setSit('base');
+  window.scrollTo({top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+});
+showKey('key.keyboard.r', false);
+initEdits();
+</script>
+
+</body></html>

@@ -1,0 +1,62 @@
+{
+ "meta": {
+  "name": "meta_site.json",
+  "size": 1519597
+ },
+ "kb": {
+  "name": "kb_site.json",
+  "size": 1793066
+ },
+ "kbvec": {
+  "name": "kb_vectors.txt",
+  "size": 2003968,
+  "scale": 695.3570556640625,
+  "rows": 3914
+ },
+ "recipe": {
+  "name": "recipe_site.json",
+  "size": 159062
+ },
+ "tokenizer": {
+  "name": "tokenizer.json",
+  "size": 1469800
+ },
+ "vectors": {
+  "name": "vectors.txt",
+  "size": 2849280,
+  "dim": 384,
+  "scale": 735.4151000976562,
+  "rows": 5565
+ },
+ "model": {
+  "parts": [
+   "model_00.txt",
+   "model_01.txt",
+   "model_02.txt",
+   "model_03.txt"
+  ],
+  "partSizes": [
+   12000000,
+   12000000,
+   12000000,
+   11645304
+  ],
+  "size": 47645304,
+  "rawSize": 35733977
+ },
+ "wasm": {
+  "name": "ort-wasm-simd-threaded.wasm",
+  "size": 11246032
+ },
+ "ortjs": {
+  "name": "ort.wasm.min.mjs",
+  "size": 48904
+ },
+ "ortmjs": {
+  "name": "ort-wasm-simd-threaded.mjs",
+  "size": 24618
+ },
+ "ver": "d73741b5",
+ "progressTotal": 65214384,
+ "firstSearchTotal": 68600569
+}
