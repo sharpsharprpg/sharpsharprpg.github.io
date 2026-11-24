@@ -703,7 +703,7 @@ backdrop.addEventListener('click', closeSide);
    수정자 모드(검색 칸에 비밀 코드 -> 켜기/끄기)일 때만 수정 칸·수정 표시가 보임. 코드는 SHA-256 해시로만 비교(원문은 어디에도 없음).
    저장: 1순위 공유 저장소 db edits/<아이템 id> (확인된 편집자), 2순위 이 브라우저(localStorage) + "수정 내용 복사" 로 채팅에 붙여 넣기.
    참고 구현: 마법 위키 TACZ_project/spell_wiki/patch_editmode_20261111.py, 냉병기 위키 melee_wiki/template_app.js */
-const EDIT_CODE_SHA = 'dafe102170e9c727d0274ac92beae8c69dec0b4b926e6985f0d05c8829b55561';   // 대소문자 무관: 공백 제거 후 소문자로 바꿔 비교(2026-11-11)
+const EDIT_CODE_SHA = '05bff14780d8b1f19bf0aec20d800f179dbbd3ea1c91d034a0056733e267b906';   // 대소문자 무관: 공백 제거 후 소문자로 바꿔 비교(2026-11-11)
 const MODE_KEY = 'armory_manifest.editMode', LS_KEY = 'armory_manifest_edits_v1';
 let EDIT_MODE = false;
 try { EDIT_MODE = localStorage.getItem(MODE_KEY) === '1'; } catch (e) {}

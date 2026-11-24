@@ -812,7 +812,7 @@ function dimName(id){ return ({'minecraft:overworld':'오버월드','minecraft:t
 const ED_FIELDS = [['hp','체력',1],['armor','방어력',0.5],['tough','방어 강도',0.5],['dmgMul','공격 배수',0.1]];
 let EDB = null, CAN_EDIT = false, EDIT_STATE = 'loading', LOCAL = false, EDIT_WHY = '', NO_DB = false, TRY_SHARED = false, SHARED_OK = false, LAST_LOCAL_WHY = '', LOCAL_REASON = '';
 const LS_KEY = 'field_bestiary_edits_v1', MODE_KEY = 'field_bestiary_edit_mode';
-const EDIT_CODE_SHA = 'dafe102170e9c727d0274ac92beae8c69dec0b4b926e6985f0d05c8829b55561';   // 대소문자 무시(소문자로 바꿔 비교)
+const EDIT_CODE_SHA = '05bff14780d8b1f19bf0aec20d800f179dbbd3ea1c91d034a0056733e267b906';   // 대소문자 무시(소문자로 바꿔 비교)
 let EDIT_MODE = false;
 try{ EDIT_MODE = localStorage.getItem(MODE_KEY) === '1'; }catch(e){}
 if(document.body) document.body.classList.toggle('editmode', EDIT_MODE); else document.addEventListener('DOMContentLoaded', ()=> document.body.classList.toggle('editmode', EDIT_MODE));

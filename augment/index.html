@@ -302,7 +302,7 @@ let NO_DB = false, UPLOADING = false, SW_ERR = '', SW_UNKNOWN = false, EDIT_STAT
 // 수정자 모드: 검색 칸에 비밀 코드(해시로만 비교)를 넣으면 켜고/끔. 일반 모드에선 수정 칸·수정 표시·문구 편집 버튼을 아예 숨김.
 // 2026-11-14 사용자 지시: 증강 위키는 다른 위키와 별도의 코드(원문은 어디에도 쓰지 않음). 입력은 앞뒤 공백 제거 + 소문자로 바꾼 뒤 비교
 // 2026-11-15 사용자 답: 공통 수정자 코드도 받음(전역 CLAUDE.md 해시). 증강 위키 전용 코드(11-14)도 계속 받음
-const EDIT_CODE_SHAS = ['aa895dfd415d13f697aa7b499fdb956c8f931fbd2ad94cf9da8e13cc8cf419d1', 'dafe102170e9c727d0274ac92beae8c69dec0b4b926e6985f0d05c8829b55561'];
+const EDIT_CODE_SHAS = ['aa895dfd415d13f697aa7b499fdb956c8f931fbd2ad94cf9da8e13cc8cf419d1', '05bff14780d8b1f19bf0aec20d800f179dbbd3ea1c91d034a0056733e267b906'];
 const MODE_KEY = 'sharpsharp_augment_wiki_editmode';
 let EDIT_MODE = false;
 try { EDIT_MODE = localStorage.getItem(MODE_KEY) === '1'; } catch (e) {}

@@ -1401,7 +1401,7 @@ document.addEventListener('change', e => {
 });
 
 // ---------- 수치 수정 · 수정자 모드 (마법 위키 v73 방식) ----------
-const EDIT_CODE_SHA = 'dafe102170e9c727d0274ac92beae8c69dec0b4b926e6985f0d05c8829b55561';   // 수정자 코드: 앞뒤 공백 제거 + 소문자로 바꾼 값의 SHA-256 (코드 원문은 어디에도 쓰지 않음)
+const EDIT_CODE_SHA = '05bff14780d8b1f19bf0aec20d800f179dbbd3ea1c91d034a0056733e267b906';   // 수정자 코드: 앞뒤 공백 제거 + 소문자로 바꾼 값의 SHA-256 (코드 원문은 어디에도 쓰지 않음)
 const MODE_KEY = 'calcwiki.editMode', LS_KEY = 'calcwiki.localEdits.v1';
 let EDIT_MODE = false;
 try { EDIT_MODE = localStorage.getItem(MODE_KEY) === '1'; } catch (e) {}

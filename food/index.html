@@ -886,7 +886,7 @@ sideBackdrop.addEventListener('click', closeSide);
 const EDITS = {};
 let EDB = null, CAN_EDIT = false, EDIT_STATE = 'loading', LOCAL = false, EDIT_WHY = '', NO_DB = false, TRY_SHARED = false;
 const SHARED = {};   // 공유 저장소에서 읽은 문서(원래 id 기준). EDITS = SHARED + (편집자가 아니면) 이 브라우저의 수정
-const EDIT_CODE_SHA = 'dafe102170e9c727d0274ac92beae8c69dec0b4b926e6985f0d05c8829b55561';   // 앞뒤 공백 제거 + 소문자 후 SHA-256 (대소문자 관계없음, 2026-11-11)
+const EDIT_CODE_SHA = '05bff14780d8b1f19bf0aec20d800f179dbbd3ea1c91d034a0056733e267b906';   // 앞뒤 공백 제거 + 소문자 후 SHA-256 (대소문자 관계없음, 2026-11-11)
 const MODE_KEY = 'provisions_manifest.editMode';
 let EDIT_MODE = false;
 try{ EDIT_MODE = localStorage.getItem(MODE_KEY) === '1'; }catch(e){}

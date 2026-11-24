@@ -507,7 +507,7 @@ document.addEventListener('touchstart', e => { const el = e.target.closest('.cel
    수정자 모드일 때만 수정 칸·수정 표시가 보임. 코드는 SHA-256 해시로만 비교(원문은 어디에도 없음, 공백 제거 + 소문자).
    저장: 확인된 편집자 = 공유 저장소 db edits/<아이템 id>, 아니면 이 브라우저(localStorage) + "수정 내용 복사".
    문서: {id, name, group, item, at, orig_names:[…], extra:[더할 모루 이름…], note}. 인형은 능력치가 없어 고칠 값 = 이름. */
-const EDIT_CODE_SHA = 'dafe102170e9c727d0274ac92beae8c69dec0b4b926e6985f0d05c8829b55561';
+const EDIT_CODE_SHA = '05bff14780d8b1f19bf0aec20d800f179dbbd3ea1c91d034a0056733e267b906';
 const MODE_KEY = 'plush_shelf.editMode', LS_KEY = 'plush_shelf_edits_v1';
 let EDIT_MODE = false;
 try { EDIT_MODE = localStorage.getItem(MODE_KEY) === '1'; } catch (e) {}

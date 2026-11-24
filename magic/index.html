@@ -1360,7 +1360,7 @@ document.getElementById('sideBackdrop').addEventListener('click', () => { docume
 // ---- 수치 수정 -----------------------------------------------------------------------------------
 // 수정자 모드(검색 칸에 비밀 코드 -> 켜기/끄기)일 때만 수정 칸이 보임. 코드는 해시로만 비교.
 // 저장: 1순위 공유 저장소 db edits/<주문 slug> (편집 권한자), 2순위 이 브라우저(localStorage) + '수정 내용 복사'.
-const EDIT_CODE_SHA = 'dafe102170e9c727d0274ac92beae8c69dec0b4b926e6985f0d05c8829b55561';   // 수정자 코드: 앞뒤 공백 제거 + 소문자로 바꾼 값의 SHA-256 (11-11 사용자: 대소문자 관계없이)
+const EDIT_CODE_SHA = '05bff14780d8b1f19bf0aec20d800f179dbbd3ea1c91d034a0056733e267b906';   // 수정자 코드: 앞뒤 공백 제거 + 소문자로 바꾼 값의 SHA-256 (11-11 사용자: 대소문자 관계없이)
 const MODE_KEY = 'spellwiki.editMode', LS_KEY = 'spellwiki.localEdits.v1';
 let EDIT_MODE = false;
 try { EDIT_MODE = localStorage.getItem(MODE_KEY) === '1'; } catch (e) {}
